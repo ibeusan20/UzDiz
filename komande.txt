@@ -1,0 +1,5 @@
+10. Otvori se terminal se te postavi na direktorij {vjezba}. U terminalu se upiše komanda koja kompilira Vjezba_01.java datoteka i stvara .class datoteku:
+
+javac -d ./target/classes ./src/main/java/Vjezba_01.java
+
+java -cp ./target/classes Vjezba_01 Pero Ivo Mato Goga Una Vika
