@@ -12,7 +12,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import edu.unizg.foi.nwtis.konfiguracije.Konfiguracija;
 import edu.unizg.foi.nwtis.konfiguracije.KonfiguracijaApstraktna;
 import edu.unizg.foi.nwtis.konfiguracije.NeispravnaKonfiguracija;
@@ -82,25 +83,29 @@ public class PosluziteljTvrtka {
 	}
 
 	public Boolean obradiKraj(Socket mreznaUticnica) {
-		try {
-			BufferedReader in = new BufferedReader(new InputStreamReader(mreznaUticnica.getInputStream(), "utf8"));
-			PrintWriter out = new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"));
-			String linija = in.readLine();
-			mreznaUticnica.shutdownInput();
-			if (linija.trim().equals("KRAJ " + this.kodZaKraj)) {
-				out.write("OK\n");
-				this.kraj.set(true);
-			} else {
-				out.write("ERROR 10\n");
-			}
+	    try {
+	        BufferedReader in = new BufferedReader(new InputStreamReader(mreznaUticnica.getInputStream(), "utf8"));
+	        PrintWriter out = new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"));
+	        String linija = in.readLine();
+	        mreznaUticnica.shutdownInput();
 
-			out.flush();
-			mreznaUticnica.shutdownOutput();
-			mreznaUticnica.close();
-		} catch (Exception e) {
+	        String regex = "^KRAJ\\s+" + Pattern.quote(this.kodZaKraj) + "$";
+	        Pattern pattern = Pattern.compile(regex);
+	        Matcher matcher = pattern.matcher(linija.trim());
 
-		}
-		return Boolean.TRUE;
+	        if (matcher.matches()) {
+	            out.write("OK\n");
+	            this.kraj.set(true);
+	        } else {
+	            out.write("ERROR 10\n");
+	        }
+
+	        out.flush();
+	        mreznaUticnica.shutdownOutput();
+	        mreznaUticnica.close();
+	    } catch (Exception e) {
+	    }
+	    return Boolean.TRUE;
 	}
 
 	/**
