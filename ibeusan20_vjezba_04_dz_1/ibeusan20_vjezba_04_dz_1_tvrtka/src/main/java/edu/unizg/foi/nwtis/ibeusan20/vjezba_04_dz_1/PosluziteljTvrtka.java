@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
@@ -115,31 +116,55 @@ public class PosluziteljTvrtka {
 		}
 	}
 
+	/**
+	 * Obradi kraj
+	 * Čita dolazne poruke. Koristi regex za provjeru forme komande KRAJ i gleda IP adresu.
+	 * Zatvara izlaz, u slučaju bilo kakve greške, pošalje grešku.
+	 * U krajnjem slučaju ignorira.
+	 *
+	 * @param mreznaUticnica the mrezna uticnica
+	 * @return the boolean
+	 */
 	public Boolean obradiKraj(Socket mreznaUticnica) {
 	    try {
-	        BufferedReader in = new BufferedReader(new InputStreamReader(mreznaUticnica.getInputStream(), "utf8"));
-	        PrintWriter out = new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"));
-	        String linija = in.readLine();
+	        BufferedReader ulaz = new BufferedReader(new InputStreamReader(mreznaUticnica.getInputStream(), "utf8"));
+	        PrintWriter izlaz = new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"));
+	        String linija = ulaz.readLine();
 	        mreznaUticnica.shutdownInput();
 
-	        String regex = "^KRAJ\\s+" + Pattern.quote(this.kodZaKraj) + "$";
-	        Pattern pattern = Pattern.compile(regex);
-	        Matcher matcher = pattern.matcher(linija.trim());
+	        String izraz = "^KRAJ\\s+" + Pattern.quote(this.kodZaKraj) + "$";
+	        Pattern uzorak = Pattern.compile(izraz);
+	        Matcher podudaranje = uzorak.matcher(linija.trim());
 
-	        if (matcher.matches()) {
-	            out.write("OK\n");
-	            this.kraj.set(true);
+	        if (!podudaranje.matches()) {
+	            izlaz.write("ERROR 10\n");
 	        } else {
-	            out.write("ERROR 10\n");
+	            InetAddress adresa = mreznaUticnica.getInetAddress();
+	            if (!adresa.isLoopbackAddress() && !adresa.isAnyLocalAddress() && !adresa.isSiteLocalAddress()) {
+	                izlaz.write("ERROR 11\n");
+	            } else {
+	                this.kraj.set(true);
+	                izlaz.write("OK\n");
+	            }
 	        }
 
-	        out.flush();
+	        izlaz.flush();
 	        mreznaUticnica.shutdownOutput();
 	        mreznaUticnica.close();
+
 	    } catch (Exception e) {
+	        try {
+	            PrintWriter izlaz = new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"));
+	            izlaz.write("ERROR 19\n");
+	            izlaz.flush();
+	            mreznaUticnica.shutdownOutput();
+	            mreznaUticnica.close();
+	        } catch (IOException ex) {
+	        }
 	    }
 	    return Boolean.TRUE;
 	}
+
 
 	/**
 	 * Ucitaj konfiguraciju.
@@ -157,6 +182,9 @@ public class PosluziteljTvrtka {
 		return false;
 	}
 	
+	/**
+	 * Ucitaj jelovnike po putanji iz konfiguracijske datoteke.
+	 */
 	public void ucitajJelovnike() {
 	    var gson = new com.google.gson.Gson();
 	    for (Object kljucObj : this.konfig.dajSvePostavke().keySet()) {
@@ -183,6 +211,9 @@ public class PosluziteljTvrtka {
 	    }
 	}
 	
+	/**
+	 * Ucitaj kartu pica po putanji iz konfiguracijske datoteke.
+	 */
 	public void ucitajKartuPica() {
 	    var gson = new com.google.gson.Gson();
 	    var datoteka = this.konfig.dajPostavku("datotekaKartaPica");
@@ -196,6 +227,9 @@ public class PosluziteljTvrtka {
 	    }
 	}
 	
+	/**
+	 * Ucitaj partnere po putanji iz konfiguracijske datoteke.
+	 */
 	public void ucitajPartnere() {
 	    var gson = new com.google.gson.Gson();
 	    var datoteka = this.konfig.dajPostavku("datotekaPartnera");
