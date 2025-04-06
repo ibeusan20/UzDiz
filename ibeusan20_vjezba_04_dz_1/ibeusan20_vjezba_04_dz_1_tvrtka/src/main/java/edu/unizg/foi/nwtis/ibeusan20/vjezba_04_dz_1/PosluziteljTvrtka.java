@@ -7,6 +7,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -17,6 +19,9 @@ import java.util.regex.Pattern;
 import edu.unizg.foi.nwtis.konfiguracije.Konfiguracija;
 import edu.unizg.foi.nwtis.konfiguracije.KonfiguracijaApstraktna;
 import edu.unizg.foi.nwtis.konfiguracije.NeispravnaKonfiguracija;
+import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.Jelovnik;
+import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.KartaPica;
+import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.Partner;
 
 public class PosluziteljTvrtka {
 
@@ -34,6 +39,12 @@ public class PosluziteljTvrtka {
 
 	/** Zastavica za kraj rada */
 	private AtomicBoolean kraj = new AtomicBoolean(false);
+	
+	/** Thread-safe kolekcije */
+    private Map<Integer, String> kuhinje = new ConcurrentHashMap<>();
+    private Map<String, Map<String, Jelovnik>> jelovnici = new ConcurrentHashMap<>();
+    private Map<String, KartaPica> kartaPica = new ConcurrentHashMap<>();
+    private Map<Integer, Partner> partneri = new ConcurrentHashMap<>();
 
 	public static void main(String[] args) {
 		if (args.length != 1) {
