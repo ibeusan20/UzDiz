@@ -65,6 +65,28 @@ public class PosluziteljTvrtka {
 		this.kodZaKraj = this.konfig.dajPostavku("kodZaKraj");
 		this.pauzaDretve = Integer.parseInt(this.konfig.dajPostavku("pauzaDretve"));
 
+		this.ucitajJelovnike();
+		this.ucitajKartuPica();
+		this.ucitajPartnere();
+		
+		//privremeno
+		System.out.println("Učitane kuhinje: " + kuhinje);
+		System.out.println("Učitani jelovnici: " + jelovnici.keySet());
+		for (var oznaka : jelovnici.keySet()) {
+		    System.out.println("Jelovnik za " + oznaka + ": " + jelovnici.get(oznaka).keySet());
+		}
+		System.out.println("Učitana karta pića: " + kartaPica.keySet());
+		for (var id : kartaPica.keySet()) {
+		    var p = kartaPica.get(id);
+		    System.out.println(id + ": " + p.naziv() + ", " + p.kolicina() + "L, " + p.cijena() + "€");
+		}
+		System.out.println("Učitani partneri: " + partneri.keySet());
+		for (var id : partneri.keySet()) {
+		    var p = partneri.get(id);
+		    System.out.println(id + ": " + p.naziv() + ", " + p.vrstaKuhinje() + ", " + p.adresa());
+		}
+		//privremeno
+		
 		var builder = Thread.ofVirtual();
 		var factory = builder.factory();
 		this.executor = Executors.newThreadPerTaskExecutor(factory);
@@ -134,4 +156,64 @@ public class PosluziteljTvrtka {
 		}
 		return false;
 	}
+	
+	public void ucitajJelovnike() {
+	    var gson = new com.google.gson.Gson();
+	    for (Object kljucObj : this.konfig.dajSvePostavke().keySet()) {
+	        String kljuc = (String) kljucObj;
+	        if (kljuc.startsWith("kuhinja_")) {
+	            var vrijednost = this.konfig.dajPostavku(kljuc);
+	            var dijelovi = vrijednost.split(";");
+	            if (dijelovi.length != 2) continue;
+
+	            int broj = Integer.parseInt(kljuc.split("_")[1]);
+	            String oznaka = dijelovi[0];
+	            this.kuhinje.put(broj, oznaka);
+
+	            var datoteka = kljuc + ".json";
+	            try (var r = new java.io.FileReader(datoteka)) {
+	                var lista = java.util.Arrays.asList(gson.fromJson(r, Jelovnik[].class));
+	                var mapa = new java.util.concurrent.ConcurrentHashMap<String, Jelovnik>();
+	                for (var j : lista) mapa.put(j.id(), j);
+	                this.jelovnici.put(oznaka, mapa);
+	            } catch (Exception e) {
+	                System.err.println("Greška kod učitavanja: " + datoteka);
+	            }
+	        }
+	    }
+	}
+	
+	public void ucitajKartuPica() {
+	    var gson = new com.google.gson.Gson();
+	    var datoteka = this.konfig.dajPostavku("datotekaKartaPica");
+	    try (var r = new java.io.FileReader(datoteka)) {
+	        var lista = java.util.Arrays.asList(gson.fromJson(r, KartaPica[].class));
+	        for (var pice : lista) {
+	            this.kartaPica.put(pice.id(), pice);
+	        }
+	    } catch (Exception e) {
+	        System.err.println("Greška kod učitavanja karte pića: " + e.getMessage());
+	    }
+	}
+	
+	public void ucitajPartnere() {
+	    var gson = new com.google.gson.Gson();
+	    var datoteka = this.konfig.dajPostavku("datotekaPartnera");
+	    var f = new java.io.File(datoteka);
+	    if (!f.exists()) {
+	        System.out.println("Datoteka partnera ne postoji: " + datoteka);
+	        return;
+	    }
+	    try (var r = new java.io.FileReader(f)) {
+	        var lista = java.util.Arrays.asList(gson.fromJson(r, Partner[].class));
+	        for (var p : lista) {
+	            this.partneri.put(p.id(), p);
+	        }
+	    } catch (Exception e) {
+	        System.err.println("Greška kod učitavanja partnera: " + e.getMessage());
+	    }
+	}
+
+
+
 }
