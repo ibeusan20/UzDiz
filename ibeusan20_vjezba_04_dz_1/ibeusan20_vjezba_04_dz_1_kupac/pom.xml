@@ -5,9 +5,8 @@
     <artifactId>ibeusan20_vjezba_04_dz_1</artifactId>
     <version>1.0.0</version>
   </parent>
-  <artifactId>ibeusan20_vjezba_04_dz_1_tvrtka</artifactId>
-  <name>ibeusan20_vjezba_04_dz_1_tvrtka</name>
-  
+  <artifactId>ibeusan20_vjezba_04_dz_1_kupac</artifactId>
+  <name>ibeusan20_vjezba_04_dz_1_kupac</name>
   <properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>23</java.version>
@@ -116,7 +115,7 @@
 					<archive>
 						<manifest>
 							<mainClass>
-								edu.unizg.foi.nwtis.ibeusan20.vjezba_04_dz_1.PosluziteljTvrtka</mainClass>
+								edu.unizg.foi.nwtis.ibeusan20.vjezba_04_dz_1.KorisnikKupac</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -131,7 +130,7 @@
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>libs/</classpathPrefix>
 							<mainClass>
-								edu.unizg.foi.nwtis.ibeusan20.vjezba_04_dz_1.PosluziteljTvrtka</mainClass>
+								edu.unizg.foi.nwtis.ibeusan20.vjezba_04_dz_1.KorisnikKupac</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

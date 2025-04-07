@@ -82,5 +82,7 @@
 		<module>ibeusan20_vjezba_04_dz_1_lib</module>
 		<module>ibeusan20_vjezba_04_dz_1_podaci</module>
 		<module>ibeusan20_vjezba_04_dz_1_tvrtka</module>
+		<module>ibeusan20_vjezba_04_dz_1_partner</module>
+		<module>ibeusan20_vjezba_04_dz_1_kupac</module>
 	</modules>
 </project>
