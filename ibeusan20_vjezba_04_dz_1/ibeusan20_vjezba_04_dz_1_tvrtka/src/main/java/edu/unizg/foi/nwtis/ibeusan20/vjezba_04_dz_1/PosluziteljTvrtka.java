@@ -10,6 +10,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,11 +24,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import edu.unizg.foi.nwtis.konfiguracije.Konfiguracija;
 import edu.unizg.foi.nwtis.konfiguracije.KonfiguracijaApstraktna;
 import edu.unizg.foi.nwtis.konfiguracije.NeispravnaKonfiguracija;
 import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.Jelovnik;
 import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.KartaPica;
+import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.Obracun;
 import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.Partner;
 
 public class PosluziteljTvrtka {
@@ -96,6 +100,7 @@ public class PosluziteljTvrtka {
 
     var dretvaZaKraj = this.executor.submit(() -> this.pokreniPosluziteljKraj());
     var dretvaRegistracija = this.executor.submit(() -> this.pokreniPosluziteljRegistracija());
+    var dretvaRadPartnera = this.executor.submit(() -> this.pokreniPosluziteljRad());
 
     while (!dretvaZaKraj.isDone()) {
       try {
@@ -333,9 +338,25 @@ public class PosluziteljTvrtka {
       System.err.println("Greška pri spremanju partnera: " + e.getMessage());
     }
   }
+  
+  public void pokreniPosluziteljRad() {
+    var mreznaVrata = Integer.parseInt(this.konfig.dajPostavku("mreznaVrataRad"));
+    var brojCekaca = Integer.parseInt(this.konfig.dajPostavku("brojCekaca"));
+
+    try (ServerSocket ss = new ServerSocket(mreznaVrata, brojCekaca)) {
+      while (!this.kraj.get()) {
+        var uticnica = ss.accept();
+        this.executor.submit(() -> this.obradiRadPartnera(uticnica));
+      }
+    } catch (IOException e) {
+      System.err.println("Greška u Poslužitelju za rad s partnerima: " + e.getMessage());
+    }
+  }
+
 
   /**
-   * Obradi registraciju.
+   * Obradi registraciju. Obarada komandi je u zasebnim metodama obradiKomanduPopis, obradiObrisiKomandu,
+   * i obradiPartnerKomandu.
    *
    * @param uticnica je parametar
    */
@@ -372,7 +393,7 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Obradi komandu popis.
+   * Obradi komandu popis. Provjera za obradiRegistraciju.
    *
    * @param izlaz je ispis
    */
@@ -387,7 +408,7 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Obradi obrisi komandu.
+   * Obradi obrisi komandu. Provjera za obradiRegistraciju.
    *
    * @param izlaz je ispis
    * @param komanda je parametar
@@ -415,10 +436,10 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Obradi partner komandu.
+   * Obradi partner komandu. Provjera za obradiRegistraciju.
    *
    * @param izlaz je ispis
-   * @param komanda je parametars
+   * @param komanda je parametar
    */
   private void obradiPartnerKomandu(PrintWriter izlaz, String komanda) {
     String regex =
@@ -426,6 +447,7 @@ public class PosluziteljTvrtka {
     var matcher = Pattern.compile(regex).matcher(komanda);
     if (!matcher.matches()) {
       izlaz.write("ERROR 20 - Format komande nije ispravan\n");
+      return;
     } else {
       int id = Integer.parseInt(matcher.group(1));
       String naziv = matcher.group(2);
@@ -446,4 +468,163 @@ public class PosluziteljTvrtka {
       }
     }
   }
+  
+  private final Object lokotObracuna = new Object();
+  
+  public void obradiRadPartnera(Socket uticnica) {
+    try (var ulaz = new BufferedReader(new InputStreamReader(uticnica.getInputStream(), "utf8"));
+         var izlaz = new PrintWriter(new OutputStreamWriter(uticnica.getOutputStream(), "utf8"))) {
+
+      var linija = ulaz.readLine();
+      var komanda = linija.trim();
+      System.out.println("Primljena komanda: " + komanda);
+
+      if (komanda.startsWith("JELOVNIK")) {
+        obradiJelovnikKomandu(izlaz, komanda);
+      } else if (komanda.startsWith("KARTAPIĆA")) {
+        obradiKartaPicaKomandu(izlaz, komanda);
+      } else if (komanda.startsWith("OBRAČUN")) {
+        obradiObracunKomandu(ulaz, izlaz, komanda);
+      } else {
+        izlaz.write("ERROR 30 - Format komande nije ispravan\n");
+      }
+      izlaz.flush();
+      uticnica.shutdownOutput();
+      uticnica.close();
+    } catch (IOException e) {
+      System.err.println("Greška u obradi partnera: " + e.getMessage());
+    }
+  }
+
+  private void obradiObracunKomandu(BufferedReader ulaz, PrintWriter izlaz, String komanda) {
+    var matcher = Pattern.compile("^OBRAČUN\\s+(\\d+)\\s+(\\S+)$").matcher(komanda);
+    if (!matcher.matches()) {
+      izlaz.write("ERROR 30 - Format komande nije ispravan\n");
+      return;
+    }
+
+    int id = Integer.parseInt(matcher.group(1));
+    String kod = matcher.group(2);
+
+    var partner = this.partneri.get(id);
+    if (partner == null || !partner.sigurnosniKod().equals(kod)) {
+      izlaz.write("ERROR 31 - Ne postoji partner s id u kolekciji partnera i/ili neispravan sigurnosni kod partnera\n");
+      return;
+    }
+
+    try {
+      StringBuilder json = new StringBuilder();
+      String linijaJson;
+      while ((linijaJson = ulaz.readLine()) != null) {
+        json.append(linijaJson).append("\n");
+        if (linijaJson.trim().endsWith("]")) break;
+      }
+
+      Gson gson = new Gson();
+      Obracun[] novi = gson.fromJson(json.toString(), Obracun[].class);
+
+      var jelovnik = this.jelovnici.get(partner.vrstaKuhinje());
+      for (var o : novi) {
+        if (o.jelo()) {
+          if (jelovnik == null || !jelovnik.containsKey(o.id())) {
+            izlaz.write("ERROR 35 - Neispravan obračun\n");
+            return;
+          }
+        } else {
+          if (!this.kartaPica.containsKey(o.id())) {
+            izlaz.write("ERROR 35 - Neispravan obračun\n");
+            return;
+          }
+        }
+      }
+
+      odradiLokotObracuna(gson, novi);
+      izlaz.write("OK\n");
+
+    } catch (JsonSyntaxException e) {
+      izlaz.write("ERROR 35 - Neispravan obračun\n");
+    } catch (Exception e) {
+      izlaz.write("ERROR 39 - Nešto drugo nije u redu\n");
+    }
+  }
+
+  private void odradiLokotObracuna(Gson gson, Obracun[] novi) throws IOException {
+    synchronized (lokotObracuna) {
+      String nazivDatoteke = this.konfig.dajPostavku("datotekaObracuna");
+      Path datoteka = Path.of(nazivDatoteke);
+
+      Obracun[] postojeci = new Obracun[0];
+      if (Files.exists(datoteka) && Files.size(datoteka) > 0) {
+        try (var reader = Files.newBufferedReader(datoteka)) {
+          postojeci = gson.fromJson(reader, Obracun[].class);
+        }
+      }
+
+      List<Obracun> svi = new ArrayList<>();
+      if (postojeci != null) svi.addAll(List.of(postojeci));
+      svi.addAll(List.of(novi));
+
+      try (var writer = Files.newBufferedWriter(datoteka)) {
+        gson.toJson(svi, writer);
+      }
+    }
+  }
+
+  private void obradiKartaPicaKomandu(PrintWriter izlaz, String komanda) {
+    var matcher = Pattern.compile("^KARTAPIĆA\\s+(\\d+)\\s+(\\S+)$").matcher(komanda);
+    if (!matcher.matches()) {
+      izlaz.write("ERROR 30 - Format komande nije ispravan\n");
+      return;
+    } else {
+      int id = Integer.parseInt(matcher.group(1));
+      String kod = matcher.group(2);
+
+      var partner = this.partneri.get(id);
+      if (partner == null || !partner.sigurnosniKod().equals(kod)) {
+        izlaz.write("ERROR 31 - Ne postoji partner s id u kolekciji partnera i/ili neispravan sigurnosni kod partnera\n");
+        return;
+      } else {
+        try {
+          izlaz.write("OK\n");
+          Gson gson = new Gson();
+          izlaz.write(gson.toJson(this.kartaPica.values()) + "\n");
+        } catch (Exception e) {
+          izlaz.write("ERROR 34 - Neispravna karta pića\n");
+        }
+      }
+    }
+  }
+
+  private void obradiJelovnikKomandu(PrintWriter izlaz, String komanda) {
+    var matcher = Pattern.compile("^JELOVNIK\\s+(\\d+)\\s+(\\S+)$").matcher(komanda);
+    if (!matcher.matches()) {
+      izlaz.write("ERROR 30 - Format komande nije ispravan\n");
+      return;
+    } else {
+      int id = Integer.parseInt(matcher.group(1));
+      String kod = matcher.group(2);
+
+      var partner = this.partneri.get(id);
+      if (partner == null || !partner.sigurnosniKod().equals(kod)) {
+        izlaz.write("ERROR 31 - Ne postoji partner s id u kolekciji partnera i/ili neispravan sigurnosni kod partnera\n");
+        return;
+      } else {
+        var jelovnik = this.jelovnici.get(partner.vrstaKuhinje());
+        if (jelovnik == null) {
+          izlaz.write("ERROR 32 - Ne postoji jelovnik s vrstom kuhinje koju partner ima ugovorenu\n");
+          return;
+        } else {
+          try {
+            izlaz.write("OK\n");
+            Gson gson = new Gson();
+            izlaz.write(gson.toJson(jelovnik.values()) + "\n");
+          } catch (Exception e) {
+            izlaz.write("ERROR 33 - Neispravan jelovnik\n");
+          }
+        }
+      }
+    }
+  }
+
+  
 }
