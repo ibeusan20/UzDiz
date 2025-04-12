@@ -39,8 +39,8 @@ public non-sealed class KonfiguracijaTxt extends KonfiguracijaApstraktna {
       throw new NeispravnaKonfiguracija(
           "Datoteka: " + datotekaNaziv + " nije datoteka/ne može se u nju pisati");
     }
-    try {
-      this.postavke.store(Files.newOutputStream(datoteka), KonfiguracijaApstraktna.verzija);
+    try (var writer = new java.io.OutputStreamWriter(Files.newOutputStream(datoteka), "utf8")) {
+      this.postavke.store(writer, KonfiguracijaApstraktna.verzija);
     } catch (IOException ex) {
       throw new NeispravnaKonfiguracija(
           "Problem kod spremanja u datoteku: '" + nazivDatoteke + "'.");
@@ -64,8 +64,8 @@ public non-sealed class KonfiguracijaTxt extends KonfiguracijaApstraktna {
       throw new NeispravnaKonfiguracija(
           "Datoteka: " + this.nazivDatoteke + " nije ispravnog tipa/ne postoji/ne može se učitati");
     }
-    try {
-      this.postavke.load(Files.newInputStream(datoteka));
+    try (var reader = new java.io.InputStreamReader(Files.newInputStream(datoteka), "utf8")) {
+      this.postavke.load(reader);
     } catch (IOException ex) {
       throw new NeispravnaKonfiguracija(
           "Problem kod učitavanja datoteke: '" + this.nazivDatoteke + "'.");
