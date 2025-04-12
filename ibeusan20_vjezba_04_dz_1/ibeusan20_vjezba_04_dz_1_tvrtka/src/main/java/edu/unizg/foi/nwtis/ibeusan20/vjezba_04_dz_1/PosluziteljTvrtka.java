@@ -17,6 +17,7 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,6 +41,14 @@ public class PosluziteljTvrtka {
 
   /** Pokretač dretvi */
   private ExecutorService executor = null;
+
+  /** Lista aktivnih dretvi. */
+  private final List<Future<?>> aktivneDretve = new ArrayList<>();
+
+  /** Future objekti za dretve */
+  private Future<?> dretvaZaKraj;
+  private Future<?> dretvaRegistracija;
+  private Future<?> dretvaRadPartnera;
 
   /** Pauza dretve. */
   private int pauzaDretve = 1000;
@@ -98,15 +107,26 @@ public class PosluziteljTvrtka {
     var factory = builder.factory();
     this.executor = Executors.newThreadPerTaskExecutor(factory);
 
-    var dretvaZaKraj = this.executor.submit(() -> this.pokreniPosluziteljKraj());
-    var dretvaRegistracija = this.executor.submit(() -> this.pokreniPosluziteljRegistracija());
-    var dretvaRadPartnera = this.executor.submit(() -> this.pokreniPosluziteljRad());
+    this.dretvaZaKraj = this.executor.submit(() -> this.pokreniPosluziteljKraj());
+    this.dretvaRegistracija = this.executor.submit(() -> this.pokreniPosluziteljRegistracija());
+    this.dretvaRadPartnera = this.executor.submit(() -> this.pokreniPosluziteljRad());
 
     while (!dretvaZaKraj.isDone()) {
       try {
         Thread.sleep(this.pauzaDretve);
       } catch (InterruptedException e) {
       }
+    }
+    if (this.kraj.get()) {
+      for (Future<?> dretva : this.aktivneDretve) {
+        if (!dretva.isDone()) {
+          dretva.cancel(true);
+        }
+      }
+      if (!dretvaRegistracija.isDone())
+        dretvaRegistracija.cancel(true);
+      if (!dretvaRadPartnera.isDone())
+        dretvaRadPartnera.cancel(true);
     }
   }
 
@@ -303,16 +323,17 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Pokreni posluzitelj registracija.
+   * Pokreni posluzitelja za registraciju.
    */
   public void pokreniPosluziteljRegistracija() {
     var mreznaVrata = Integer.parseInt(this.konfig.dajPostavku("mreznaVrataRegistracija"));
     var brojCekaca = Integer.parseInt(this.konfig.dajPostavku("brojCekaca"));
-    
+
     try (ServerSocket ss = new ServerSocket(mreznaVrata, brojCekaca)) {
       while (!this.kraj.get()) {
         var uticnica = ss.accept();
-        this.executor.submit(() -> obradiRegistraciju(uticnica));
+        var dretva = this.executor.submit(() -> obradiRegistraciju(uticnica));
+        this.aktivneDretve.add(dretva);
       }
     } catch (IOException e) {
       System.err.println("Greška u poslužitelju za registraciju: " + e.getMessage());
@@ -338,7 +359,10 @@ public class PosluziteljTvrtka {
       System.err.println("Greška pri spremanju partnera: " + e.getMessage());
     }
   }
-  
+
+  /**
+   * Pokreni posluzitelja za rad s partnerima.
+   */
   public void pokreniPosluziteljRad() {
     var mreznaVrata = Integer.parseInt(this.konfig.dajPostavku("mreznaVrataRad"));
     var brojCekaca = Integer.parseInt(this.konfig.dajPostavku("brojCekaca"));
@@ -346,7 +370,8 @@ public class PosluziteljTvrtka {
     try (ServerSocket ss = new ServerSocket(mreznaVrata, brojCekaca)) {
       while (!this.kraj.get()) {
         var uticnica = ss.accept();
-        this.executor.submit(() -> this.obradiRadPartnera(uticnica));
+        var dretva = this.executor.submit(() -> this.obradiRadPartnera(uticnica));
+        this.aktivneDretve.add(dretva);
       }
     } catch (IOException e) {
       System.err.println("Greška u Poslužitelju za rad s partnerima: " + e.getMessage());
@@ -355,8 +380,8 @@ public class PosluziteljTvrtka {
 
 
   /**
-   * Obradi registraciju. Obarada komandi je u zasebnim metodama obradiKomanduPopis, obradiObrisiKomandu,
-   * i obradiPartnerKomandu.
+   * Obradi registraciju. Obarada komandi je u zasebnim metodama obradiKomanduPopis,
+   * obradiObrisiKomandu, i obradiPartnerKomandu.
    *
    * @param uticnica je parametar
    */
@@ -400,10 +425,11 @@ public class PosluziteljTvrtka {
   private void obradiKomanduPopis(PrintWriter izlaz) {
     izlaz.write("OK\n");
     Gson gson = new Gson();
-    var popis = this.partneri.values().stream()
-        .map(p -> new edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.PartnerPopis(p.id(), p.naziv(),
-            p.vrstaKuhinje(), p.adresa(), p.mreznaVrata(), p.gpsSirina(), p.gpsDuzina()))
-        .toList();
+    var popis =
+        this.partneri.values().stream()
+            .map(p -> new edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.PartnerPopis(p.id(), p.naziv(),
+                p.vrstaKuhinje(), p.adresa(), p.mreznaVrata(), p.gpsSirina(), p.gpsDuzina()))
+            .toList();
     izlaz.write(gson.toJson(popis) + "\n");
   }
 
@@ -468,20 +494,19 @@ public class PosluziteljTvrtka {
       }
     }
   }
-  
+
   /** Objekt obracuna. */
   private final Object lokotObracuna = new Object();
-  
+
   /**
-   * Obrada rada partnera.
-   * Provjere komandi partnera su u obradiObracunKomandu, obradiKartaPicaKomandu
-   * i u obradiJelovnikKomandu.
+   * Obrada rada partnera. Provjere komandi partnera su u obradiObracunKomandu,
+   * obradiKartaPicaKomandu i u obradiJelovnikKomandu.
    *
    * @param uticnica je parametar
    */
   public void obradiRadPartnera(Socket uticnica) {
     try (var ulaz = new BufferedReader(new InputStreamReader(uticnica.getInputStream(), "utf8"));
-         var izlaz = new PrintWriter(new OutputStreamWriter(uticnica.getOutputStream(), "utf8"))) {
+        var izlaz = new PrintWriter(new OutputStreamWriter(uticnica.getOutputStream(), "utf8"))) {
 
       var linija = ulaz.readLine();
       var komanda = linija.trim();
@@ -522,7 +547,8 @@ public class PosluziteljTvrtka {
 
     var partner = this.partneri.get(id);
     if (partner == null || !partner.sigurnosniKod().equals(kod)) {
-      izlaz.write("ERROR 31 - Ne postoji partner s id u kolekciji partnera i/ili neispravan sigurnosni kod partnera\n");
+      izlaz.write(
+          "ERROR 31 - Ne postoji partner s id u kolekciji partnera i/ili neispravan sigurnosni kod partnera\n");
       return;
     }
 
@@ -531,7 +557,8 @@ public class PosluziteljTvrtka {
       String linijaJson;
       while ((linijaJson = ulaz.readLine()) != null) {
         json.append(linijaJson).append("\n");
-        if (linijaJson.trim().endsWith("]")) break;
+        if (linijaJson.trim().endsWith("]"))
+          break;
       }
       Gson gson = new Gson();
       Obracun[] novi = gson.fromJson(json.toString(), Obracun[].class);
@@ -579,7 +606,8 @@ public class PosluziteljTvrtka {
       }
 
       List<Obracun> svi = new ArrayList<>();
-      if (postojeci != null) svi.addAll(List.of(postojeci));
+      if (postojeci != null)
+        svi.addAll(List.of(postojeci));
       svi.addAll(List.of(novi));
 
       try (var writer = Files.newBufferedWriter(datoteka)) {
@@ -605,7 +633,8 @@ public class PosluziteljTvrtka {
 
       var partner = this.partneri.get(id);
       if (partner == null || !partner.sigurnosniKod().equals(kod)) {
-        izlaz.write("ERROR 31 - Ne postoji partner s id u kolekciji partnera i/ili neispravan sigurnosni kod partnera\n");
+        izlaz.write(
+            "ERROR 31 - Ne postoji partner s id u kolekciji partnera i/ili neispravan sigurnosni kod partnera\n");
         return;
       } else {
         try {
@@ -636,12 +665,14 @@ public class PosluziteljTvrtka {
 
       var partner = this.partneri.get(id);
       if (partner == null || !partner.sigurnosniKod().equals(kod)) {
-        izlaz.write("ERROR 31 - Ne postoji partner s id u kolekciji partnera i/ili neispravan sigurnosni kod partnera\n");
+        izlaz.write(
+            "ERROR 31 - Ne postoji partner s id u kolekciji partnera i/ili neispravan sigurnosni kod partnera\n");
         return;
       } else {
         var jelovnik = this.jelovnici.get(partner.vrstaKuhinje());
         if (jelovnik == null) {
-          izlaz.write("ERROR 32 - Ne postoji jelovnik s vrstom kuhinje koju partner ima ugovorenu\n");
+          izlaz.write(
+              "ERROR 32 - Ne postoji jelovnik s vrstom kuhinje koju partner ima ugovorenu\n");
           return;
         } else {
           try {
