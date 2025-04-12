@@ -168,12 +168,12 @@ public class PosluziteljTvrtka {
       Matcher podudaranje = uzorak.matcher(linija.trim());
 
       if (!podudaranje.matches()) {
-        izlaz.write("ERROR 10\n");
+        izlaz.write("ERROR 10 - Format komande nije ispravan ili nije ispravan kod za kraj\n");
       } else {
         InetAddress adresa = mreznaUticnica.getInetAddress();
         if (!adresa.isLoopbackAddress() && !adresa.isAnyLocalAddress()
             && !adresa.isSiteLocalAddress()) {
-          izlaz.write("ERROR 11\n");
+          izlaz.write("ERROR 11 - Adresa računala s kojeg je poslan zahtjev nije lokalna adresa\n");
         } else {
           this.kraj.set(true);
           izlaz.write("OK\n");
@@ -186,7 +186,7 @@ public class PosluziteljTvrtka {
       try {
         PrintWriter izlaz =
             new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"));
-        izlaz.write("ERROR 19\n");
+        izlaz.write("ERROR 19 - Nešto drugo nije u redu.\n");
         izlaz.flush();
         mreznaUticnica.shutdownOutput();
         mreznaUticnica.close();
@@ -336,7 +336,7 @@ public class PosluziteljTvrtka {
         this.aktivneDretve.add(dretva);
       }
     } catch (IOException e) {
-      System.err.println("Greška u poslužitelju za registraciju: " + e.getMessage());
+      System.err.println("Gašenje: " + e.getMessage());
     }
   }
 
@@ -374,7 +374,7 @@ public class PosluziteljTvrtka {
         this.aktivneDretve.add(dretva);
       }
     } catch (IOException e) {
-      System.err.println("Greška u Poslužitelju za rad s partnerima: " + e.getMessage());
+      System.err.println("Gašenje: " + e.getMessage());
     }
   }
 
@@ -530,7 +530,8 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Obradi obracun komandu. Provjera za obradiRadPartnera.
+   * Obradi obracun komandu. Provjera za obradiRadPartnera. Poziva provjeriIspravnostObracuna i
+   * ucitajJsonObracune
    *
    * @param ulaz je parametar
    * @param izlaz je parametar
@@ -542,9 +543,9 @@ public class PosluziteljTvrtka {
       izlaz.write("ERROR 30 - Format komande nije ispravan\n");
       return;
     }
+
     int id = Integer.parseInt(matcher.group(1));
     String kod = matcher.group(2);
-
     var partner = this.partneri.get(id);
     if (partner == null || !partner.sigurnosniKod().equals(kod)) {
       izlaz.write(
@@ -553,38 +554,67 @@ public class PosluziteljTvrtka {
     }
 
     try {
-      StringBuilder json = new StringBuilder();
-      String linijaJson;
-      while ((linijaJson = ulaz.readLine()) != null) {
-        json.append(linijaJson).append("\n");
-        if (linijaJson.trim().endsWith("]"))
-          break;
-      }
-      Gson gson = new Gson();
-      Obracun[] novi = gson.fromJson(json.toString(), Obracun[].class);
+      var novi = ucitajJsonObracune(ulaz);
+      if (!provjeriIspravnostObracuna(partner, novi, izlaz))
+        return;
 
-      var jelovnik = this.jelovnici.get(partner.vrstaKuhinje());
-      for (var o : novi) {
-        if (o.jelo()) {
-          if (jelovnik == null || !jelovnik.containsKey(o.id())) {
-            izlaz.write("ERROR 35 - Neispravan obračun\n");
-            return;
-          }
-        } else {
-          if (!this.kartaPica.containsKey(o.id())) {
-            izlaz.write("ERROR 35 - Neispravan obračun\n");
-            return;
-          }
-        }
-      }
+      Gson gson = new Gson();
       odradiLokotObracuna(gson, novi);
       izlaz.write("OK\n");
+
     } catch (JsonSyntaxException e) {
       izlaz.write("ERROR 35 - Neispravan obračun\n");
     } catch (Exception e) {
       izlaz.write("ERROR 39 - Nešto drugo nije u redu\n");
     }
   }
+
+
+  /**
+   * Ucitaj json obracune. Poziva se u bradiObracunKomandu
+   *
+   * @param ulaz the ulaz
+   * @return the obracun[]
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
+  private Obracun[] ucitajJsonObracune(BufferedReader ulaz) throws IOException {
+    StringBuilder json = new StringBuilder();
+    String linijaJson;
+    while ((linijaJson = ulaz.readLine()) != null) {
+      json.append(linijaJson).append("\n");
+      if (linijaJson.trim().endsWith("]"))
+        break;
+    }
+    Gson gson = new Gson();
+    return gson.fromJson(json.toString(), Obracun[].class);
+  }
+
+  /**
+   * Provjeri ispravnost obracuna. Poziva se u obradiObracunKomandu.
+   *
+   * @param partner the partner
+   * @param novi the novi
+   * @param izlaz the izlaz
+   * @return true, if successful
+   */
+  private boolean provjeriIspravnostObracuna(Partner partner, Obracun[] novi, PrintWriter izlaz) {
+    var jelovnik = this.jelovnici.get(partner.vrstaKuhinje());
+    for (var o : novi) {
+      if (o.jelo()) {
+        if (jelovnik == null || !jelovnik.containsKey(o.id())) {
+          izlaz.write("ERROR 35 - Neispravan obračun\n");
+          return false;
+        }
+      } else {
+        if (!this.kartaPica.containsKey(o.id())) {
+          izlaz.write("ERROR 35 - Neispravan obračun\n");
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
 
   /**
    * Odradi lokot obracuna. Metoda za zapis u obačun za obraduObračunKomandu

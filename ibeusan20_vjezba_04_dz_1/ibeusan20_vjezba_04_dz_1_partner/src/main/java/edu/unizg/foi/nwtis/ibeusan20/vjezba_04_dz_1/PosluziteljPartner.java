@@ -13,17 +13,26 @@ import edu.unizg.foi.nwtis.konfiguracije.Konfiguracija;
 import edu.unizg.foi.nwtis.konfiguracije.KonfiguracijaApstraktna;
 import edu.unizg.foi.nwtis.konfiguracije.NeispravnaKonfiguracija;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PosluziteljPartner.
+ */
 public class PosluziteljPartner {
 
-  /** Konfiguracijski podaci */
+  /** Konfiguracijski podaci. */
   private Konfiguracija konfig;
 
-  /** Predložak za kraj */
+  /** Predložak za kraj. */
   private Pattern predlozakKraj = Pattern.compile("^KRAJ$");
 
-  /** Predložak za partnera */
+  /** Predložak za partnera. */
   private Pattern predlozakPartner = Pattern.compile("^PARTNER$");
 
+  /**
+   * Glavna metoda.
+   *
+   * @param args su argumenti
+   */
   public static void main(String[] args) {
     if (args.length < 1 || args.length > 2) {
       System.out.println("Neispravan broj argumenata. (1 <= nArgs <= 2)");
@@ -70,20 +79,16 @@ public class PosluziteljPartner {
     return false;
   }
 
+  /**
+   * Registriraj partnera.
+   */
   private void registrirajPartnera() {
     try {
+      String komanda = generirajKomanduPartnera();
+      
       var adresa = konfig.dajPostavku("adresa");
       var vrata = Integer.parseInt(konfig.dajPostavku("mreznaVrataRegistracija"));
-      var id = Integer.parseInt(konfig.dajPostavku("id"));
-      var naziv = konfig.dajPostavku("naziv");
-      var vrsta = konfig.dajPostavku("kuhinja");
-      var mreznaVrata = konfig.dajPostavku("mreznaVrata");
-      var gpsSirina = konfig.dajPostavku("gpsSirina");
-      var gpsDuzina = konfig.dajPostavku("gpsDuzina");
-
-      String komanda = String.format("PARTNER %d \"%s\" %s %s %s %s %s", id, naziv, vrsta, adresa,
-          mreznaVrata, gpsSirina, gpsDuzina);
-
+      
       try (Socket socket = new Socket(adresa, vrata);
           PrintWriter out =
               new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"));
@@ -110,7 +115,29 @@ public class PosluziteljPartner {
       System.err.println("Greška kod registracije partnera: " + e.getMessage());
     }
   }
+  
+  /**
+   * Generiraj komandu partnera.
+   *
+   * @return vraća komandu PATRTNER itd. za registriranje partnera
+   */
+  private String generirajKomanduPartnera() {
+    var adresa = konfig.dajPostavku("adresa");
+    var vrata = Integer.parseInt(konfig.dajPostavku("mreznaVrataRegistracija"));
+    var id = Integer.parseInt(konfig.dajPostavku("id"));
+    var naziv = konfig.dajPostavku("naziv");
+    var vrsta = konfig.dajPostavku("kuhinja");
+    var mreznaVrata = konfig.dajPostavku("mreznaVrata");
+    var gpsSirina = konfig.dajPostavku("gpsSirina");
+    var gpsDuzina = konfig.dajPostavku("gpsDuzina");
 
+    return String.format("PARTNER %d \"%s\" %s %s %s %s %s", id, naziv, vrsta, adresa,
+        mreznaVrata, gpsSirina, gpsDuzina);
+  }
+
+  /**
+   * Posalji kraj.
+   */
   private void posaljiKraj() {
     var kodZaKraj = this.konfig.dajPostavku("kodZaKraj");
     var adresa = this.konfig.dajPostavku("adresa");
