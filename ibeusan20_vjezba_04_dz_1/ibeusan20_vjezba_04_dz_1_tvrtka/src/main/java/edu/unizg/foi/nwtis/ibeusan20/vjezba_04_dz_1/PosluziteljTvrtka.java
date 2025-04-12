@@ -469,8 +469,16 @@ public class PosluziteljTvrtka {
     }
   }
   
+  /** Objekt obracuna. */
   private final Object lokotObracuna = new Object();
   
+  /**
+   * Obrada rada partnera.
+   * Provjere komandi partnera su u obradiObracunKomandu, obradiKartaPicaKomandu
+   * i u obradiJelovnikKomandu.
+   *
+   * @param uticnica je parametar
+   */
   public void obradiRadPartnera(Socket uticnica) {
     try (var ulaz = new BufferedReader(new InputStreamReader(uticnica.getInputStream(), "utf8"));
          var izlaz = new PrintWriter(new OutputStreamWriter(uticnica.getOutputStream(), "utf8"))) {
@@ -496,13 +504,19 @@ public class PosluziteljTvrtka {
     }
   }
 
+  /**
+   * Obradi obracun komandu. Provjera za obradiRadPartnera.
+   *
+   * @param ulaz je parametar
+   * @param izlaz je parametar
+   * @param komanda je parametar
+   */
   private void obradiObracunKomandu(BufferedReader ulaz, PrintWriter izlaz, String komanda) {
     var matcher = Pattern.compile("^OBRAČUN\\s+(\\d+)\\s+(\\S+)$").matcher(komanda);
     if (!matcher.matches()) {
       izlaz.write("ERROR 30 - Format komande nije ispravan\n");
       return;
     }
-
     int id = Integer.parseInt(matcher.group(1));
     String kod = matcher.group(2);
 
@@ -519,7 +533,6 @@ public class PosluziteljTvrtka {
         json.append(linijaJson).append("\n");
         if (linijaJson.trim().endsWith("]")) break;
       }
-
       Gson gson = new Gson();
       Obracun[] novi = gson.fromJson(json.toString(), Obracun[].class);
 
@@ -537,10 +550,8 @@ public class PosluziteljTvrtka {
           }
         }
       }
-
       odradiLokotObracuna(gson, novi);
       izlaz.write("OK\n");
-
     } catch (JsonSyntaxException e) {
       izlaz.write("ERROR 35 - Neispravan obračun\n");
     } catch (Exception e) {
@@ -548,6 +559,13 @@ public class PosluziteljTvrtka {
     }
   }
 
+  /**
+   * Odradi lokot obracuna. Metoda za zapis u obačun za obraduObračunKomandu
+   *
+   * @param gson je parametar
+   * @param novi je parametar
+   * @throws IOException izbacuje grešku
+   */
   private void odradiLokotObracuna(Gson gson, Obracun[] novi) throws IOException {
     synchronized (lokotObracuna) {
       String nazivDatoteke = this.konfig.dajPostavku("datotekaObracuna");
@@ -570,6 +588,12 @@ public class PosluziteljTvrtka {
     }
   }
 
+  /**
+   * Obradi karta pica komandu. Provjera za obradiRadPartnera.
+   *
+   * @param izlaz je parametar
+   * @param komanda je parametar
+   */
   private void obradiKartaPicaKomandu(PrintWriter izlaz, String komanda) {
     var matcher = Pattern.compile("^KARTAPIĆA\\s+(\\d+)\\s+(\\S+)$").matcher(komanda);
     if (!matcher.matches()) {
@@ -595,6 +619,12 @@ public class PosluziteljTvrtka {
     }
   }
 
+  /**
+   * Obradi jelovnik komandu. Provjera za obradiRadPartnera.
+   *
+   * @param izlaz je parametar
+   * @param komanda je parametar
+   */
   private void obradiJelovnikKomandu(PrintWriter izlaz, String komanda) {
     var matcher = Pattern.compile("^JELOVNIK\\s+(\\d+)\\s+(\\S+)$").matcher(komanda);
     if (!matcher.matches()) {
@@ -625,6 +655,4 @@ public class PosluziteljTvrtka {
       }
     }
   }
-
-  
 }
