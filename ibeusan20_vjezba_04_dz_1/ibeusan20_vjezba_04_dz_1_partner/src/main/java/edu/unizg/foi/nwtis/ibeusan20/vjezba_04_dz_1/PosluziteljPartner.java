@@ -197,6 +197,10 @@ public class PosluziteljPartner {
     try {
       this.idPartnera = Integer.parseInt(konfig.dajPostavku("id"));
       this.sigKodPartnera = konfig.dajPostavku("sigKod");
+      if (this.sigKodPartnera == null || this.sigKodPartnera.isBlank()) {
+        System.out.println("Sigurnosni kod partnera nije pronađen. Registracija je obavezna.");
+        return false;
+      }
       var adresa = konfig.dajPostavku("adresa");
       var vrata = Integer.parseInt(konfig.dajPostavku("mreznaVrataRad"));
 
@@ -595,26 +599,26 @@ public class PosluziteljPartner {
   /**
    * Pošalji obračun.
    *
-   * @param obracuni csu lista obračuna
+   * @param obracuni su lista obračuna
    * @return ako je uspješno vraća true
    */
   private boolean posaljiObracun(List<Obracun> obracuni) {
     try {
       var adresa = konfig.dajPostavku("adresa");
       var vrata = Integer.parseInt(konfig.dajPostavku("mreznaVrataRad"));
-      var socket = new Socket(adresa, vrata);
+      var uticnica = new Socket(adresa, vrata);
 
-      PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"));
-      BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"));
+      PrintWriter out = new PrintWriter(new OutputStreamWriter(uticnica.getOutputStream(), "utf8"));
+      BufferedReader in = new BufferedReader(new InputStreamReader(uticnica.getInputStream(), "utf8"));
 
       out.write("OBRAČUN " + idPartnera + " " + sigKodPartnera + "\n");
       out.write(new Gson().toJson(obracuni) + "\n");
       out.flush();
-      socket.shutdownOutput();
+      uticnica.shutdownOutput();
 
       String odgovor = in.readLine();
-      socket.shutdownInput();
-      socket.close();
+      uticnica.shutdownInput();
+      uticnica.close();
 
       return odgovor != null && odgovor.startsWith("OK");
     } catch (Exception e) {
@@ -630,22 +634,35 @@ public class PosluziteljPartner {
     var adresa = this.konfig.dajPostavku("adresa");
     var mreznaVrata = Integer.parseInt(this.konfig.dajPostavku("mreznaVrataKraj"));
 
+    var sigKod = this.konfig.dajPostavku("sigKod");
+    if (sigKod == null || sigKod.isBlank()) {
+      System.out.println("Sigurnosni kod partnera nije pronađen. Registracija je obavezna.");
+      return;
+    }
+
     try {
       var mreznaUticnica = new Socket(adresa, mreznaVrata);
-      BufferedReader in =
-          new BufferedReader(new InputStreamReader(mreznaUticnica.getInputStream(), "utf8"));
-      PrintWriter out =
-          new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"));
+      BufferedReader in = new BufferedReader(new InputStreamReader(
+          mreznaUticnica.getInputStream(), "utf8"));
+      PrintWriter out = new PrintWriter(new OutputStreamWriter(
+          mreznaUticnica.getOutputStream(), "utf8"));
+
       out.write("KRAJ " + kodZaKraj + "\n");
       out.flush();
       mreznaUticnica.shutdownOutput();
+
       var linija = in.readLine();
       mreznaUticnica.shutdownInput();
-      if (linija.equals("OK")) {
+
+      if ("OK".equals(linija)) {
         System.out.println("Uspješan kraj poslužitelja.");
+      } else {
+        System.out.println("Greška prilikom slanja komande KRAJ.");
       }
+
       mreznaUticnica.close();
     } catch (IOException e) {
+      System.err.println("Greška prilikom slanja komande KRAJ: " + e.getMessage());
     }
   }
 }

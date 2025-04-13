@@ -147,9 +147,8 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Obradi kraj Čita dolazne poruke. Koristi regex za provjeru forme komande KRAJ i gleda IP
-   * adresu. Zatvara izlaz, u slučaju bilo kakve greške, pošalje grešku. U krajnjem slučaju
-   * ignorira.
+   * Čita dolazne poruke. Provjerava forme komande KRAJ i gleda IP
+   * adresu.
    * 
    * Koristi metode provjeriFormatKomande, provjeriLokalnuAdresu i posaljiPorukuGreske.
    *
@@ -301,7 +300,7 @@ public class PosluziteljTvrtka {
    * Ispisuje sve učitane jelovnike po vrstama kuhinja.
    * Svaki jelovnik ispisuje se sa svim svojim jelima (ID, naziv i cijena).
    * <p>
-   * Metoda je namijenjena za privremeni ispis u konzolu (debug).
+   * Metoda je namijenjena za privremeni ispis u konzolu
    */
   private void ispisUcitanogJelovnikaKartePica() {
     // PRIVREMENI ISPIS
@@ -339,7 +338,7 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Učitava popis partnera iz konfigurirane JSON datoteke.
+   * Učitava popis partnera iz konfiguracije.
    *
    * @return true ako je učitavanje partnera bilo uspješno, inače false
    */
@@ -430,12 +429,12 @@ public class PosluziteljTvrtka {
   /**
    * Obradi zahtjev za registraciju partnera. 
    * 
-   * Metoda prihvaća dolaznu mrežnu utičnicu i obrađuje jednu od mogućih komandi:
+   * Metoda prihvaća dolaznu mrežnu utičnicu i obrađuje komande:
    * - PARTNER ...   → registracija novog partnera
    * - OBRIŠI ...    → brisanje postojećeg partnera
    * - POPIS         → dohvaćanje popisa svih partnera
    * 
-   * Sve specifične komande delegiraju se u zasebne metode:
+   * Sve specifične komande obrađuju se svojim metodama:
    * - {@code obradiPartnerKomandu}
    * - {@code obradiObrisiKomandu}
    * - {@code obradiKomanduPopis}
@@ -477,7 +476,7 @@ public class PosluziteljTvrtka {
   /**
    * Obradi komandu POPIS koja dohvaća listu svih registriranih partnera.
    *
-   * @param izlaz ispisni tok prema klijentu (odgovor poslužitelja)
+   * @param izlaz ispisni tok prema klijentu
    */
   private void obradiKomanduPopis(PrintWriter izlaz) {
     izlaz.write("OK\n");
@@ -496,9 +495,6 @@ public class PosluziteljTvrtka {
    * Metoda provjerava ispravnost komande "OBRIŠI <id> <sigurnosniKod>", 
    * validira postoji li partner s danim ID-jem i je li sigurnosni kod točan. 
    * Ako su uvjeti ispunjeni, partner se uklanja iz kolekcije i ažurira se datoteka partnera.
-   *
-   * Format komande:
-   * OBRIŠI <id> <sigurnosniKod>
    *
    * @param izlaz ispis odgovora klijentu
    * @param komanda puna komanda za brisanje partnera
@@ -529,12 +525,9 @@ public class PosluziteljTvrtka {
    * Obradi komandu za registraciju novog partnera.
    *
    * Metoda provjerava format komande "PARTNER", parsira podatke
-   * o partneru (ID, naziv, vrsta kuhinje, adresa, mrežna vrata, GPS koordinate),
+   * o partneru (ID, naziv, vrsta kuhinje, adresa, mrežna vrata, GPS koordinate) 
    * te provjerava postoji li već partner s istim ID-jem.
    * Ako ne postoji, partner se dodaje u kolekciju i sprema u datoteku.
-   *
-   * Format komande:
-   * PARTNER <id> "<naziv>" <kuhinja> <adresa> <vrata> <gpsSirina> <gpsDuzina>
    *
    * @param izlaz ispis prema partneru
    * @param komanda puna komanda za registraciju partnera
@@ -656,8 +649,7 @@ public class PosluziteljTvrtka {
   /**
    * Učitava JSON zapis obračuna iz ulaznog toka i pretvara ga u niz objekata
    * 
-   * Metoda čita ulazni tok sve dok ne pročita cijeli JSON niz (do zatvarajuće zagrade "]").
-   * Parsiranje se obavlja pomoću biblioteke Gson
+   * Metoda čita ulazni tok sve dok ne pročita cijeli JSON
    *
    * @param ulaz ulazni tok podataka koji sadrži JSON zapis
    * @return niz objekata tipa {@code Obracun} učitanih iz JSON zapisa
@@ -702,8 +694,9 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Sinkronizirano zapisuje obračune u datoteku koristeći hehanizam međusobnog isključivanja kako
-   * bi se spriječila istovremena izmjena podataka iz više dretvi.
+   * Sinkronizirano zapisuje obračune u datoteku koristeći hehanizam 
+   * međusobnog isključivanja kako bi se spriječila
+   * istovremena izmjena podataka iz više dretvi.
    * 
    * Metoda za zapis u obračun za obraduObračunKomandu
    *
