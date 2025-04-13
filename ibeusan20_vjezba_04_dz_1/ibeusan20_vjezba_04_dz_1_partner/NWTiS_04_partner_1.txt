@@ -1,5 +1,5 @@
 #NWTiS 2024.
-#Sun Apr 13 20:31:57 CEST 2025
+#Sun Apr 13 22:53:46 CEST 2025
 adresa=localhost
 brojCekaca=10
 gpsDuzina=16.34009
@@ -14,3 +14,4 @@ mreznaVrataRad=8002
 mreznaVrataRegistracija=8001
 naziv=FOLT 1 - Varaždin, Pavlinska 9
 pauzaDretve=100
+sigKod=da53e5e7

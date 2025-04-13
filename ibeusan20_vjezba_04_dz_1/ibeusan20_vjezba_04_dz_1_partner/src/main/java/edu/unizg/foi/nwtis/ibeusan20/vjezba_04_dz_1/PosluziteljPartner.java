@@ -57,6 +57,9 @@ public class PosluziteljPartner {
   /** Lista aktivnih dretvi. */
   private final List<Future<?>> aktivneDretve = new ArrayList<>();
   
+  /** Mapa aktivnih dretvi i njihovih mrežnih utičnica. */
+  private final Map<Future<?>, Socket> mapaDretviUticnica = new ConcurrentHashMap<>();
+  
   /** Executor servis. */
   private ExecutorService executor;
   
@@ -85,8 +88,8 @@ public class PosluziteljPartner {
       System.out.println("Neispravan broj argumenata. (1 <= nArgs <= 2)");
       return;
     }
-
     var program = new PosluziteljPartner();
+    gracioznoZatvaranje(program);
     var nazivDatoteke = args[0];
 
     if (!program.ucitajKonfiguraciju(nazivDatoteke)) {
@@ -113,6 +116,38 @@ public class PosluziteljPartner {
       return;
     }
     System.out.println("Nepoznata opcija: " + drugiArg);
+  }
+
+  /**
+   * Postavlja shutdown hook za graciozno zatvaranje programa.
+   *
+   * @param program instanca poslužitelja partnera
+   */
+  private static void gracioznoZatvaranje(PosluziteljPartner program) {
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      System.out.println("\n\n[INFO] Zatvaranje programa...");
+      int brojZatvorenih = 0;
+
+      for (var entry : program.mapaDretviUticnica.entrySet()) {
+        Future<?> dretva = entry.getKey();
+        Socket uticnica = entry.getValue();
+
+        dretva.cancel(true);
+
+        try {
+          if (uticnica != null && !uticnica.isClosed()) {
+            uticnica.close();
+            brojZatvorenih++;
+            System.out.println("[INFO] Zatvorena mrežna utičnica za dretvu.");
+          }
+        } catch (IOException e) {
+          System.err.println("[UPOZORENJE] Pogreška kod zatvaranja utičnice: " + e.getMessage());
+        }
+      }
+
+      System.out.println("[INFO] Ukupan broj zatvorenih veza: " + brojZatvorenih);
+      System.out.println("[INFO] Ukupan broj prekinutih dretvi: " + program.mapaDretviUticnica.size());
+    }));
   }
 
   /**
@@ -296,6 +331,7 @@ public class PosluziteljPartner {
         var uticnica = serverSocket.accept();
         Future<?> dretva = executor.submit(() -> obradiZahtjevKupca(uticnica));
         aktivneDretve.add(dretva);
+        mapaDretviUticnica.put(dretva, uticnica);
 
         aktivneDretve.removeIf(Future::isDone); // provjera kraja dretve
 
@@ -563,7 +599,7 @@ public class PosluziteljPartner {
   /**
    * Provjera treba li se slati obračun po kvoti učitanoj iz postavki.
    *
-   * @return true, if successful
+   * @return vraća true ako je istina
    */
   private boolean trebaSlatiObracun() {
     try {
@@ -599,7 +635,7 @@ public class PosluziteljPartner {
   /**
    * Pošalji obračun.
    *
-   * @param obracuni su lista obračuna
+   * @param obracuni csu lista obračuna
    * @return ako je uspješno vraća true
    */
   private boolean posaljiObracun(List<Obracun> obracuni) {
@@ -625,44 +661,58 @@ public class PosluziteljPartner {
       return false;
     }
   }
-
+  
   /**
    * Slanje komande KRAJ.
    */
   private void posaljiKraj() {
-    var kodZaKraj = this.konfig.dajPostavku("kodZaKraj");
-    var adresa = this.konfig.dajPostavku("adresa");
-    var mreznaVrata = Integer.parseInt(this.konfig.dajPostavku("mreznaVrataKraj"));
+    var kodZaKraj = konfig.dajPostavku("kodZaKraj");
+    var sigKod = konfig.dajPostavku("sigKod");
 
-    var sigKod = this.konfig.dajPostavku("sigKod");
     if (sigKod == null || sigKod.isBlank()) {
       System.out.println("Sigurnosni kod partnera nije pronađen. Registracija je obavezna.");
       return;
     }
 
-    try {
-      var mreznaUticnica = new Socket(adresa, mreznaVrata);
-      BufferedReader in = new BufferedReader(new InputStreamReader(
-          mreznaUticnica.getInputStream(), "utf8"));
-      PrintWriter out = new PrintWriter(new OutputStreamWriter(
-          mreznaUticnica.getOutputStream(), "utf8"));
-
-      out.write("KRAJ " + kodZaKraj + "\n");
-      out.flush();
-      mreznaUticnica.shutdownOutput();
-
-      var linija = in.readLine();
-      mreznaUticnica.shutdownInput();
-
-      if ("OK".equals(linija)) {
-        System.out.println("Uspješan kraj poslužitelja.");
-      } else {
-        System.out.println("Greška prilikom slanja komande KRAJ.");
-      }
-
-      mreznaUticnica.close();
+    try (Socket uticnica = stvoriKrajSocket()) {
+      posaljiKrajKomandu(uticnica, kodZaKraj);
+      obradiOdgovorKraj(uticnica);
     } catch (IOException e) {
       System.err.println("Greška prilikom slanja komande KRAJ: " + e.getMessage());
+    }
+  }
+
+  /**
+   * Otvara utučnicu za slanje komande KRAJ.
+   */
+  private Socket stvoriKrajSocket() throws IOException {
+    var adresa = konfig.dajPostavku("adresa");
+    var vrata = Integer.parseInt(konfig.dajPostavku("mreznaVrataKraj"));
+    return new Socket(adresa, vrata);
+  }
+
+  /**
+   * Šalje komandu KRAJ kroz dani socket.
+   */
+  private void posaljiKrajKomandu(Socket uticnica, String kodZaKraj) throws IOException {
+    var out = new PrintWriter(new OutputStreamWriter(uticnica.getOutputStream(), "utf8"));
+    out.write("KRAJ " + kodZaKraj + "\n");
+    out.flush();
+    uticnica.shutdownOutput();
+  }
+
+  /**
+   * Prima odgovor na komandu KRAJ i ispisuje rezultat.
+   */
+  private void obradiOdgovorKraj(Socket uticnica) throws IOException {
+    var in = new BufferedReader(new InputStreamReader(uticnica.getInputStream(), "utf8"));
+    String linija = in.readLine();
+    uticnica.shutdownInput();
+
+    if ("OK".equals(linija)) {
+      System.out.println("Uspješan kraj poslužitelja.");
+    } else {
+      System.out.println("Greška prilikom slanja komande KRAJ.");
     }
   }
 }

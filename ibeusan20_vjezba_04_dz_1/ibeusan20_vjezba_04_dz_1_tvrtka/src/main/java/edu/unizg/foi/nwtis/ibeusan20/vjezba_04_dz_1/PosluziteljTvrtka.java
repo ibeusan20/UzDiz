@@ -44,6 +44,9 @@ public class PosluziteljTvrtka {
 
   /** Lista aktivnih dretvi. */
   private final List<Future<?>> aktivneDretve = new ArrayList<>();
+  
+  /** Broj zatvorenih veza. */
+  private int brojZatvorenihVeza = 0;
 
   /** Future objekti za dretve */
   private Future<?> dretvaZaKraj;
@@ -85,6 +88,15 @@ public class PosluziteljTvrtka {
       return;
     }
     var program = new PosluziteljTvrtka();
+    
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      System.out.println("\n[INFO] Zatvaranje programa...");
+      int zatvorene = program.zatvoriDretveIMrezneVeze();
+      System.out.println("[INFO] Ukupan broj zatvorenih veza: " + zatvorene);
+      System.out.println("[INFO] Ukupan broj prekinutih dretvi: " + program.aktivneDretve.size());
+    }));
+
+    
     var nazivDatoteke = args[0];
 
     program.pripremiKreni(nazivDatoteke);
@@ -145,6 +157,35 @@ public class PosluziteljTvrtka {
     } catch (IOException e) {
     }
   }
+  
+  /**
+   * Zatvori dretve i mrezne veze.
+   *
+   * @return vraća broj zatvorenih dretvi
+   */
+  public int zatvoriDretveIMrezneVeze() {
+    int zatvorene = 0;
+
+    for (Future<?> dretva : aktivneDretve) {
+      if (!dretva.isDone()) {
+        dretva.cancel(true);
+        zatvorene++;
+      }
+    }
+    if (dretvaRegistracija != null && !dretvaRegistracija.isDone()) {
+      dretvaRegistracija.cancel(true);
+      zatvorene++;
+    }
+    if (dretvaRadPartnera != null && !dretvaRadPartnera.isDone()) {
+      dretvaRadPartnera.cancel(true);
+      zatvorene++;
+    }
+    if (dretvaZaKraj != null && !dretvaZaKraj.isDone()) {
+      dretvaZaKraj.cancel(true);
+      zatvorene++;
+    }
+    return zatvorene;
+  }
 
   /**
    * Čita dolazne poruke. Provjerava forme komande KRAJ i gleda IP
@@ -175,6 +216,9 @@ public class PosluziteljTvrtka {
       izlaz.flush();
       mreznaUticnica.shutdownOutput();
       mreznaUticnica.close();
+      synchronized (this) {
+        brojZatvorenihVeza++;
+      }
     } catch (Exception e) {
       posaljiPorukuGreske(mreznaUticnica);
     }
@@ -215,6 +259,9 @@ public class PosluziteljTvrtka {
       izlaz.flush();
       mreznaUticnica.shutdownOutput();
       mreznaUticnica.close();
+      synchronized (this) {
+        brojZatvorenihVeza++;
+      }
     } catch (IOException ignored) {
     }
   }
@@ -367,7 +414,6 @@ public class PosluziteljTvrtka {
     return true;
   }
 
-  
   /**
    * Pokreće poslužitelj za registraciju partnera. 
    * Na svaku mrežnu vezu stvara novu dretvu za obradu zahtjeva.
@@ -467,7 +513,9 @@ public class PosluziteljTvrtka {
       izlaz.flush();
       uticnica.shutdownOutput();
       uticnica.close();
-
+      synchronized (this) {
+        brojZatvorenihVeza++;
+      }
     } catch (IOException | NumberFormatException e) {
       System.err.println("Greška u obradi registracije: " + e.getMessage());
     }
@@ -600,6 +648,9 @@ public class PosluziteljTvrtka {
       izlaz.flush();
       uticnica.shutdownOutput();
       uticnica.close();
+      synchronized (this) {
+        brojZatvorenihVeza++;
+      }
     } catch (IOException e) {
       System.err.println("Greška u obradi partnera: " + e.getMessage());
     }
