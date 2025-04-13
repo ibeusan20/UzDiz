@@ -1,5 +1,5 @@
 #NWTiS 2024.
-#Sun Apr 13 22:53:46 CEST 2025
+#Sun Apr 13 23:01:28 CEST 2025
 adresa=localhost
 brojCekaca=10
 gpsDuzina=16.34009
