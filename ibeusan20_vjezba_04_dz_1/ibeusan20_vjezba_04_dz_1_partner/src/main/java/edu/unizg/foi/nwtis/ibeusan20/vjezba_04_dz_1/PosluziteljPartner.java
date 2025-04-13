@@ -6,12 +6,25 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import com.google.gson.Gson;
 import edu.unizg.foi.nwtis.konfiguracije.Konfiguracija;
 import edu.unizg.foi.nwtis.konfiguracije.KonfiguracijaApstraktna;
 import edu.unizg.foi.nwtis.konfiguracije.NeispravnaKonfiguracija;
+import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.Jelovnik;
+import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.KartaPica;
+import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.Narudzba;
+import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.Obracun;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -27,6 +40,44 @@ public class PosluziteljPartner {
 
   /** Predložak za partnera. */
   private Pattern predlozakPartner = Pattern.compile("^PARTNER$");
+
+  // private AtomicBoolean kraj = new AtomicBoolean(false);
+
+  /** Jelovnik kolekcija. */
+  private Map<String, Jelovnik> jelovnik = new ConcurrentHashMap<>();
+ 
+  /** Karta pića kolekcija. */
+  private Map<String, KartaPica> kartaPica = new ConcurrentHashMap<>();
+
+  /** Varijabla za zapis id-ja partnera. */
+  private int idPartnera;
+
+  /** Varijabla za zapis sigurnosnog koda partnera. */
+  private String sigKodPartnera;
+  
+  /** Lista aktivnih dretvi. */
+  private final List<Future<?>> aktivneDretve = new ArrayList<>();
+  
+  /** Executor servis. */
+  private ExecutorService executor;
+  
+  /** Lista otvorenih narudžbi. */
+  private Map<String, List<Narudzba>> otvoreneNarudzbe = new ConcurrentHashMap<>();
+  
+  /** Lista plaćenih / zatvorneih narudžbi. */
+  private final Map<String, List<Narudzba>> placeneNarudzbe = new ConcurrentHashMap<>();
+  
+  /** Brojač naplaćenih narudžbi. */
+  private int brojNaplacenihNarudzbi = 0;
+  
+  /** Početna pauza dretve. */
+  private int pauzaDretve = 1000;
+  
+  /** Zaključavanje. */
+  private final Object lokotNarudzbe = new Object();
+
+
+
 
   /**
    * Glavna metoda.
@@ -49,17 +100,25 @@ public class PosluziteljPartner {
 
     if (args.length == 1) {
       program.registrirajPartnera();
+      return;
     }
+
     var drugiArg = args[1].trim();
 
     if (program.predlozakKraj.matcher(drugiArg).matches()) {
       program.posaljiKraj();
+      return;
     } else if (program.predlozakPartner.matcher(drugiArg).matches()) {
-      System.out.println("TOBE: " + drugiArg);
-      // program.pokreniPosluziteljKupaca(); // TODO
-    } else {
-      System.out.println("Nepoznata opcija: " + drugiArg);
+      if (!program.poveziSeITraziJelovnikIKartu()) {
+        System.out.println("Neuspješno učitavanje jelovnika ili karte pića.");
+        return;
+      }
+      System.out.println("Poslužitelj kupaca pokrenut: " + drugiArg);
+      program.pokreniPosluziteljKupaca();
+      return;
     }
+
+    System.out.println("Nepoznata opcija: " + drugiArg);
 
   }
 
@@ -72,6 +131,7 @@ public class PosluziteljPartner {
   private boolean ucitajKonfiguraciju(String nazivDatoteke) {
     try {
       this.konfig = KonfiguracijaApstraktna.preuzmiKonfiguraciju(nazivDatoteke);
+      this.pauzaDretve = Integer.parseInt(konfig.dajPostavku("pauzaDretve"));
       return true;
     } catch (NeispravnaKonfiguracija ex) {
       Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
@@ -85,10 +145,10 @@ public class PosluziteljPartner {
   private void registrirajPartnera() {
     try {
       String komanda = generirajKomanduPartnera();
-      
+
       var adresa = konfig.dajPostavku("adresa");
       var vrata = Integer.parseInt(konfig.dajPostavku("mreznaVrataRegistracija"));
-      
+
       try (Socket socket = new Socket(adresa, vrata);
           PrintWriter out =
               new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"));
@@ -115,7 +175,7 @@ public class PosluziteljPartner {
       System.err.println("Greška kod registracije partnera: " + e.getMessage());
     }
   }
-  
+
   /**
    * Generiraj komandu partnera.
    *
@@ -131,8 +191,392 @@ public class PosluziteljPartner {
     var gpsSirina = konfig.dajPostavku("gpsSirina");
     var gpsDuzina = konfig.dajPostavku("gpsDuzina");
 
-    return String.format("PARTNER %d \"%s\" %s %s %s %s %s", id, naziv, vrsta, adresa,
-        mreznaVrata, gpsSirina, gpsDuzina);
+    return String.format("PARTNER %d \"%s\" %s %s %s %s %s", id, naziv, vrsta, adresa, mreznaVrata,
+        gpsSirina, gpsDuzina);
+  }
+
+  /**
+   * Povezi se i trazi jelovnik i kartu.
+   *
+   * @return true, if successful
+   */
+  private boolean poveziSeITraziJelovnikIKartu() {
+    try {
+      this.idPartnera = Integer.parseInt(konfig.dajPostavku("id"));
+      this.sigKodPartnera = konfig.dajPostavku("sigKod");
+      var adresa = konfig.dajPostavku("adresa");
+      var vrata = Integer.parseInt(konfig.dajPostavku("mreznaVrataRad"));
+
+      String komandaJelovnik = "JELOVNIK " + idPartnera + " " + sigKodPartnera;
+      try (Socket socket = new Socket(adresa, vrata);
+          PrintWriter out =
+              new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"));
+          BufferedReader in =
+              new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"))) {
+
+        out.write(komandaJelovnik + "\n");
+        out.flush();
+        socket.shutdownOutput();
+
+        String odgovor = in.readLine();
+        if (!"OK".equals(odgovor))
+          return false;
+
+        String json = in.readLine();
+        Jelovnik[] niz = new Gson().fromJson(json, Jelovnik[].class);
+        for (Jelovnik j : niz)
+          this.jelovnik.put(j.id(), j);
+
+      } catch (Exception e) {
+        return false;
+      }
+
+      String komandaPica = "KARTAPIĆA " + idPartnera + " " + sigKodPartnera;
+      try (Socket socket = new Socket(adresa, vrata);
+          PrintWriter out =
+              new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"));
+          BufferedReader in =
+              new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"))) {
+
+        out.write(komandaPica + "\n");
+        out.flush();
+        socket.shutdownOutput();
+
+        String odgovor = in.readLine();
+        if (!"OK".equals(odgovor))
+          return false;
+
+        String json = in.readLine();
+        KartaPica[] niz = new Gson().fromJson(json, KartaPica[].class);
+        for (KartaPica p : niz)
+          this.kartaPica.put(p.id(), p);
+
+      } catch (Exception e) {
+        return false;
+      }
+
+      System.out.println("Uspješno učitan jelovnik i karta pića.");
+      return true;
+
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+
+  /**
+   * Pokreni posluzitelj kupaca.
+   */
+  private void pokreniPosluziteljKupaca() {
+    int mreznaVrata = Integer.parseInt(konfig.dajPostavku("mreznaVrata"));
+    int brojCekaca = Integer.parseInt(konfig.dajPostavku("brojCekaca"));
+    this.pauzaDretve = Integer.parseInt(konfig.dajPostavku("pauzaDretve"));
+
+    var builder = Thread.ofVirtual();
+    this.executor = Executors.newThreadPerTaskExecutor(builder.factory());
+
+    try (var serverSocket = new java.net.ServerSocket(mreznaVrata, brojCekaca)) {
+      System.out.println("Poslužitelj za kupce pokrenut na portu " + mreznaVrata);
+
+      while (true) {
+        var uticnica = serverSocket.accept();
+        Future<?> dretva = executor.submit(() -> obradiZahtjevKupca(uticnica));
+        aktivneDretve.add(dretva);
+
+        aktivneDretve.removeIf(Future::isDone); // provjera kraja dretve
+
+        Thread.sleep(pauzaDretve);
+      }
+
+    } catch (IOException | InterruptedException e) {
+      System.err.println("Greška prilikom pokretanja poslužitelja za kupce: " + e.getMessage());
+    }
+  }
+
+  /**
+   * Obradi zahtjev kupca. Poziva funkcije ovisno o  primljenom parametru:
+   *  obradiJelovnikKupca.
+   *
+   * @param uticnica the uticnica
+   */
+  private void obradiZahtjevKupca(Socket uticnica) {
+    try (var ulaz = new BufferedReader(new InputStreamReader(uticnica.getInputStream(), "utf8"));
+         var izlaz = new PrintWriter(new OutputStreamWriter(uticnica.getOutputStream(), "utf8"))) {
+
+      var linija = ulaz.readLine();
+      System.out.println("Zahtjev od kupca: " + linija);
+
+      if (linija == null || linija.isBlank()) {
+        izlaz.write("ERROR 40 - Format komande nije ispravan\n");
+      } else if (linija.startsWith("JELOVNIK")) {
+        obradiJelovnikKupca(ulaz, izlaz, linija);
+      } else if (linija.startsWith("KARTAPIĆA")) {
+        obradiKartaPicaKupca(ulaz, izlaz, linija);
+      } else if (linija.startsWith("NARUDŽBA")) {
+        obradiNarudzbuKupca(izlaz, linija);
+      } else if (linija.startsWith("JELO")) {
+        obradiJeloKupca(izlaz, linija);
+      } else if (linija.startsWith("PIĆE")) {
+        obradiPiceKupca(izlaz, linija);
+      } else if (linija.startsWith("RAČUN")) {
+        obradiRacunKupca(izlaz, linija);
+      } else {
+        izlaz.write("ERROR 40 - Format komande nije ispravan\n");
+      }
+
+      izlaz.flush();
+      uticnica.shutdownOutput();
+      uticnica.close();
+
+    } catch (IOException e) {
+      System.err.println("Greška kod obrade zahtjeva kupca: " + e.getMessage());
+    }
+  }
+  
+  /**
+   * Obradi jelovnik kupca.
+   *
+   * @param ulaz the ulaz
+   * @param izlaz the izlaz
+   * @param linija the linija
+   */
+  private void obradiJelovnikKupca(BufferedReader ulaz, PrintWriter izlaz, String linija) {
+    var matcher = Pattern.compile("^JELOVNIK\\s+(\\w+)$").matcher(linija);
+    if (!matcher.matches()) {
+      izlaz.write("ERROR 40 - Format komande nije ispravan\n");
+      return;
+    }
+
+    String korisnik = matcher.group(1);
+
+    if (this.jelovnik.isEmpty()) {
+      izlaz.write("ERROR 46 - Neuspješno preuzimanje jelovnika\n");
+    } else {
+      izlaz.write("OK\n");
+      Gson gson = new Gson();
+      izlaz.write(gson.toJson(this.jelovnik.values()) + "\n");
+    }
+  }
+
+  /**
+   * Obradi karta pica kupca.
+   *
+   * @param ulaz the ulaz
+   * @param izlaz the izlaz
+   * @param linija the linija
+   */
+  private void obradiKartaPicaKupca(BufferedReader ulaz, PrintWriter izlaz, String linija) {
+    var matcher = Pattern.compile("^KARTAPIĆA\\s+(\\w+)$").matcher(linija);
+    if (!matcher.matches()) {
+      izlaz.write("ERROR 40 - Format komande nije ispravan\n");
+      return;
+    }
+
+    String korisnik = matcher.group(1);
+
+    if (this.kartaPica.isEmpty()) {
+      izlaz.write("ERROR 47 - Neuspješno preuzimanje karte pića\n");
+    } else {
+      izlaz.write("OK\n");
+      Gson gson = new Gson();
+      izlaz.write(gson.toJson(this.kartaPica.values()) + "\n");
+    }
+  }
+  
+  /**
+   * Obradi narudzbu kupca.
+   *
+   * @param izlaz the izlaz
+   * @param linija the linija
+   */
+  private void obradiNarudzbuKupca(PrintWriter izlaz, String linija) {
+    var matcher = Pattern.compile("^NARUDŽBA\\s+(\\w+)$").matcher(linija);
+    if (!matcher.matches()) {
+      izlaz.write("ERROR 40 - Format komande nije ispravan\n");
+      return;
+    }
+
+    String korisnik = matcher.group(1);
+
+    synchronized (lokotNarudzbe) {
+      if (otvoreneNarudzbe.containsKey(korisnik)) {
+        izlaz.write("ERROR 44 - Već postoji otvorena narudžba za korisnika/kupca\n");
+      } else {
+        otvoreneNarudzbe.put(korisnik, new ArrayList<>());
+        izlaz.write("OK\n");
+      }
+    }
+  }
+  
+  /**
+   * Obradi jelo kupca.
+   *
+   * @param izlaz the izlaz
+   * @param linija the linija
+   */
+  private void obradiJeloKupca(PrintWriter izlaz, String linija) {
+    var matcher = Pattern.compile("^JELO\\s+(\\w+)\\s+(\\S+)\\s+([+-]?\\d*\\.?\\d+)$").matcher(linija);
+    if (!matcher.matches()) {
+      izlaz.write("ERROR 40 - Format komande nije ispravan\n");
+      return;
+    }
+
+    String korisnik = matcher.group(1);
+    String idJela = matcher.group(2);
+    float kolicina = Float.parseFloat(matcher.group(3));
+
+    synchronized (lokotNarudzbe) {
+      var narudzba = otvoreneNarudzbe.get(korisnik);
+      if (narudzba == null) {
+        izlaz.write("ERROR 43 - Ne postoji otvorena narudžba za korisnika/kupca\n");
+        return;
+      }
+
+      var jelo = this.jelovnik.get(idJela);
+      if (jelo == null) {
+        izlaz.write("ERROR 41 - Ne postoji jelo s id u kolekciji jelovnika kod partnera\n");
+        return;
+      }
+
+      float cijena = jelo.cijena() * kolicina;
+      long vrijeme = System.currentTimeMillis();
+
+      narudzba.add(new Narudzba(korisnik, idJela, true, kolicina, cijena, vrijeme));
+      izlaz.write("OK\n");
+    }
+  }
+  
+  /**
+   * Obradi pice kupca.
+   *
+   * @param izlaz the izlaz
+   * @param linija the linija
+   */
+  private void obradiPiceKupca(PrintWriter izlaz, String linija) {
+    var matcher = Pattern.compile("^PIĆE\\s+(\\w+)\\s+(\\S+)\\s+([+-]?\\d*\\.?\\d+)$").matcher(linija);
+    if (!matcher.matches()) {
+      izlaz.write("ERROR 40 - Format komande nije ispravan\n");
+      return;
+    }
+
+    String korisnik = matcher.group(1);
+    String idPica = matcher.group(2);
+    float kolicina = Float.parseFloat(matcher.group(3));
+
+    synchronized (lokotNarudzbe) {
+      var narudzba = otvoreneNarudzbe.get(korisnik);
+      if (narudzba == null) {
+        izlaz.write("ERROR 43 - Ne postoji otvorena narudžba za korisnika/kupca\n");
+        return;
+      }
+
+      var pice = this.kartaPica.get(idPica);
+      if (pice == null) {
+        izlaz.write("ERROR 42 - Ne postoji piće s id u kolekciji karte pića kod partnera\n");
+        return;
+      }
+
+      float cijena = pice.cijena() * kolicina;
+      long vrijeme = System.currentTimeMillis();
+
+      narudzba.add(new Narudzba(korisnik, idPica, false, kolicina, cijena, vrijeme));
+      izlaz.write("OK\n");
+    }
+  }
+  
+  /**
+   * Obradi racun kupca.
+   *
+   * @param izlaz the izlaz
+   * @param linija the linija
+   */
+  private void obradiRacunKupca(PrintWriter izlaz, String linija) {
+    var matcher = Pattern.compile("^RAČUN\\s+(\\w+)$").matcher(linija);
+    if (!matcher.matches()) {
+      izlaz.write("ERROR 40 - Format komande nije ispravan\n");
+      return;
+    }
+
+    String korisnik = matcher.group(1);
+    synchronized (lokotNarudzbe) {
+      List<Narudzba> narudzbe = otvoreneNarudzbe.remove(korisnik);
+      if (narudzbe == null) {
+        izlaz.write("ERROR 43 - Ne postoji otvorena narudžba za korisnika/kupca\n");
+        return;
+      }
+
+      placeneNarudzbe.computeIfAbsent(korisnik, k -> new ArrayList<>()).addAll(narudzbe);
+      brojNaplacenihNarudzbi++;
+
+      try {
+        int kvota = Integer.parseInt(konfig.dajPostavku("kvotaNarudzbi"));
+        if (brojNaplacenihNarudzbi % kvota == 0) {
+          var obracuni = generirajObracun();
+          boolean uspjesno = posaljiObracun(obracuni);
+          if (!uspjesno) {
+            izlaz.write("ERROR 45 - Neuspješno slanje obračuna\n");
+            return;
+          }
+          placeneNarudzbe.clear();
+        }
+        izlaz.write("OK\n");
+      } catch (Exception e) {
+        izlaz.write("ERROR 49 - Nešto drugo nije u redu.\n");
+      }
+    }
+  }
+  
+  /**
+   * Generiraj obracun.
+   *
+   * @return the list
+   */
+  private List<Obracun> generirajObracun() {
+    Map<String, Obracun> mapa = new HashMap<>();
+    long sada = System.currentTimeMillis();
+
+    for (var lista : placeneNarudzbe.values()) {
+        for (var n : lista) {
+            mapa.compute(n.id(), (k, o) -> {
+                float novaKolicina = (o != null ? o.kolicina() : 0) + n.kolicina();
+                float novaCijena = n.cijena();
+                //float novaCijena = (o != null ? o.cijena() : 0) + n.cijena();
+                return new Obracun(idPartnera, n.id(), n.jelo(), novaKolicina, novaCijena, sada);
+            });
+        }
+    }
+    return new ArrayList<>(mapa.values());
+}
+
+
+  /**
+   * Posalji obracun.
+   *
+   * @param obracuni the obracuni
+   * @return true, if successful
+   */
+  private boolean posaljiObracun(List<Obracun> obracuni) {
+    try {
+      var adresa = konfig.dajPostavku("adresa");
+      var vrata = Integer.parseInt(konfig.dajPostavku("mreznaVrataRad"));
+      var socket = new Socket(adresa, vrata);
+
+      PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"));
+      BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"));
+
+      out.write("OBRAČUN " + idPartnera + " " + sigKodPartnera + "\n");
+      out.write(new Gson().toJson(obracuni) + "\n");
+      out.flush();
+      socket.shutdownOutput();
+
+      String odgovor = in.readLine();
+      socket.shutdownInput();
+      socket.close();
+
+      return odgovor != null && odgovor.startsWith("OK");
+    } catch (Exception e) {
+      return false;
+    }
   }
 
   /**
