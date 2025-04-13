@@ -26,9 +26,8 @@ import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.KartaPica;
 import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.Narudzba;
 import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.Obracun;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class PosluziteljPartner.
+ * Klasa PosluziteljPartner.
  */
 public class PosluziteljPartner {
 
@@ -76,9 +75,6 @@ public class PosluziteljPartner {
   /** Zaključavanje. */
   private final Object lokotNarudzbe = new Object();
 
-
-
-
   /**
    * Glavna metoda.
    *
@@ -97,7 +93,6 @@ public class PosluziteljPartner {
       System.out.println("Neuspješno učitavanje konfiguracije.");
       return;
     }
-
     if (args.length == 1) {
       program.registrirajPartnera();
       return;
@@ -117,9 +112,7 @@ public class PosluziteljPartner {
       program.pokreniPosluziteljKupaca();
       return;
     }
-
     System.out.println("Nepoznata opcija: " + drugiArg);
-
   }
 
   /**
@@ -177,7 +170,7 @@ public class PosluziteljPartner {
   }
 
   /**
-   * Generiraj komandu partnera.
+   * Generiraj komandu partnera. Koristi se u registriranju partnera.
    *
    * @return vraća komandu PATRTNER itd. za registriranje partnera
    */
@@ -196,9 +189,9 @@ public class PosluziteljPartner {
   }
 
   /**
-   * Povezi se i trazi jelovnik i kartu.
+   * Poveži se i traži jelovnik i kartu.
    *
-   * @return true, if successful
+   * @return ako je uspješno, vraća true
    */
   private boolean poveziSeITraziJelovnikIKartu() {
     try {
@@ -207,55 +200,72 @@ public class PosluziteljPartner {
       var adresa = konfig.dajPostavku("adresa");
       var vrata = Integer.parseInt(konfig.dajPostavku("mreznaVrataRad"));
 
-      String komandaJelovnik = "JELOVNIK " + idPartnera + " " + sigKodPartnera;
-      try (Socket socket = new Socket(adresa, vrata);
-          PrintWriter out =
-              new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"));
-          BufferedReader in =
-              new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"))) {
-
-        out.write(komandaJelovnik + "\n");
-        out.flush();
-        socket.shutdownOutput();
-
-        String odgovor = in.readLine();
-        if (!"OK".equals(odgovor))
-          return false;
-
-        String json = in.readLine();
-        Jelovnik[] niz = new Gson().fromJson(json, Jelovnik[].class);
-        for (Jelovnik j : niz)
-          this.jelovnik.put(j.id(), j);
-
-      } catch (Exception e) {
-        return false;
-      }
-
-      String komandaPica = "KARTAPIĆA " + idPartnera + " " + sigKodPartnera;
-      try (Socket socket = new Socket(adresa, vrata);
-          PrintWriter out =
-              new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"));
-          BufferedReader in =
-              new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"))) {
-
-        out.write(komandaPica + "\n");
-        out.flush();
-        socket.shutdownOutput();
-
-        String odgovor = in.readLine();
-        if (!"OK".equals(odgovor))
-          return false;
-
-        String json = in.readLine();
-        KartaPica[] niz = new Gson().fromJson(json, KartaPica[].class);
-        for (KartaPica p : niz)
-          this.kartaPica.put(p.id(), p);
-
-      } catch (Exception e) {
-        return false;
-      }
+      if (!ucitajJelovnik(adresa, vrata)) return false;
+      if (!ucitajKartuPica(adresa, vrata)) return false;
 
       System.out.println("Uspješno učitan jelovnik i karta pića.");
+      return true;
+
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  /**
+   * Učitaj jelovnik.
+   *
+   * @param adresa je parametar kao mrežna adresa
+   * @param vrata je parametar kao socket
+   * @return vraća true u slučaju uspjeha
+   */
+  private boolean ucitajJelovnik(String adresa, int vrata) {
+    String komanda = "JELOVNIK " + idPartnera + " " + sigKodPartnera;
+    try (Socket socket = new Socket(adresa, vrata);
+         PrintWriter out = new PrintWriter(
+             new OutputStreamWriter(socket.getOutputStream(), "utf8"));
+         BufferedReader in = new BufferedReader(
+             new InputStreamReader(socket.getInputStream(), "utf8"))) {
+
+      out.write(komanda + "\n");
+      out.flush();
+      socket.shutdownOutput();
+
+      if (!"OK".equals(in.readLine())) return false;
+
+      String json = in.readLine();
+      Jelovnik[] niz = new Gson().fromJson(json, Jelovnik[].class);
+      for (Jelovnik j : niz) jelovnik.put(j.id(), j);
+      return true;
+
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  /**
+   * Učitaj kartu pica.
+   *
+   * @param adresa je parametar kao mrežna adresa
+   * @param vrata je parametar kao socket
+   * @return vraća true u slučaju uspjeha
+   */
+  private boolean ucitajKartuPica(String adresa, int vrata) {
+    String komanda = "KARTAPIĆA " + idPartnera + " " + sigKodPartnera;
+    try (Socket socket = new Socket(adresa, vrata);
+         PrintWriter out = new PrintWriter(
+             new OutputStreamWriter(socket.getOutputStream(), "utf8"));
+         BufferedReader in = new BufferedReader(
+             new InputStreamReader(socket.getInputStream(), "utf8"))) {
+
+      out.write(komanda + "\n");
+      out.flush();
+      socket.shutdownOutput();
+
+      if (!"OK".equals(in.readLine())) return false;
+
+      String json = in.readLine();
+      KartaPica[] niz = new Gson().fromJson(json, KartaPica[].class);
+      for (KartaPica p : niz) kartaPica.put(p.id(), p);
       return true;
 
     } catch (Exception e) {
@@ -297,7 +307,7 @@ public class PosluziteljPartner {
    * Obradi zahtjev kupca. Poziva funkcije ovisno o  primljenom parametru:
    *  obradiJelovnikKupca.
    *
-   * @param uticnica the uticnica
+   * @param uticnica je parametar kao socket
    */
   private void obradiZahtjevKupca(Socket uticnica) {
     try (var ulaz = new BufferedReader(new InputStreamReader(uticnica.getInputStream(), "utf8"));
@@ -334,11 +344,11 @@ public class PosluziteljPartner {
   }
   
   /**
-   * Obradi jelovnik kupca.
+   * Obradi zahtjev kupca za jelovnikom.
    *
-   * @param ulaz the ulaz
-   * @param izlaz the izlaz
-   * @param linija the linija
+   * @param ulazni tok
+   * @param izlazni tok
+   * @param linija je primljena komanda
    */
   private void obradiJelovnikKupca(BufferedReader ulaz, PrintWriter izlaz, String linija) {
     var matcher = Pattern.compile("^JELOVNIK\\s+(\\w+)$").matcher(linija);
@@ -359,11 +369,11 @@ public class PosluziteljPartner {
   }
 
   /**
-   * Obradi karta pica kupca.
+   * Obradi zahtjev kupca za kartom pića.
    *
-   * @param ulaz the ulaz
-   * @param izlaz the izlaz
-   * @param linija the linija
+   * @param ulazni tok
+   * @param izlazni tok
+   * @param linija je primljena komanda
    */
   private void obradiKartaPicaKupca(BufferedReader ulaz, PrintWriter izlaz, String linija) {
     var matcher = Pattern.compile("^KARTAPIĆA\\s+(\\w+)$").matcher(linija);
@@ -384,10 +394,10 @@ public class PosluziteljPartner {
   }
   
   /**
-   * Obradi narudzbu kupca.
+   * Obradi zahtjev kupca za početak narudžbe.
    *
-   * @param izlaz the izlaz
-   * @param linija the linija
+   * @param izlazni tok
+   * @param linija je primljena komanda
    */
   private void obradiNarudzbuKupca(PrintWriter izlaz, String linija) {
     var matcher = Pattern.compile("^NARUDŽBA\\s+(\\w+)$").matcher(linija);
@@ -409,10 +419,10 @@ public class PosluziteljPartner {
   }
   
   /**
-   * Obradi jelo kupca.
+   * Obradi zahtjev kupca za dodavanje jela u narudžbu.
    *
-   * @param izlaz the izlaz
-   * @param linija the linija
+   * @param izlazni tok
+   * @param linija je primljena komanda
    */
   private void obradiJeloKupca(PrintWriter izlaz, String linija) {
     var matcher = Pattern.compile("^JELO\\s+(\\w+)\\s+(\\S+)\\s+([+-]?\\d*\\.?\\d+)$").matcher(linija);
@@ -447,10 +457,10 @@ public class PosluziteljPartner {
   }
   
   /**
-   * Obradi pice kupca.
+   * Obradi zahtjev kupca za dodavanje pića u narudžbu.
    *
-   * @param izlaz the izlaz
-   * @param linija the linija
+   * @param izlaz je izlazni tok
+   * @param linija je primjena komanda
    */
   private void obradiPiceKupca(PrintWriter izlaz, String linija) {
     var matcher = Pattern.compile("^PIĆE\\s+(\\w+)\\s+(\\S+)\\s+([+-]?\\d*\\.?\\d+)$").matcher(linija);
@@ -485,10 +495,10 @@ public class PosluziteljPartner {
   }
   
   /**
-   * Obradi racun kupca.
+   * Obradi zahtjev kupca za zatvaranje narudžbe i izdavanje računa.
    *
-   * @param izlaz the izlaz
-   * @param linija the linija
+   * @param izlaz je izlazni tok
+   * @param linija je primjena komanda
    */
   private void obradiRacunKupca(PrintWriter izlaz, String linija) {
     var matcher = Pattern.compile("^RAČUN\\s+(\\w+)$").matcher(linija);
@@ -499,37 +509,71 @@ public class PosluziteljPartner {
 
     String korisnik = matcher.group(1);
     synchronized (lokotNarudzbe) {
-      List<Narudzba> narudzbe = otvoreneNarudzbe.remove(korisnik);
-      if (narudzbe == null) {
-        izlaz.write("ERROR 43 - Ne postoji otvorena narudžba za korisnika/kupca\n");
-        return;
-      }
+      if (!provjeriOtvorenuNarudzbu(korisnik, izlaz)) return;
 
-      placeneNarudzbe.computeIfAbsent(korisnik, k -> new ArrayList<>()).addAll(narudzbe);
+      premjestiUNaplacene(korisnik);
       brojNaplacenihNarudzbi++;
 
-      try {
-        int kvota = Integer.parseInt(konfig.dajPostavku("kvotaNarudzbi"));
-        if (brojNaplacenihNarudzbi % kvota == 0) {
-          var obracuni = generirajObracun();
-          boolean uspjesno = posaljiObracun(obracuni);
-          if (!uspjesno) {
-            izlaz.write("ERROR 45 - Neuspješno slanje obračuna\n");
-            return;
-          }
-          placeneNarudzbe.clear();
+      if (trebaSlatiObracun()) {
+        var obracuni = generirajObracun();
+        if (!posaljiObracun(obracuni)) {
+          izlaz.write("ERROR 45 - Neuspješno slanje obračuna\n");
+          return;
         }
-        izlaz.write("OK\n");
-      } catch (Exception e) {
-        izlaz.write("ERROR 49 - Nešto drugo nije u redu.\n");
+        placeneNarudzbe.clear();
       }
+      izlaz.write("OK\n");
     }
   }
   
   /**
-   * Generiraj obracun.
+   * Provjera otvorene narudžbe za obradiRacunKupca
    *
-   * @return the list
+   * @param korisnik je kupac koji naručuje
+   * @param izlaz je izlazni tok
+   * @return ako je uspješno, vraća true
+   */
+  private boolean provjeriOtvorenuNarudzbu(String korisnik, PrintWriter izlaz) {
+    List<Narudzba> narudzbe = otvoreneNarudzbe.get(korisnik);
+    if (narudzbe == null) {
+      izlaz.write("ERROR 43 - Ne postoji otvorena narudžba za korisnika/kupca\n");
+      return false;
+    }
+    if (narudzbe.isEmpty()) {
+      izlaz.write("ERROR 49 - Nešto drugo nije u redu.\n");
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Premještanje narudžbe iz nenaplaćenih u naplaćene.
+   *
+   * @param korisnik je kupac
+   */
+  private void premjestiUNaplacene(String korisnik) {
+    List<Narudzba> narudzbe = otvoreneNarudzbe.remove(korisnik);
+    placeneNarudzbe.computeIfAbsent(korisnik, k -> new ArrayList<>()).addAll(narudzbe);
+  }
+
+  /**
+   * Provjera treba li se slati obračun po kvoti učitanoj iz postavki.
+   *
+   * @return true, if successful
+   */
+  private boolean trebaSlatiObracun() {
+    try {
+      int kvota = Integer.parseInt(konfig.dajPostavku("kvotaNarudzbi"));
+      return brojNaplacenihNarudzbi % kvota == 0;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+  
+  /**
+   * Generiraj obračun.
+   *
+   * @return Vraća listu obračuna.
    */
   private List<Obracun> generirajObracun() {
     Map<String, Obracun> mapa = new HashMap<>();
@@ -548,12 +592,11 @@ public class PosluziteljPartner {
     return new ArrayList<>(mapa.values());
 }
 
-
   /**
-   * Posalji obracun.
+   * Pošalji obračun.
    *
-   * @param obracuni the obracuni
-   * @return true, if successful
+   * @param obracuni csu lista obračuna
+   * @return ako je uspješno vraća true
    */
   private boolean posaljiObracun(List<Obracun> obracuni) {
     try {
@@ -580,7 +623,7 @@ public class PosluziteljPartner {
   }
 
   /**
-   * Posalji kraj.
+   * Slanje komande KRAJ.
    */
   private void posaljiKraj() {
     var kodZaKraj = this.konfig.dajPostavku("kodZaKraj");

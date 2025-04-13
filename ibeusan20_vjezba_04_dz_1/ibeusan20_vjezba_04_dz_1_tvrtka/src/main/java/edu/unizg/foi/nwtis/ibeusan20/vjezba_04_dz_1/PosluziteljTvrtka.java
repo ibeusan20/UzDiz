@@ -150,58 +150,81 @@ public class PosluziteljTvrtka {
    * Obradi kraj Čita dolazne poruke. Koristi regex za provjeru forme komande KRAJ i gleda IP
    * adresu. Zatvara izlaz, u slučaju bilo kakve greške, pošalje grešku. U krajnjem slučaju
    * ignorira.
+   * 
+   * Koristi metode provjeriFormatKomande, provjeriLokalnuAdresu i posaljiPorukuGreske.
    *
-   * @param mreznaUticnica the mrezna uticnica
+   * @param mreznaUticnica je parametar
    * @return the boolean
    */
   public Boolean obradiKraj(Socket mreznaUticnica) {
     try {
-      BufferedReader ulaz =
-          new BufferedReader(new InputStreamReader(mreznaUticnica.getInputStream(), "utf8"));
-      PrintWriter izlaz =
-          new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"));
+      var ulaz = new BufferedReader(new InputStreamReader(mreznaUticnica.getInputStream(), "utf8"));
+      var izlaz = new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"));
+
       String linija = ulaz.readLine();
       mreznaUticnica.shutdownInput();
 
-      String izraz = "^KRAJ\\s+" + Pattern.quote(this.kodZaKraj) + "$";
-      Pattern uzorak = Pattern.compile(izraz);
-      Matcher podudaranje = uzorak.matcher(linija.trim());
-
-      if (!podudaranje.matches()) {
+      if (!provjeriFormatKomande(linija)) {
         izlaz.write("ERROR 10 - Format komande nije ispravan ili nije ispravan kod za kraj\n");
+      } else if (!provjeriLokalnuAdresu(mreznaUticnica)) {
+        izlaz.write("ERROR 11 - Adresa računala s kojeg je poslan zahtjev nije lokalna adresa\n");
       } else {
-        InetAddress adresa = mreznaUticnica.getInetAddress();
-        if (!adresa.isLoopbackAddress() && !adresa.isAnyLocalAddress()
-            && !adresa.isSiteLocalAddress()) {
-          izlaz.write("ERROR 11 - Adresa računala s kojeg je poslan zahtjev nije lokalna adresa\n");
-        } else {
-          this.kraj.set(true);
-          izlaz.write("OK\n");
-        }
+        kraj.set(true);
+        izlaz.write("OK\n");
       }
+
       izlaz.flush();
       mreznaUticnica.shutdownOutput();
       mreznaUticnica.close();
     } catch (Exception e) {
-      try {
-        PrintWriter izlaz =
-            new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"));
-        izlaz.write("ERROR 19 - Nešto drugo nije u redu.\n");
-        izlaz.flush();
-        mreznaUticnica.shutdownOutput();
-        mreznaUticnica.close();
-      } catch (IOException ex) {
-      }
+      posaljiPorukuGreske(mreznaUticnica);
     }
     return Boolean.TRUE;
   }
 
+  /**
+   * Provjerava ispravnost formata komande KRAJ.
+   *
+   * @param linija ulazna komanda
+   * @return true ako je komanda ispravna i sadrži točan kod za kraj, inače false
+   */
+  private boolean provjeriFormatKomande(String linija) {
+    String izraz = "^KRAJ\\s+" + Pattern.quote(this.kodZaKraj) + "$";
+    return Pattern.compile(izraz).matcher(linija.trim()).matches();
+  }
 
   /**
-   * Ucitaj konfiguraciju.
+   * Provjerava je li mrežna adresa lokalna.
    *
-   * @param nazivDatoteke naziv datoteke
-   * @return true, ako je uspješno učitavanje konfiguracije
+   * @param mreznaUticnica mrežna utičnica s koje je došla komanda
+   * @return true ako adresa pripada lokalnoj mreži, inače false
+   */
+  private boolean provjeriLokalnuAdresu(Socket mreznaUticnica) {
+    InetAddress adresa = mreznaUticnica.getInetAddress();
+    return adresa.isLoopbackAddress() || adresa.isAnyLocalAddress() || adresa.isSiteLocalAddress();
+  }
+
+  /**
+   * Šalje generičku poruku greške klijentu u slučaju iznimke.
+   *
+   * @param mreznaUticnica mrežna utičnica prema klijentu
+   */
+  private void posaljiPorukuGreske(Socket mreznaUticnica) {
+    try {
+      var izlaz = new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"));
+      izlaz.write("ERROR 19 - Nešto drugo nije u redu.\n");
+      izlaz.flush();
+      mreznaUticnica.shutdownOutput();
+      mreznaUticnica.close();
+    } catch (IOException ignored) {
+    }
+  }
+
+  /**
+   * Učitava konfiguraciju iz zadane datoteke.
+   *
+   * @param nazivDatoteke putanja do konfiguracijske datoteke
+   * @return true ako je konfiguracija uspješno učitana, inače false
    */
   public boolean ucitajKonfiguraciju(String nazivDatoteke) {
     try {
@@ -214,9 +237,9 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Ucitaj kartu pica.
+   * Učitava kartu pića iz JSON datoteke definirane u konfiguraciji.
    *
-   * @return true, ako je uspješno učitano
+   * @return true ako je učitavanje bilo uspješno, inače false
    */
   public boolean ucitajKartuPica() {
     var nazivDatoteke = this.konfig.dajPostavku("datotekaKartaPica");
@@ -242,9 +265,9 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Ucitaj jelovnike.
+   * Učitava sve jelovnike iz datoteka na temelju konfiguracije.
    *
-   * @return true, ako je uspješno učitano
+   * @return true ako su svi jelovnici uspješno učitani, inače false
    */
   public boolean ucitajJelovnike() {
     Gson gson = new Gson();
@@ -268,17 +291,19 @@ public class PosluziteljTvrtka {
       if (!Files.exists(datoteka))
         continue;
 
-      try (var reader = Files.newBufferedReader(datoteka)) {
-        Jelovnik[] niz = gson.fromJson(reader, Jelovnik[].class);
-        Map<String, Jelovnik> mapa = new ConcurrentHashMap<>();
-        for (var j : niz) {
-          mapa.put(j.id(), j);
-        }
-        this.jelovnici.put(oznaka, mapa);
-      } catch (IOException e) {
-        System.err.println("Greška kod učitavanja jelovnika: " + nazivDatoteke);
-      }
+      ucitajJelovnikZaKuhinju(gson, oznaka, nazivDatoteke, datoteka);
     }
+    ispisUcitanogJelovnikaKartePica();
+    return true;
+  }
+
+  /**
+   * Ispisuje sve učitane jelovnike po vrstama kuhinja.
+   * Svaki jelovnik ispisuje se sa svim svojim jelima (ID, naziv i cijena).
+   * <p>
+   * Metoda je namijenjena za privremeni ispis u konzolu (debug).
+   */
+  private void ispisUcitanogJelovnikaKartePica() {
     // PRIVREMENI ISPIS
     System.out.println("Učitani jelovnici:");
     for (var ulaz : this.jelovnici.entrySet()) {
@@ -289,13 +314,34 @@ public class PosluziteljTvrtka {
         System.out.println(" " + j.id() + " " + j.naziv() + " " + j.cijena() + " ");
       }
     }
-    return true;
   }
 
   /**
-   * Ucitaj partnere.
+   * Učitava jelovnik za određenu vrstu kuhinje iz JSON datoteke i sprema ga u memoriju.
    *
-   * @return true, ako je uspješno učitano
+   * @param gson instanca Gson za parsiranje JSON-a
+   * @param oznaka oznaka kuhinje (npr. "MK", "IT")
+   * @param nazivDatoteke naziv datoteke iz koje se učitava jelovnik
+   * @param datoteka put do datoteke koja sadrži JSON zapis jelovnika
+   */
+  private void ucitajJelovnikZaKuhinju(Gson gson, String oznaka, String nazivDatoteke,
+      Path datoteka) {
+    try (var reader = Files.newBufferedReader(datoteka)) {
+      Jelovnik[] niz = gson.fromJson(reader, Jelovnik[].class);
+      Map<String, Jelovnik> mapa = new ConcurrentHashMap<>();
+      for (var j : niz) {
+        mapa.put(j.id(), j);
+      }
+      this.jelovnici.put(oznaka, mapa);
+    } catch (IOException e) {
+      System.err.println("Greška kod učitavanja jelovnika: " + nazivDatoteke);
+    }
+  }
+
+  /**
+   * Učitava popis partnera iz konfigurirane JSON datoteke.
+   *
+   * @return true ako je učitavanje partnera bilo uspješno, inače false
    */
   public boolean ucitajPartnere() {
     Gson gson = new Gson();
@@ -322,8 +368,10 @@ public class PosluziteljTvrtka {
     return true;
   }
 
+  
   /**
-   * Pokreni posluzitelja za registraciju.
+   * Pokreće poslužitelj za registraciju partnera. 
+   * Na svaku mrežnu vezu stvara novu dretvu za obradu zahtjeva.
    */
   public void pokreniPosluziteljRegistracija() {
     var mreznaVrata = Integer.parseInt(this.konfig.dajPostavku("mreznaVrataRegistracija"));
@@ -380,10 +428,19 @@ public class PosluziteljTvrtka {
 
 
   /**
-   * Obradi registraciju. Obarada komandi je u zasebnim metodama obradiKomanduPopis,
-   * obradiObrisiKomandu, i obradiPartnerKomandu.
+   * Obradi zahtjev za registraciju partnera. 
+   * 
+   * Metoda prihvaća dolaznu mrežnu utičnicu i obrađuje jednu od mogućih komandi:
+   * - PARTNER ...   → registracija novog partnera
+   * - OBRIŠI ...    → brisanje postojećeg partnera
+   * - POPIS         → dohvaćanje popisa svih partnera
+   * 
+   * Sve specifične komande delegiraju se u zasebne metode:
+   * - {@code obradiPartnerKomandu}
+   * - {@code obradiObrisiKomandu}
+   * - {@code obradiKomanduPopis}
    *
-   * @param uticnica je parametar
+   * @param uticnica mrežna utičnica s koje je primljen zahtjev za registraciju
    */
   public void obradiRegistraciju(Socket uticnica) {
     try (var ulaz = new BufferedReader(new InputStreamReader(uticnica.getInputStream(), "utf8"));
@@ -418,9 +475,9 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Obradi komandu popis. Provjera za obradiRegistraciju.
+   * Obradi komandu POPIS koja dohvaća listu svih registriranih partnera.
    *
-   * @param izlaz je ispis
+   * @param izlaz ispisni tok prema klijentu (odgovor poslužitelja)
    */
   private void obradiKomanduPopis(PrintWriter izlaz) {
     izlaz.write("OK\n");
@@ -434,10 +491,17 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Obradi obrisi komandu. Provjera za obradiRegistraciju.
+   * Obradi komandu za brisanje partnera iz sustava.
    *
-   * @param izlaz je ispis
-   * @param komanda je parametar
+   * Metoda provjerava ispravnost komande "OBRIŠI <id> <sigurnosniKod>", 
+   * validira postoji li partner s danim ID-jem i je li sigurnosni kod točan. 
+   * Ako su uvjeti ispunjeni, partner se uklanja iz kolekcije i ažurira se datoteka partnera.
+   *
+   * Format komande:
+   * OBRIŠI <id> <sigurnosniKod>
+   *
+   * @param izlaz ispis odgovora klijentu
+   * @param komanda puna komanda za brisanje partnera
    */
   private void obradiObrisiKomandu(PrintWriter izlaz, String komanda) {
     var matcher = Pattern.compile("OBRIŠI\\s+(\\d+)\\s+(\\S+)").matcher(komanda);
@@ -462,10 +526,18 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Obradi partner komandu. Provjera za obradiRegistraciju.
+   * Obradi komandu za registraciju novog partnera.
    *
-   * @param izlaz je ispis
-   * @param komanda je parametar
+   * Metoda provjerava format komande "PARTNER", parsira podatke
+   * o partneru (ID, naziv, vrsta kuhinje, adresa, mrežna vrata, GPS koordinate),
+   * te provjerava postoji li već partner s istim ID-jem.
+   * Ako ne postoji, partner se dodaje u kolekciju i sprema u datoteku.
+   *
+   * Format komande:
+   * PARTNER <id> "<naziv>" <kuhinja> <adresa> <vrata> <gpsSirina> <gpsDuzina>
+   *
+   * @param izlaz ispis prema partneru
+   * @param komanda puna komanda za registraciju partnera
    */
   private void obradiPartnerKomandu(PrintWriter izlaz, String komanda) {
     String regex =
@@ -495,14 +567,25 @@ public class PosluziteljTvrtka {
     }
   }
 
-  /** Objekt obracuna. */
+  /** 
+   * Objekt za zaključavanje pristupa datoteci obračuna.
+   * Koristi se u metodi {@code odradiLokotObracuna} za sinkronizaciju.
+   */
   private final Object lokotObracuna = new Object();
 
   /**
-   * Obrada rada partnera. Provjere komandi partnera su u obradiObracunKomandu,
-   * obradiKartaPicaKomandu i u obradiJelovnikKomandu.
+   * Obrada zahtjeva partnera tijekom rada poslužitelja.
    *
-   * @param uticnica je parametar
+   * Prima mrežnu utičnicu, čita prvu liniju zahtjeva te na temelju
+   * komande prosljeđuje obradu jednoj od metoda:
+   * <ul>
+   *   <li>{@code obradiJelovnikKomandu}</li>
+   *   <li>{@code obradiKartaPicaKomandu}</li>
+   *   <li>{@code obradiObracunKomandu}</li>
+   * </ul>
+   * U slučaju neispravne komande, vraća odgovarajuću grešku partneru.
+   *
+   * @param uticnica mrežna utičnica preko koje partner šalje zahtjev
    */
   public void obradiRadPartnera(Socket uticnica) {
     try (var ulaz = new BufferedReader(new InputStreamReader(uticnica.getInputStream(), "utf8"));
@@ -530,12 +613,13 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Obradi obracun komandu. Provjera za obradiRadPartnera. Poziva provjeriIspravnostObracuna i
-   * ucitajJsonObracune
+   * Provjera za obradiRadPartnera. Poziva provjeriIspravnostObracuna i ucitajJsonObracune
+   * 
+   * Obrada komande OBRAČUN koju partner šalje za dostavu obračuna narudžbi.
    *
-   * @param ulaz je parametar
-   * @param izlaz je parametar
-   * @param komanda je parametar
+   * @param ulaz ulazni tok s podacima koji sadrži JSON zapis obračuna
+   * @param izlaz izlazni tok za slanje odgovora partneru
+   * @param komanda komanda koja se obrađuje
    */
   private void obradiObracunKomandu(BufferedReader ulaz, PrintWriter izlaz, String komanda) {
     var matcher = Pattern.compile("^OBRAČUN\\s+(\\d+)\\s+(\\S+)$").matcher(komanda);
@@ -569,13 +653,15 @@ public class PosluziteljTvrtka {
     }
   }
 
-
   /**
-   * Ucitaj json obracune. Poziva se u bradiObracunKomandu
+   * Učitava JSON zapis obračuna iz ulaznog toka i pretvara ga u niz objekata
+   * 
+   * Metoda čita ulazni tok sve dok ne pročita cijeli JSON niz (do zatvarajuće zagrade "]").
+   * Parsiranje se obavlja pomoću biblioteke Gson
    *
-   * @param ulaz the ulaz
-   * @return the obracun[]
-   * @throws IOException Signals that an I/O exception has occurred.
+   * @param ulaz ulazni tok podataka koji sadrži JSON zapis
+   * @return niz objekata tipa {@code Obracun} učitanih iz JSON zapisa
+   * @throws IOException ako dođe do pogreške prilikom čitanja ulaznog toka
    */
   private Obracun[] ucitajJsonObracune(BufferedReader ulaz) throws IOException {
     StringBuilder json = new StringBuilder();
@@ -592,10 +678,10 @@ public class PosluziteljTvrtka {
   /**
    * Provjeri ispravnost obracuna. Poziva se u obradiObracunKomandu.
    *
-   * @param partner the partner
-   * @param novi the novi
-   * @param izlaz the izlaz
-   * @return true, if successful
+   * @param partner partner za kojeg je obračun primljen
+   * @param novi niz novih zapisa obračuna za provjeru
+   * @param izlaz tok za ispis rezultata provjere
+   * @return true ako su svi zapisi u obračunu ispravni
    */
   private boolean provjeriIspravnostObracuna(Partner partner, Obracun[] novi, PrintWriter izlaz) {
     var jelovnik = this.jelovnici.get(partner.vrstaKuhinje());
@@ -615,13 +701,15 @@ public class PosluziteljTvrtka {
     return true;
   }
 
-
   /**
-   * Odradi lokot obracuna. Metoda za zapis u obačun za obraduObračunKomandu
+   * Sinkronizirano zapisuje obračune u datoteku koristeći hehanizam međusobnog isključivanja kako
+   * bi se spriječila istovremena izmjena podataka iz više dretvi.
+   * 
+   * Metoda za zapis u obračun za obraduObračunKomandu
    *
-   * @param gson je parametar
-   * @param novi je parametar
-   * @throws IOException izbacuje grešku
+   * @param gson objekt za serijalizaciju u JSON
+   * @param novi niz novih obračuna koji se dodaju
+   * @throws IOException ako dođe do greške pri čitanju ili pisanju datoteke
    */
   private void odradiLokotObracuna(Gson gson, Obracun[] novi) throws IOException {
     synchronized (lokotObracuna) {
@@ -647,10 +735,11 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Obradi karta pica komandu. Provjera za obradiRadPartnera.
+   * Obradi komandu KARTAPIĆA i pošalji partneru njegovu kartu pića.
+   * Provodi validaciju partnera i njegovog sigurnosnog koda.
    *
-   * @param izlaz je parametar
-   * @param komanda je parametar
+   * @param izlaz izlazni tok za slanje odgovora partneru
+   * @param komanda ulazna komanda u obliku "KARTAPIĆA <id> <sigurnosniKod>"
    */
   private void obradiKartaPicaKomandu(PrintWriter izlaz, String komanda) {
     var matcher = Pattern.compile("^KARTAPIĆA\\s+(\\d+)\\s+(\\S+)$").matcher(komanda);
@@ -679,10 +768,11 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Obradi jelovnik komandu. Provjera za obradiRadPartnera.
+   * Obradi komandu JELOVNIK i pošalji partneru njegov jelovnik.
+   * Provodi validaciju partnera, sigurnosnog koda i postoji li jelovnik za traženu vrstu kuhinje.
    *
-   * @param izlaz je parametar
-   * @param komanda je parametar
+   * @param izlaz izlazni tok za slanje odgovora partneru
+   * @param komanda ulazna komanda u obliku "JELOVNIK <id> <sigurnosniKod>"
    */
   private void obradiJelovnikKomandu(PrintWriter izlaz, String komanda) {
     var matcher = Pattern.compile("^JELOVNIK\\s+(\\d+)\\s+(\\S+)$").matcher(komanda);
