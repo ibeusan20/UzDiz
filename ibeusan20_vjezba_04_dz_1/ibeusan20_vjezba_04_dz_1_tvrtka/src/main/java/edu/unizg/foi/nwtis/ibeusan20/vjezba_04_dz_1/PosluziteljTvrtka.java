@@ -147,7 +147,7 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Pokreni posluzitelj kraj.
+   * Pokreni poslužitelja za kraj rada.
    */
   public void pokreniPosluziteljKraj() {
     var mreznaVrata = Integer.parseInt(this.konfig.dajPostavku("mreznaVrataKraj"));
@@ -163,7 +163,7 @@ public class PosluziteljTvrtka {
   }
   
   /**
-   * Zatvori dretve i mrezne veze.
+   * Zatvori dretve i mrežne veze.
    *
    * @return vraća broj zatvorenih dretvi
    */
@@ -192,7 +192,7 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Čita dolazne poruke. Provjerava forme komande KRAJ i gleda IP
+   * Čita dolazne poruke. Provjerava forme komandi KRAJ i gleda IP
    * adresu.
    * 
    * Koristi metode provjeriFormatKomande, provjeriLokalnuAdresu i posaljiPorukuGreske.
@@ -306,11 +306,11 @@ public class PosluziteljTvrtka {
       return false;
     }
     // PRIVREMENI ISPIS
-    System.out.println("Učitana pića:");
-    for (var p : this.kartaPica.values()) {
-      System.out
-          .println(" " + p.id() + " " + p.naziv() + " " + p.kolicina() + " " + p.cijena() + " ");
-    }
+    //System.out.println("Učitana pića:");
+    //for (var p : this.kartaPica.values()) {
+    //  System.out
+    //      .println(" " + p.id() + " " + p.naziv() + " " + p.kolicina() + " " + p.cijena() + " ");
+    //}
     return true;
   }
 
@@ -343,7 +343,7 @@ public class PosluziteljTvrtka {
 
       ucitajJelovnikZaKuhinju(gson, oznaka, nazivDatoteke, datoteka);
     }
-    ispisUcitanogJelovnikaKartePica();
+    //ispisUcitanogJelovnikaKartePica();
     return true;
   }
 
@@ -432,8 +432,7 @@ public class PosluziteljTvrtka {
         var dretva = this.executor.submit(() -> obradiRegistraciju(uticnica));
         this.aktivneDretve.add(dretva);
         this.mapaDretviUticnica.put(dretva, uticnica);
-        
-        System.out.println("[INFO] Nova konekcija: " + uticnica);
+        //System.out.println("[INFO] Nova konekcija: " + uticnica);
       }
     } catch (IOException e) {
       System.err.println("[INFO] Gašenje poslužitelja za registraciju, zatvorena 1 veza.");
@@ -473,8 +472,7 @@ public class PosluziteljTvrtka {
         var dretva = this.executor.submit(() -> this.obradiRadPartnera(uticnica));
         this.aktivneDretve.add(dretva);
         this.mapaDretviUticnica.put(dretva, uticnica);
-        
-        System.out.println("[INFO] Nova konekcija: " + uticnica);
+        //System.out.println("[INFO] Nova konekcija: " + uticnica);
       }
     } catch (IOException e) {
       System.err.println("[INFO] Gašenje poslužitelja za rad s partnerima, zatvorena 1 veza.");
@@ -503,7 +501,7 @@ public class PosluziteljTvrtka {
       var komanda = linija.trim();
       var dijelovi = komanda.split("\\s+", 2);
       // PRIVREMENI ISPIS
-      System.out.println("primljena linija: " + linija);
+      //System.out.println("primljena linija: " + linija);
 
       if (dijelovi.length < 1) {
         izlaz.write("ERROR 20 - Format komande nije ispravan\n");
@@ -643,7 +641,7 @@ public class PosluziteljTvrtka {
 
       var linija = ulaz.readLine();
       var komanda = linija.trim();
-      System.out.println("Primljena komanda: " + komanda);
+      //System.out.println("Primljena komanda: " + komanda);
 
       if (komanda.startsWith("JELOVNIK")) {
         obradiJelovnikKomandu(izlaz, komanda);
