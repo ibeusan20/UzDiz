@@ -1,2 +1,2 @@
-mreznaVrataRegistracija=8001
+mreznaVrataRegistracija=8000
 partner=1

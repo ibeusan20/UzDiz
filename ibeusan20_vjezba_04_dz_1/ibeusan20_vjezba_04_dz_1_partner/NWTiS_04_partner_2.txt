@@ -1,5 +1,5 @@
 #NWTiS 2024.
-#Sat Apr 12 20:43:45 CEST 2025
+#Mon Apr 14 16:13:50 CEST 2025
 adresa=localhost
 brojCekaca=10
 gpsDuzina=16.34780
@@ -14,3 +14,4 @@ mreznaVrataRad=8002
 mreznaVrataRegistracija=8001
 naziv=FOLT 2 - Varaždin, Ul. Julija Merlića 9
 pauzaDretve=100
+sigKod=e57a5998

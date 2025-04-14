@@ -45,6 +45,9 @@ public class PosluziteljTvrtka {
   /** Lista aktivnih dretvi. */
   private final List<Future<?>> aktivneDretve = new ArrayList<>();
   
+  /** Mapa dretvi i utičnica. */
+  private final Map<Future<?>, Socket> mapaDretviUticnica = new ConcurrentHashMap<>();
+  
   /** Broj zatvorenih veza. */
   private int brojZatvorenihVeza = 0;
 
@@ -90,10 +93,10 @@ public class PosluziteljTvrtka {
     var program = new PosluziteljTvrtka();
     
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-      System.out.println("\n[INFO] Zatvaranje programa...");
+      System.out.println("\n[INFO] Zatvaranje programa...\n[INFO] Gašenje poslužitelja za kraj, zatvorena 1 veza.");
       int zatvorene = program.zatvoriDretveIMrezneVeze();
-      System.out.println("[INFO] Ukupan broj zatvorenih veza: " + zatvorene);
-      System.out.println("[INFO] Ukupan broj prekinutih dretvi: " + program.aktivneDretve.size());
+      //System.out.println("[INFO] Ukupan broj zatvorenih veza: " + program.brojZatvorenihVeza);
+      System.out.println("[INFO] Ukupan broj prekinutih dretvi: " + zatvorene);
     }));
 
     
@@ -130,15 +133,16 @@ public class PosluziteljTvrtka {
       }
     }
     if (this.kraj.get()) {
-      for (Future<?> dretva : this.aktivneDretve) {
-        if (!dretva.isDone()) {
-          dretva.cancel(true);
-        }
-      }
-      if (!dretvaRegistracija.isDone())
-        dretvaRegistracija.cancel(true);
-      if (!dretvaRadPartnera.isDone())
-        dretvaRadPartnera.cancel(true);
+      zatvoriDretveIMrezneVeze();
+//      for (Future<?> dretva : this.aktivneDretve) {
+//        if (!dretva.isDone()) {
+//          dretva.cancel(true);
+//        }
+//      }
+//      if (!dretvaRegistracija.isDone())
+//        dretvaRegistracija.cancel(true);
+//      if (!dretvaRadPartnera.isDone())
+//        dretvaRadPartnera.cancel(true);
     }
   }
 
@@ -427,9 +431,12 @@ public class PosluziteljTvrtka {
         var uticnica = ss.accept();
         var dretva = this.executor.submit(() -> obradiRegistraciju(uticnica));
         this.aktivneDretve.add(dretva);
+        this.mapaDretviUticnica.put(dretva, uticnica);
+        
+        System.out.println("[INFO] Nova konekcija: " + uticnica);
       }
     } catch (IOException e) {
-      System.err.println("Gašenje: " + e.getMessage());
+      System.err.println("[INFO] Gašenje poslužitelja za registraciju, zatvorena 1 veza.");
     }
   }
 
@@ -465,12 +472,14 @@ public class PosluziteljTvrtka {
         var uticnica = ss.accept();
         var dretva = this.executor.submit(() -> this.obradiRadPartnera(uticnica));
         this.aktivneDretve.add(dretva);
+        this.mapaDretviUticnica.put(dretva, uticnica);
+        
+        System.out.println("[INFO] Nova konekcija: " + uticnica);
       }
     } catch (IOException e) {
-      System.err.println("Gašenje: " + e.getMessage());
+      System.err.println("[INFO] Gašenje poslužitelja za rad s partnerima, zatvorena 1 veza.");
     }
   }
-
 
   /**
    * Obradi zahtjev za registraciju partnera. 

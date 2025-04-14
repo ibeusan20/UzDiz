@@ -115,7 +115,7 @@ public class PosluziteljPartner {
       program.pokreniPosluziteljKupaca();
       return;
     }
-    System.out.println("Nepoznata opcija: " + drugiArg);
+    System.out.println("ERROR 40 - Format komande nije ispravan");
   }
 
   /**
