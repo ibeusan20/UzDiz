@@ -111,7 +111,7 @@ public class PosluziteljPartner {
         System.out.println("Neuspješno učitavanje jelovnika ili karte pića.");
         return;
       }
-      System.out.println("Poslužitelj kupaca pokrenut: " + drugiArg);
+      //System.out.println("Poslužitelj kupaca pokrenut: " + drugiArg);
       program.pokreniPosluziteljKupaca();
       return;
     }
@@ -125,7 +125,7 @@ public class PosluziteljPartner {
    */
   private static void gracioznoZatvaranje(PosluziteljPartner program) {
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-      System.out.println("\n\n[INFO] Zatvaranje programa...");
+      //System.out.println("\n\n[INFO] Zatvaranje programa...");
       int brojZatvorenih = 0;
 
       for (var entry : program.mapaDretviUticnica.entrySet()) {
@@ -194,9 +194,9 @@ public class PosluziteljPartner {
           String kod = odgovor.split("\\s+")[1];
           konfig.spremiPostavku("sigKod", kod);
           konfig.spremiKonfiguraciju();
-          System.out.println("Partner registriran. Sigurnosni kod: " + kod);
+          //System.out.println("Partner registriran. Sigurnosni kod: " + kod);
         } else {
-          System.out.println("Greška u registraciji: " + odgovor);
+          //System.out.println("Greška u registraciji: " + odgovor);
         }
       }
     } catch (Exception e) {
@@ -233,7 +233,7 @@ public class PosluziteljPartner {
       this.idPartnera = Integer.parseInt(konfig.dajPostavku("id"));
       this.sigKodPartnera = konfig.dajPostavku("sigKod");
       if (this.sigKodPartnera == null || this.sigKodPartnera.isBlank()) {
-        System.out.println("Sigurnosni kod partnera nije pronađen. Registracija je obavezna.");
+        //System.out.println("Sigurnosni kod partnera nije pronađen. Registracija je obavezna.");
         return false;
       }
       var adresa = konfig.dajPostavku("adresa");
@@ -242,7 +242,7 @@ public class PosluziteljPartner {
       if (!ucitajJelovnik(adresa, vrata)) return false;
       if (!ucitajKartuPica(adresa, vrata)) return false;
 
-      System.out.println("Uspješno učitan jelovnik i karta pića.");
+      //System.out.println("Uspješno učitan jelovnik i karta pića.");
       return true;
 
     } catch (Exception e) {
@@ -325,7 +325,7 @@ public class PosluziteljPartner {
     this.executor = Executors.newThreadPerTaskExecutor(builder.factory());
 
     try (var serverSocket = new java.net.ServerSocket(mreznaVrata, brojCekaca)) {
-      System.out.println("Poslužitelj za kupce pokrenut na portu " + mreznaVrata);
+      //System.out.println("Poslužitelj za kupce pokrenut na portu " + mreznaVrata);
 
       while (true) {
         var uticnica = serverSocket.accept();
@@ -333,7 +333,7 @@ public class PosluziteljPartner {
         aktivneDretve.add(dretva);
         mapaDretviUticnica.put(dretva, uticnica);
 
-        aktivneDretve.removeIf(Future::isDone); // provjera kraja dretve
+        aktivneDretve.removeIf(Future::isDone);
 
         Thread.sleep(pauzaDretve);
       }
@@ -354,7 +354,7 @@ public class PosluziteljPartner {
          var izlaz = new PrintWriter(new OutputStreamWriter(uticnica.getOutputStream(), "utf8"))) {
 
       var linija = ulaz.readLine();
-      System.out.println("Zahtjev od kupca: " + linija);
+      //System.out.println("Zahtjev od kupca: " + linija);
 
       if (linija == null || linija.isBlank()) {
         izlaz.write("ERROR 40 - Format komande nije ispravan\n");
@@ -670,7 +670,7 @@ public class PosluziteljPartner {
     var sigKod = konfig.dajPostavku("sigKod");
 
     if (sigKod == null || sigKod.isBlank()) {
-      System.out.println("Sigurnosni kod partnera nije pronađen. Registracija je obavezna.");
+      //System.out.println("Sigurnosni kod partnera nije pronađen. Registracija je obavezna.");
       return;
     }
 
