@@ -99,7 +99,7 @@ public class KorisnikKupac {
         // System.out.println("[INFO] Uspješno poslan KRAJ.");
         // } else {
         // System.out.println("[GREŠKA] Odgovor: " + odgovor);
-        // } 
+        // }
       }
     } catch (IOException e) {
       // System.err.println("[GREŠKA] Slanje KRAJ nije uspjelo: " + e.getMessage());
