@@ -26,6 +26,7 @@ import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.KartaPica;
 import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.Narudzba;
 import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.Obracun;
 
+// TODO: Auto-generated Javadoc
 /**
  * Klasa PosluziteljPartner.
  */
@@ -127,12 +128,14 @@ public class PosluziteljPartner {
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
       // System.out.println("\n\n[INFO] Zatvaranje programa...");
       int brojZatvorenih = 0;
+      int brojPrekinutihDretvi = 0;
 
       for (var entry : program.mapaDretviUticnica.entrySet()) {
         Future<?> dretva = entry.getKey();
         Socket uticnica = entry.getValue();
 
-        dretva.cancel(true);
+        boolean prekinuta = dretva.cancel(true);
+        if (prekinuta) brojPrekinutihDretvi++;
 
         try {
           if (uticnica != null && !uticnica.isClosed()) {
@@ -143,11 +146,17 @@ public class PosluziteljPartner {
         } catch (IOException e) {
           System.err.println("[UPOZORENJE] Pogreška kod zatvaranja utičnice: " + e.getMessage());
         }
+        if (!dretva.isDone() && !dretva.isCancelled()) {
+          prekinuta = dretva.cancel(true);
+          if (prekinuta) {
+            brojPrekinutihDretvi++;
+          }
+        }
       }
 
       System.out.println("[INFO] Ukupan broj zatvorenih veza: " + brojZatvorenih);
       System.out
-          .println("[INFO] Ukupan broj prekinutih dretvi: " + program.mapaDretviUticnica.size());
+          .println("[INFO] Ukupan broj prekinutih dretvi: " + brojPrekinutihDretvi);
     }));
   }
 
@@ -390,8 +399,8 @@ public class PosluziteljPartner {
   /**
    * Obradi zahtjev kupca za jelovnikom.
    *
-   * @param ulazni tok
-   * @param izlazni tok
+   * @param ulaz the ulaz
+   * @param izlaz the izlaz
    * @param linija je primljena komanda
    */
   private void obradiJelovnikKupca(BufferedReader ulaz, PrintWriter izlaz, String linija) {
@@ -415,8 +424,8 @@ public class PosluziteljPartner {
   /**
    * Obradi zahtjev kupca za kartom pića.
    *
-   * @param ulazni tok
-   * @param izlazni tok
+   * @param ulaz the ulaz
+   * @param izlaz the izlaz
    * @param linija je primljena komanda
    */
   private void obradiKartaPicaKupca(BufferedReader ulaz, PrintWriter izlaz, String linija) {
@@ -440,7 +449,7 @@ public class PosluziteljPartner {
   /**
    * Obradi zahtjev kupca za početak narudžbe.
    *
-   * @param izlazni tok
+   * @param izlaz the izlaz
    * @param linija je primljena komanda
    */
   private void obradiNarudzbuKupca(PrintWriter izlaz, String linija) {
@@ -465,7 +474,7 @@ public class PosluziteljPartner {
   /**
    * Obradi zahtjev kupca za dodavanje jela u narudžbu.
    *
-   * @param izlazni tok
+   * @param izlaz the izlaz
    * @param linija je primljena komanda
    */
   private void obradiJeloKupca(PrintWriter izlaz, String linija) {
@@ -574,7 +583,7 @@ public class PosluziteljPartner {
   }
 
   /**
-   * Provjera otvorene narudžbe za obradiRacunKupca
+   * Provjera otvorene narudžbe za obradiRacunKupca.
    *
    * @param korisnik je kupac koji naručuje
    * @param izlaz je izlazni tok
@@ -661,7 +670,7 @@ public class PosluziteljPartner {
       uticnica.shutdownOutput();
 
       String odgovor = in.readLine();
-      uticnica.shutdownInput();
+      uticnica.shutdownOutput();
       uticnica.close();
 
       return odgovor != null && odgovor.startsWith("OK");
@@ -692,6 +701,9 @@ public class PosluziteljPartner {
 
   /**
    * Otvara utučnicu za slanje komande KRAJ.
+   *
+   * @return the socket
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private Socket stvoriKrajSocket() throws IOException {
     var adresa = konfig.dajPostavku("adresa");
@@ -701,6 +713,10 @@ public class PosluziteljPartner {
 
   /**
    * Šalje komandu KRAJ kroz dani socket.
+   *
+   * @param uticnica the uticnica
+   * @param kodZaKraj the kod za kraj
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void posaljiKrajKomandu(Socket uticnica, String kodZaKraj) throws IOException {
     var out = new PrintWriter(new OutputStreamWriter(uticnica.getOutputStream(), "utf8"));
@@ -711,6 +727,9 @@ public class PosluziteljPartner {
 
   /**
    * Prima odgovor na komandu KRAJ i ispisuje rezultat.
+   *
+   * @param uticnica the uticnica
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   private void obradiOdgovorKraj(Socket uticnica) throws IOException {
     var in = new BufferedReader(new InputStreamReader(uticnica.getInputStream(), "utf8"));
