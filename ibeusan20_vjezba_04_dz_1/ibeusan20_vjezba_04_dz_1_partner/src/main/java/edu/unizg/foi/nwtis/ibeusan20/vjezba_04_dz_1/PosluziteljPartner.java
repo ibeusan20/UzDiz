@@ -595,10 +595,10 @@ public class PosluziteljPartner {
       izlaz.write("ERROR 43 - Ne postoji otvorena narudžba za korisnika/kupca\n");
       return false;
     }
-    if (narudzbe.isEmpty()) {
-      izlaz.write("ERROR 49 - Nešto drugo nije u redu.\n");
-      return false;
-    }
+//    if (narudzbe.isEmpty()) {
+//      izlaz.write("ERROR 49 - Nešto drugo nije u redu.\n");
+//      return false;
+//    }
     return true;
   }
 
@@ -669,11 +669,24 @@ public class PosluziteljPartner {
       out.flush();
       uticnica.shutdownOutput();
 
-      String odgovor = in.readLine();
-      uticnica.shutdownOutput();
+//      String odgovor = in.readLine();  // slat će grešku ako se šalje obračun s praznom narudžbom
+//      uticnica.shutdownOutput();
+//      uticnica.close();
+//      return odgovor != null && odgovor.startsWith("OK");
+      boolean uspjeh = false;
+      String odgovor;
+
+      while ((odgovor = in.readLine()) != null) {
+          if (odgovor.trim().startsWith("OK")) {
+              uspjeh = true;
+              break;
+          }
+      }
+
+      uticnica.shutdownInput();
       uticnica.close();
 
-      return odgovor != null && odgovor.startsWith("OK");
+      return uspjeh;
     } catch (Exception e) {
       return false;
     }
