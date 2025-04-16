@@ -95,7 +95,7 @@ public class PosluziteljPartner {
     var nazivDatoteke = args[0];
 
     if (!program.ucitajKonfiguraciju(nazivDatoteke)) {
-      System.out.println("Neuspješno učitavanje konfiguracije.");
+      //System.out.println("Neuspješno učitavanje konfiguracije.");
       return;
     }
     if (args.length == 1) {
@@ -110,7 +110,7 @@ public class PosluziteljPartner {
       return;
     } else if (program.predlozakPartner.matcher(drugiArg).matches()) {
       if (!program.poveziSeITraziJelovnikIKartu()) {
-        System.out.println("Neuspješno učitavanje jelovnika ili karte pića.");
+        //System.out.println("Neuspješno učitavanje jelovnika ili karte pića.");
         return;
       }
       // System.out.println("Poslužitelj kupaca pokrenut: " + drugiArg);

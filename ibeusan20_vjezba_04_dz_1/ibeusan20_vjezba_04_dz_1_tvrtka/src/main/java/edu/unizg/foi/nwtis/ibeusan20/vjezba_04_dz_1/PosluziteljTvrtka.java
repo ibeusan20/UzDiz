@@ -39,7 +39,7 @@ public class PosluziteljTvrtka {
   private Konfiguracija konfig;
 
   /** Pokretač dretvi */
-  private ExecutorService executor = null;
+  public ExecutorService executor = null;
 
   /** Lista aktivnih dretvi. */
   public final List<Future<?>> aktivneDretve = new ArrayList<>();
@@ -346,24 +346,23 @@ public class PosluziteljTvrtka {
     return true;
   }
 
-  /**
-   * Ispisuje sve učitane jelovnike po vrstama kuhinja.
-   * Svaki jelovnik ispisuje se sa svim svojim jelima (ID, naziv i cijena).
-   * <p>
-   * Metoda je namijenjena za privremeni ispis u konzolu
-   */
-  private void ispisUcitanogJelovnikaKartePica() {
-    // PRIVREMENI ISPIS
-    System.out.println("Učitani jelovnici:");
-    for (var ulaz : this.jelovnici.entrySet()) {
-      String oznakaKuhinje = ulaz.getKey();
-      Map<String, Jelovnik> jela = ulaz.getValue();
-      System.out.println("Kuhinja: " + oznakaKuhinje);
-      for (var j : jela.values()) {
-        System.out.println(" " + j.id() + " " + j.naziv() + " " + j.cijena() + " ");
-      }
-    }
-  }
+//  /**
+//   * Ispisuje sve učitane jelovnike po vrstama kuhinja.
+//   * Svaki jelovnik ispisuje se sa svim svojim jelima (ID, naziv i cijena).
+//   * <p>
+//   * Metoda je namijenjena za privremeni ispis u konzolu
+//   */
+//  private void ispisUcitanogJelovnikaKartePica() {
+//    System.out.println("Učitani jelovnici:");
+//    for (var ulaz : this.jelovnici.entrySet()) {
+//      String oznakaKuhinje = ulaz.getKey();
+//      Map<String, Jelovnik> jela = ulaz.getValue();
+//      System.out.println("Kuhinja: " + oznakaKuhinje);
+//      for (var j : jela.values()) {
+//        System.out.println(" " + j.id() + " " + j.naziv() + " " + j.cijena() + " ");
+//      }
+//    }
+//  }
 
   /**
    * Učitava jelovnik za određenu vrstu kuhinje iz JSON datoteke i sprema ga u memoriju.
@@ -383,7 +382,7 @@ public class PosluziteljTvrtka {
       }
       this.jelovnici.put(oznaka, mapa);
     } catch (IOException e) {
-      System.err.println("Greška kod učitavanja jelovnika: " + nazivDatoteke);
+      //System.err.println("Greška kod učitavanja jelovnika: " + nazivDatoteke);
     }
   }
 
@@ -439,9 +438,9 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Spremi partnere.
+   * Sprema partnere u datoteku partnera.
    */
-  private synchronized void spremiPartnere() {
+  public synchronized void spremiPartnere() {
     String nazivDatoteke = this.konfig.dajPostavku("datotekaPartnera");
     Path datoteka = Path.of(nazivDatoteke);
     try {
@@ -532,7 +531,7 @@ public class PosluziteljTvrtka {
    *
    * @param izlaz ispisni tok prema klijentu
    */
-  private void obradiKomanduPopis(PrintWriter izlaz) {
+  public void obradiKomanduPopis(PrintWriter izlaz) {
     izlaz.write("OK\n");
     Gson gson = new Gson();
     var popis =
@@ -553,7 +552,7 @@ public class PosluziteljTvrtka {
    * @param izlaz ispis odgovora klijentu
    * @param komanda puna komanda za brisanje partnera
    */
-  private void obradiObrisiKomandu(PrintWriter izlaz, String komanda) {
+  public void obradiObrisiKomandu(PrintWriter izlaz, String komanda) {
     var matcher = Pattern.compile("OBRIŠI\\s+(\\d+)\\s+(\\S+)").matcher(komanda);
     if (!matcher.matches()) {
       izlaz.write("ERROR 20 - Format komande nije ispravan\n");
@@ -586,7 +585,7 @@ public class PosluziteljTvrtka {
    * @param izlaz ispis prema partneru
    * @param komanda puna komanda za registraciju partnera
    */
-  private void obradiPartnerKomandu(PrintWriter izlaz, String komanda) {
+  public void obradiPartnerKomandu(PrintWriter izlaz, String komanda) {
     String regex =
         "^PARTNER\\s+(\\d+)\\s+\"(.+?)\"\\s+(\\S+)\\s+(\\S+)\\s+(\\d+)\\s+([+-]?\\d*\\.?\\d+)\\s+([+-]?\\d*\\.?\\d+)$";
     var matcher = Pattern.compile(regex).matcher(komanda);
@@ -671,7 +670,7 @@ public class PosluziteljTvrtka {
    * @param izlaz izlazni tok za slanje odgovora partneru
    * @param komanda komanda koja se obrađuje
    */
-  private void obradiObracunKomandu(BufferedReader ulaz, PrintWriter izlaz, String komanda) {
+  public void obradiObracunKomandu(BufferedReader ulaz, PrintWriter izlaz, String komanda) {
     var matcher = Pattern.compile("^OBRAČUN\\s+(\\d+)\\s+(\\S+)$").matcher(komanda);
     if (!matcher.matches()) {
       izlaz.write("ERROR 30 - Format komande nije ispravan\n");
@@ -712,7 +711,7 @@ public class PosluziteljTvrtka {
    * @return niz objekata tipa {@code Obracun} učitanih iz JSON zapisa
    * @throws IOException ako dođe do pogreške prilikom čitanja ulaznog toka
    */
-  private Obracun[] ucitajJsonObracune(BufferedReader ulaz) throws IOException {
+  public Obracun[] ucitajJsonObracune(BufferedReader ulaz) throws IOException {
     StringBuilder json = new StringBuilder();
     String linijaJson;
     while ((linijaJson = ulaz.readLine()) != null) {
@@ -732,7 +731,7 @@ public class PosluziteljTvrtka {
    * @param izlaz tok za ispis rezultata provjere
    * @return true ako su svi zapisi u obračunu ispravni
    */
-  private boolean provjeriIspravnostObracuna(Partner partner, Obracun[] novi, PrintWriter izlaz) {
+  public boolean provjeriIspravnostObracuna(Partner partner, Obracun[] novi, PrintWriter izlaz) {
     var jelovnik = this.jelovnici.get(partner.vrstaKuhinje());
     for (var o : novi) {
       if (o.jelo()) {
@@ -761,7 +760,7 @@ public class PosluziteljTvrtka {
    * @param novi niz novih obračuna koji se dodaju
    * @throws IOException ako dođe do greške pri čitanju ili pisanju datoteke
    */
-  private void odradiLokotObracuna(Gson gson, Obracun[] novi) throws IOException {
+  public void odradiLokotObracuna(Gson gson, Obracun[] novi) throws IOException {
     synchronized (lokotObracuna) {
       String nazivDatoteke = this.konfig.dajPostavku("datotekaObracuna");
       Path datoteka = Path.of(nazivDatoteke);
@@ -791,7 +790,7 @@ public class PosluziteljTvrtka {
    * @param izlaz izlazni tok za slanje odgovora partneru
    * @param komanda ulazna komanda u obliku "KARTAPIĆA <id> <sigurnosniKod>"
    */
-  private void obradiKartaPicaKomandu(PrintWriter izlaz, String komanda) {
+  public void obradiKartaPicaKomandu(PrintWriter izlaz, String komanda) {
     var matcher = Pattern.compile("^KARTAPIĆA\\s+(\\d+)\\s+(\\S+)$").matcher(komanda);
     if (!matcher.matches()) {
       izlaz.write("ERROR 30 - Format komande nije ispravan\n");
@@ -824,7 +823,7 @@ public class PosluziteljTvrtka {
    * @param izlaz izlazni tok za slanje odgovora partneru
    * @param komanda ulazna komanda u obliku "JELOVNIK <id> <sigurnosniKod>"
    */
-  private void obradiJelovnikKomandu(PrintWriter izlaz, String komanda) {
+  public void obradiJelovnikKomandu(PrintWriter izlaz, String komanda) {
     var matcher = Pattern.compile("^JELOVNIK\\s+(\\d+)\\s+(\\S+)$").matcher(komanda);
     if (!matcher.matches()) {
       izlaz.write("ERROR 30 - Format komande nije ispravan\n");

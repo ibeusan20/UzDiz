@@ -93,13 +93,13 @@ public class KorisnikKupac {
           BufferedReader in =
               new BufferedReader(new InputStreamReader(uticnica.getInputStream(), "utf8"))) {
 
-        // out.println("KRAJ " + kodZaKraj);
-        // String odgovor = in.readLine();
-        // if ("OK".equals(odgovor)) {
-        // System.out.println("[INFO] Uspješno poslan KRAJ.");
-        // } else {
-        // System.out.println("[GREŠKA] Odgovor: " + odgovor);
-        // } 
+         out.println("KRAJ " + kodZaKraj);
+         String odgovor = in.readLine();
+         if ("OK".equals(odgovor)) {
+         System.out.println("[INFO] Uspješno poslan KRAJ.");
+         } else {
+         System.out.println("[GREŠKA] Odgovor: " + odgovor);
+         } 
       }
     } catch (IOException e) {
       // System.err.println("[GREŠKA] Slanje KRAJ nije uspjelo: " + e.getMessage());
@@ -159,7 +159,7 @@ public class KorisnikKupac {
       return;
     }
     try (Socket socket = new Socket(adresa, port);
-         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"));
+         //BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"));
          PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"), true)) {
 
       out.println(komanda);
