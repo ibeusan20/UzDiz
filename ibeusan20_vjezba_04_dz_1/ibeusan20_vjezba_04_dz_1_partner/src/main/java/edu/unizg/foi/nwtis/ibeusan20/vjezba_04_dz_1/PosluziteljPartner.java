@@ -634,7 +634,6 @@ public class PosluziteljPartner {
    */
   private List<Obracun> generirajObracun() {
     Map<String, Obracun> mapa = new HashMap<>();
-    //long sada = System.currentTimeMillis();
     long sada = new Date().getTime();
 
     for (var lista : placeneNarudzbe.values()) {
