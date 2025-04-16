@@ -94,7 +94,7 @@ public class KorisnikKupac {
               new BufferedReader(new InputStreamReader(uticnica.getInputStream(), "utf8"))) {
 
         // out.println("KRAJ " + kodZaKraj);
-        String odgovor = in.readLine();
+        // String odgovor = in.readLine();
         // if ("OK".equals(odgovor)) {
         // System.out.println("[INFO] Uspješno poslan KRAJ.");
         // } else {
@@ -154,23 +154,40 @@ public class KorisnikKupac {
    * @param komanda komanda koja se šalje
    */
   private void posaljiKomandu(String korisnik, String adresa, int port, String komanda) {
+    if (!provjeriImeKorisnikaUKomandi(korisnik, komanda)) {
+      //System.err.println("[SIGURNOST] Korisnik '" + korisnik + "' pokušao slati komandu u tuđe ime: " + komanda);
+      return;
+    }
     try (Socket socket = new Socket(adresa, port);
-        BufferedReader in =
-            new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"));
-        PrintWriter out =
-            new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"), true)) {
+         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"));
+         PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"), true)) {
+
       out.println(komanda);
       socket.shutdownOutput();
 
-      String odgovor;
+      // String odgovor;
       // while ((odgovor = in.readLine()) != null) {
-      // System.out.println("[" + korisnik + "] " + odgovor);
+      //   System.out.println("[" + korisnik + "] " + odgovor);
       // }
       socket.shutdownInput();
     } catch (IOException e) {
-      System.err
-          .println("[GREŠKA] Slanje komande '" + komanda + "' nije uspjelo: " + e.getMessage());
+      System.err.println("[GREŠKA] Slanje komande '" + komanda + "' nije uspjelo: " + e.getMessage());
     }
+  }
+  
+  private boolean provjeriImeKorisnikaUKomandi(String korisnikCSV, String komanda) {
+    String[] komande = { "JELOVNIK", "JELO", "PIĆE", "RAČUN", "NARUDŽBA", "KARTAPIĆA"};
+
+    for (String naredba : komande) {
+      if (komanda.startsWith(naredba + " ")) {
+        String[] dijelovi = komanda.split("\\s+");
+        if (dijelovi.length >= 2) {
+          String korisnikKomande = dijelovi[1];
+          return korisnikCSV.equalsIgnoreCase(korisnikKomande);
+        }
+      }
+    }
+    return true;
   }
 
   /**
