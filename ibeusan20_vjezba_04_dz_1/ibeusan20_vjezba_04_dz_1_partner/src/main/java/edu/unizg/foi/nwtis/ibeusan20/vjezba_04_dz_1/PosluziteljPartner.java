@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -633,7 +634,8 @@ public class PosluziteljPartner {
    */
   private List<Obracun> generirajObracun() {
     Map<String, Obracun> mapa = new HashMap<>();
-    long sada = System.currentTimeMillis();
+    //long sada = System.currentTimeMillis();
+    long sada = new Date().getTime();
 
     for (var lista : placeneNarudzbe.values()) {
       for (var n : lista) {
