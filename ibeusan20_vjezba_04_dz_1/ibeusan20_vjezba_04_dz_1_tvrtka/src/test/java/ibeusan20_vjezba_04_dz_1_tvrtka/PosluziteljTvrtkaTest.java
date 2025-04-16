@@ -24,6 +24,7 @@ import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -34,7 +35,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -861,8 +861,8 @@ class PosluziteljTvrtkaTest {
     assertNotNull(partner, "Testni partner nije učitan");
 
     Obracun[] obracuni =
-        new Obracun[] {new Obracun(1, "j1", true, 2.0f, 8.0f, System.currentTimeMillis()),
-            new Obracun(1, "p1", false, 1.0f, 2.5f, System.currentTimeMillis())};
+        new Obracun[] {new Obracun(1, "j1", true, 2.0f, 8.0f, new Date().getTime()),
+            new Obracun(1, "p1", false, 1.0f, 2.5f, new Date().getTime())};
     StringWriter sw = new StringWriter();
     PrintWriter izlaz = new PrintWriter(sw, true);
     boolean rezultat = posluziteljTvrtka.provjeriIspravnostObracuna(partner, obracuni, izlaz);
@@ -877,7 +877,7 @@ class PosluziteljTvrtkaTest {
     var partner = posluziteljTvrtka.partneri.get(1);
     assertNotNull(partner);
     Obracun[] obracuni =
-        {new Obracun(1, "nePostoji", true, 1.0f, 1.0f, System.currentTimeMillis())};
+        {new Obracun(1, "nePostoji", true, 1.0f, 1.0f, new Date().getTime())};
     StringWriter sw = new StringWriter();
     PrintWriter pw = new PrintWriter(sw, true);
     boolean rezultat = posluziteljTvrtka.provjeriIspravnostObracuna(partner, obracuni, pw);
@@ -893,7 +893,7 @@ class PosluziteljTvrtkaTest {
     assertEquals(TEST_OBRACUN, stvarniPut, "Putanja do obračuna nije ispravna");
 
     Gson gson = new Gson();
-    Obracun testObracun = new Obracun(1, "p1", false, 1.5f, 2.5f, System.currentTimeMillis());
+    Obracun testObracun = new Obracun(1, "p1", false, 1.5f, 2.5f, new Date().getTime());
     Obracun[] niz = new Obracun[] {testObracun};
 
     posluziteljTvrtka.odradiLokotObracuna(gson, niz);
@@ -933,7 +933,7 @@ class PosluziteljTvrtkaTest {
       executor.submit(() -> {
         try {
           Obracun obracun = new Obracun(1, "p" + indeks, false, 1.0f + indeks, 2.5f + indeks,
-              System.currentTimeMillis());
+              new Date().getTime());
           Obracun[] niz = new Obracun[] {obracun};
           posluziteljTvrtka.odradiLokotObracuna(gson, niz);
         } catch (IOException e) {
@@ -965,7 +965,7 @@ class PosluziteljTvrtkaTest {
 
     Runnable nesinkroniziraniUpis = () -> {
       try {
-        Obracun o = new Obracun(1, "p1", false, 1.0f, 2.5f, System.currentTimeMillis());
+        Obracun o = new Obracun(1, "p1", false, 1.0f, 2.5f, new Date().getTime());
         Obracun[] niz = new Obracun[] {o};
         String json = gson.toJson(niz);
         Files.writeString(datoteka, json);
@@ -1106,7 +1106,7 @@ class PosluziteljTvrtkaTest {
       executor.submit(() -> {
         try {
           Obracun obracun =
-              new Obracun(1, "p1", false, 1.0f + id, 2.0f + id, System.currentTimeMillis());
+              new Obracun(1, "p1", false, 1.0f + id, 2.0f + id, new Date().getTime());
           Obracun[] niz = new Obracun[] {obracun};
           posluziteljTvrtka.odradiLokotObracuna(gson, niz);
         } catch (IOException e) {
