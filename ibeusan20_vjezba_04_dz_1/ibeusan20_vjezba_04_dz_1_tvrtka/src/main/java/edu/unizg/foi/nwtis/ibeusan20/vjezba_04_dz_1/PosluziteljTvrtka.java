@@ -21,7 +21,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import com.google.gson.Gson;
@@ -43,7 +42,7 @@ public class PosluziteljTvrtka {
   private ExecutorService executor = null;
 
   /** Lista aktivnih dretvi. */
-  private final List<Future<?>> aktivneDretve = new ArrayList<>();
+  public final List<Future<?>> aktivneDretve = new ArrayList<>();
   
   /** Mapa dretvi i utičnica. */
   private final Map<Future<?>, Socket> mapaDretviUticnica = new ConcurrentHashMap<>();
@@ -52,24 +51,24 @@ public class PosluziteljTvrtka {
   private int brojZatvorenihVeza = 0;
 
   /** Future objekti za dretve */
-  private Future<?> dretvaZaKraj;
-  private Future<?> dretvaRegistracija;
-  private Future<?> dretvaRadPartnera;
+  public Future<?> dretvaZaKraj;
+  public Future<?> dretvaRegistracija;
+  public Future<?> dretvaRadPartnera;
 
   /** Pauza dretve. */
   private int pauzaDretve = 1000;
 
   /** Kod za kraj rada */
-  private String kodZaKraj = "";
+  public String kodZaKraj = "";
 
   /** Zastavica za kraj rada */
-  private AtomicBoolean kraj = new AtomicBoolean(false);
+  public AtomicBoolean kraj = new AtomicBoolean(false);
 
   /** Thread-safe kolekcije */
   private Map<Integer, String> kuhinje = new ConcurrentHashMap<>();
-  private Map<String, Map<String, Jelovnik>> jelovnici = new ConcurrentHashMap<>();
-  private Map<String, KartaPica> kartaPica = new ConcurrentHashMap<>();
-  private Map<Integer, Partner> partneri = new ConcurrentHashMap<>();
+  public Map<String, Map<String, Jelovnik>> jelovnici = new ConcurrentHashMap<>();
+  public Map<String, KartaPica> kartaPica = new ConcurrentHashMap<>();
+  public Map<Integer, Partner> partneri = new ConcurrentHashMap<>();
 
   /**
    * Dohvaća konfiguraciju.
@@ -235,7 +234,7 @@ public class PosluziteljTvrtka {
    * @param linija ulazna komanda
    * @return true ako je komanda ispravna i sadrži točan kod za kraj, inače false
    */
-  private boolean provjeriFormatKomande(String linija) {
+  public boolean provjeriFormatKomande(String linija) {
     String izraz = "^KRAJ\\s+" + Pattern.quote(this.kodZaKraj) + "$";
     return Pattern.compile(izraz).matcher(linija.trim()).matches();
   }
@@ -246,7 +245,7 @@ public class PosluziteljTvrtka {
    * @param mreznaUticnica mrežna utičnica s koje je došla komanda
    * @return true ako adresa pripada lokalnoj mreži, inače false
    */
-  private boolean provjeriLokalnuAdresu(Socket mreznaUticnica) {
+  public boolean provjeriLokalnuAdresu(Socket mreznaUticnica) {
     InetAddress adresa = mreznaUticnica.getInetAddress();
     return adresa.isLoopbackAddress() || adresa.isAnyLocalAddress() || adresa.isSiteLocalAddress();
   }
@@ -256,7 +255,7 @@ public class PosluziteljTvrtka {
    *
    * @param mreznaUticnica mrežna utičnica prema klijentu
    */
-  private void posaljiPorukuGreske(Socket mreznaUticnica) {
+  public void posaljiPorukuGreske(Socket mreznaUticnica) {
     try {
       var izlaz = new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"));
       izlaz.write("ERROR 19 - Nešto drugo nije u redu.\n");
@@ -374,7 +373,7 @@ public class PosluziteljTvrtka {
    * @param nazivDatoteke naziv datoteke iz koje se učitava jelovnik
    * @param datoteka put do datoteke koja sadrži JSON zapis jelovnika
    */
-  private void ucitajJelovnikZaKuhinju(Gson gson, String oznaka, String nazivDatoteke,
+  public void ucitajJelovnikZaKuhinju(Gson gson, String oznaka, String nazivDatoteke,
       Path datoteka) {
     try (var reader = Files.newBufferedReader(datoteka)) {
       Jelovnik[] niz = gson.fromJson(reader, Jelovnik[].class);
