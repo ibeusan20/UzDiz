@@ -18,13 +18,14 @@ import edu.unizg.foi.nwtis.konfiguracije.Konfiguracija;
 import edu.unizg.foi.nwtis.konfiguracije.KonfiguracijaApstraktna;
 import edu.unizg.foi.nwtis.konfiguracije.NeispravnaKonfiguracija;
 
+// TODO: Auto-generated Javadoc
 /**
  * Klasa KorisnikKupac. Šalje poslužiteljuPartneru komande iz CSV datoteke 
  * 
  */
 public class KorisnikKupac {
 
-  /** Definiranje varijable konfiguracije */
+  /** Definiranje varijable konfiguracije. */
   private Konfiguracija konfig;
   
   /** Predložak za prepoznavanje komande "KRAJ". */
@@ -36,14 +37,13 @@ public class KorisnikKupac {
   /**
    * Glavna metoda klase kojom se program pokreće i gasi.
    *
-   * @param args the arguments
+   * @param args argumenti main metode
    */
   public static void main(String[] args) {
     if (args.length > 2) {
       System.out.println("Broj argumenata veći od 2.");
       return;
     }
-
     var program = new KorisnikKupac();
     var nazivKonfiguracije = args[0];
 
@@ -58,7 +58,6 @@ public class KorisnikKupac {
     } else {
       program.obradiCSV(naredba);
     }
-
     program.zatvoriSveVeze();
   }
 
@@ -73,7 +72,6 @@ public class KorisnikKupac {
       this.konfig = KonfiguracijaApstraktna.preuzmiKonfiguraciju(nazivDatoteke);
       return true;
     } catch (NeispravnaKonfiguracija ex) {
-      Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
     }
     return false;
   }
@@ -88,13 +86,13 @@ public class KorisnikKupac {
       var mreznaVrata = Integer.parseInt(konfig.dajPostavku("mreznaVrataKraj"));
 
       try (Socket uticnica = new Socket(adresa, mreznaVrata);
-          PrintWriter out =
+          PrintWriter pisac =
               new PrintWriter(new OutputStreamWriter(uticnica.getOutputStream(), "utf8"), true);
-          BufferedReader in =
+          BufferedReader citac =
               new BufferedReader(new InputStreamReader(uticnica.getInputStream(), "utf8"))) {
 
-         out.println("KRAJ " + kodZaKraj);
-         String odgovor = in.readLine();
+         pisac.println("KRAJ " + kodZaKraj);
+         String odgovor = citac.readLine();
          if ("OK".equals(odgovor)) {
          System.out.println("[INFO] Uspješno poslan KRAJ.");
          } else {
@@ -102,7 +100,6 @@ public class KorisnikKupac {
          } 
       }
     } catch (IOException e) {
-      // System.err.println("[GREŠKA] Slanje KRAJ nije uspjelo: " + e.getMessage());
     }
   }
 
@@ -118,9 +115,9 @@ public class KorisnikKupac {
       return;
     }
 
-    try (BufferedReader reader = Files.newBufferedReader(putanja)) {
+    try (BufferedReader citac = Files.newBufferedReader(putanja)) {
       String redak;
-      while ((redak = reader.readLine()) != null) {
+      while ((redak = citac.readLine()) != null) {
         String[] polja = redak.split(";", 5);
         if (polja.length < 5) {
           System.out.println("[UPOZORENJE] Preskočen redak: " + redak);
@@ -137,11 +134,9 @@ public class KorisnikKupac {
           Thread.sleep(spavanje);
         } catch (InterruptedException ignored) {
         }
-
         posaljiKomandu(korisnik, adresa, port, komanda);
       }
     } catch (IOException e) {
-      System.err.println("[GREŠKA] Čitanje CSV datoteke nije uspjelo: " + e.getMessage());
     }
   }
 
@@ -158,23 +153,24 @@ public class KorisnikKupac {
       //System.err.println("[SIGURNOST] Korisnik '" + korisnik + "' pokušao slati komandu u tuđe ime: " + komanda);
       return;
     }
-    try (Socket socket = new Socket(adresa, port);
-         //BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"));
-         PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"), true)) {
+    try (Socket mreznaUticnica = new Socket(adresa, port);
+         PrintWriter pisac = new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"), true)) {
 
-      out.println(komanda);
-      socket.shutdownOutput();
+      pisac.println(komanda);
+      mreznaUticnica.shutdownOutput();
 
-      // String odgovor;
-      // while ((odgovor = in.readLine()) != null) {
-      //   System.out.println("[" + korisnik + "] " + odgovor);
-      // }
-      socket.shutdownInput();
+      mreznaUticnica.shutdownInput();
     } catch (IOException e) {
-      System.err.println("[GREŠKA] Slanje komande '" + komanda + "' nije uspjelo: " + e.getMessage());
     }
   }
   
+  /**
+   * Provjeri ime korisnika U komandi.
+   *
+   * @param korisnikCSV CSV datoteka konfiguracije za korisnika
+   * @param komanda komanda koja se šalje
+   * @return true, ako je upsješno
+   */
   private boolean provjeriImeKorisnikaUKomandi(String korisnikCSV, String komanda) {
     String[] komande = { "JELOVNIK", "JELO", "PIĆE", "RAČUN", "NARUDŽBA", "KARTAPIĆA"};
 
@@ -197,9 +193,7 @@ public class KorisnikKupac {
     for (Map.Entry<String, Socket> entry : aktivneUticnice.entrySet()) {
       try {
         entry.getValue().close();
-        // System.out.println("[INFO] Zatvorena veza za: " + entry.getKey());
       } catch (IOException e) {
-        // System.err.println("[GREŠKA] Ne mogu zatvoriti vezu: " + entry.getKey());
       }
     }
     aktivneUticnice.clear();
