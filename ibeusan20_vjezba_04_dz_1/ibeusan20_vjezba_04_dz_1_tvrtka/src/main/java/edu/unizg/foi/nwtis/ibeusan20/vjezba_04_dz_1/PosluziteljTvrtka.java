@@ -58,7 +58,7 @@ public class PosluziteljTvrtka {
   /** Pauza dretve. */
   private int pauzaDretve = 1000;
 
-  /** Kod za kraj rada */
+  /** Varijabla za kod za kraj rada */
   public String kodZaKraj = "";
 
   /** Zastavica za kraj rada */
