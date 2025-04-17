@@ -33,41 +33,55 @@ import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.KartaPica;
 import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.Obracun;
 import edu.unizg.foi.nwtis.vjezba_04_dz_1.podaci.Partner;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PosluziteljTvrtka.
+ */
 public class PosluziteljTvrtka {
 
-  /** Konfiguracijski podaci */
+  /** Konfiguracijski podaci. */
   private Konfiguracija konfig;
 
-  /** Pokretač dretvi */
+  /** Pokretač dretvi. */
   public ExecutorService executor = null;
 
   /** Lista aktivnih dretvi. */
   public final List<Future<?>> aktivneDretve = new ArrayList<>();
-  
+
   /** Mapa dretvi i utičnica. */
   private final Map<Future<?>, Socket> mapaDretviUticnica = new ConcurrentHashMap<>();
-  
+
   /** Broj zatvorenih veza. */
   private int brojZatvorenihVeza = 0;
 
-  /** Future objekti za dretve */
+  /** Future objekti za dretve. */
   public Future<?> dretvaZaKraj;
+  
+  /** Dretva za registraciju. */
   public Future<?> dretvaRegistracija;
+  
+  /** Dretva za rad partnera. */
   public Future<?> dretvaRadPartnera;
 
   /** Pauza dretve. */
   private int pauzaDretve = 1000;
 
-  /** Varijabla za kod za kraj rada */
+  /** Varijabla za kod za kraj rada. */
   public String kodZaKraj = "";
 
-  /** Zastavica za kraj rada */
+  /** Zastavica za kraj rada. */
   public AtomicBoolean kraj = new AtomicBoolean(false);
 
-  /** Thread-safe kolekcije */
+  /** Thread-safe kolekcija kuhinja. */
   private Map<Integer, String> kuhinje = new ConcurrentHashMap<>();
+  
+  /** Thread-safe kolekcija jelovnika. */
   public Map<String, Map<String, Jelovnik>> jelovnici = new ConcurrentHashMap<>();
+  
+  /** Thread-safe kolekcija karta pića. */
   public Map<String, KartaPica> kartaPica = new ConcurrentHashMap<>();
+  
+  /** Thread-safe kolekcija partnera. */
   public Map<Integer, Partner> partneri = new ConcurrentHashMap<>();
 
   /**
@@ -90,17 +104,14 @@ public class PosluziteljTvrtka {
       return;
     }
     var program = new PosluziteljTvrtka();
-    
+
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
       int br = program.kraj.get() ? 3 : 0;
       int zatvorene = program.zatvoriDretveIMrezneVeze(br);
-      //System.out.println("[INFO] Ukupan broj zatvorenih veza: " + program.brojZatvorenihVeza);
       System.out.println("[INFO] Ukupan broj prekinutih dretvi: " + zatvorene);
     }));
 
-    
     var nazivDatoteke = args[0];
-
     program.pripremiKreni(nazivDatoteke);
   }
 
@@ -153,10 +164,11 @@ public class PosluziteljTvrtka {
     } catch (IOException e) {
     }
   }
-  
+
   /**
    * Zatvori dretve i mrežne veze.
    *
+   * @param zatvorene prima broj zatvorenih dretvi ako ih ima
    * @return vraća broj zatvorenih dretvi
    */
   public int zatvoriDretveIMrezneVeze(int zatvorene) {
@@ -184,13 +196,12 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Čita dolazne poruke. Provjerava forme komandi KRAJ i gleda IP
-   * adresu.
+   * Čita dolazne poruke. Provjerava komandu KRAJ i gleda IP adresu.
    * 
    * Koristi metode provjeriFormatKomande, provjeriLokalnuAdresu i posaljiPorukuGreske.
    *
    * @param mreznaUticnica je parametar
-   * @return the boolean
+   * @return vraća bool
    */
   public Boolean obradiKraj(Socket mreznaUticnica) {
     try {
@@ -297,12 +308,6 @@ public class PosluziteljTvrtka {
     } catch (IOException ex) {
       return false;
     }
-    // PRIVREMENI ISPIS
-    //System.out.println("Učitana pića:");
-    //for (var p : this.kartaPica.values()) {
-    //  System.out
-    //      .println(" " + p.id() + " " + p.naziv() + " " + p.kolicina() + " " + p.cijena() + " ");
-    //}
     return true;
   }
 
@@ -335,27 +340,8 @@ public class PosluziteljTvrtka {
 
       ucitajJelovnikZaKuhinju(gson, oznaka, nazivDatoteke, datoteka);
     }
-    //ispisUcitanogJelovnikaKartePica();
     return true;
   }
-
-//  /**
-//   * Ispisuje sve učitane jelovnike po vrstama kuhinja.
-//   * Svaki jelovnik ispisuje se sa svim svojim jelima (ID, naziv i cijena).
-//   * <p>
-//   * Metoda je namijenjena za privremeni ispis u konzolu
-//   */
-//  private void ispisUcitanogJelovnikaKartePica() {
-//    System.out.println("Učitani jelovnici:");
-//    for (var ulaz : this.jelovnici.entrySet()) {
-//      String oznakaKuhinje = ulaz.getKey();
-//      Map<String, Jelovnik> jela = ulaz.getValue();
-//      System.out.println("Kuhinja: " + oznakaKuhinje);
-//      for (var j : jela.values()) {
-//        System.out.println(" " + j.id() + " " + j.naziv() + " " + j.cijena() + " ");
-//      }
-//    }
-//  }
 
   /**
    * Učitava jelovnik za određenu vrstu kuhinje iz JSON datoteke i sprema ga u memoriju.
@@ -367,15 +353,14 @@ public class PosluziteljTvrtka {
    */
   public void ucitajJelovnikZaKuhinju(Gson gson, String oznaka, String nazivDatoteke,
       Path datoteka) {
-    try (var reader = Files.newBufferedReader(datoteka)) {
-      Jelovnik[] niz = gson.fromJson(reader, Jelovnik[].class);
+    try (var citac = Files.newBufferedReader(datoteka)) {
+      Jelovnik[] niz = gson.fromJson(citac, Jelovnik[].class);
       Map<String, Jelovnik> mapa = new ConcurrentHashMap<>();
       for (var j : niz) {
         mapa.put(j.id(), j);
       }
       this.jelovnici.put(oznaka, mapa);
     } catch (IOException e) {
-      //System.err.println("Greška kod učitavanja jelovnika: " + nazivDatoteke);
     }
   }
 
@@ -394,8 +379,8 @@ public class PosluziteljTvrtka {
         Files.createFile(datoteka);
         return true;
       }
-      try (var reader = Files.newBufferedReader(datoteka)) {
-        Partner[] niz = gson.fromJson(reader, Partner[].class);
+      try (var citac = Files.newBufferedReader(datoteka)) {
+        Partner[] niz = gson.fromJson(citac, Partner[].class);
         if (niz != null) {
           for (Partner p : niz) {
             this.partneri.put(p.id(), p);
@@ -403,15 +388,14 @@ public class PosluziteljTvrtka {
         }
       }
     } catch (IOException e) {
-      System.err.println("Greška kod učitavanja partnera: " + e.getMessage());
       return false;
     }
     return true;
   }
 
   /**
-   * Pokreće poslužitelj za registraciju partnera. 
-   * Na svaku mrežnu vezu stvara novu dretvu za obradu zahtjeva.
+   * Pokreće poslužitelj za registraciju partnera. Na svaku mrežnu vezu stvara novu dretvu za obradu
+   * zahtjeva.
    */
   public void pokreniPosluziteljRegistracija() {
     var mreznaVrata = Integer.parseInt(this.konfig.dajPostavku("mreznaVrataRegistracija"));
@@ -423,7 +407,6 @@ public class PosluziteljTvrtka {
         var dretva = this.executor.submit(() -> obradiRegistraciju(uticnica));
         this.aktivneDretve.add(dretva);
         this.mapaDretviUticnica.put(dretva, uticnica);
-        //System.out.println("[INFO] Nova konekcija: " + uticnica);
       }
     } catch (IOException e) {
       System.err.println("[INFO] Gašenje poslužitelja za registraciju, zatvorena 1 veza.");
@@ -446,7 +429,6 @@ public class PosluziteljTvrtka {
         gson.toJson(niz, pisac);
       }
     } catch (IOException e) {
-      System.err.println("Greška pri spremanju partnera: " + e.getMessage());
     }
   }
 
@@ -463,7 +445,6 @@ public class PosluziteljTvrtka {
         var dretva = this.executor.submit(() -> this.obradiRadPartnera(uticnica));
         this.aktivneDretve.add(dretva);
         this.mapaDretviUticnica.put(dretva, uticnica);
-        //System.out.println("[INFO] Nova konekcija: " + uticnica);
       }
     } catch (IOException e) {
       System.err.println("[INFO] Gašenje poslužitelja za rad s partnerima, zatvorena 1 veza.");
@@ -471,17 +452,13 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Obradi zahtjev za registraciju partnera. 
+   * Obradi zahtjev za registraciju partnera.
    * 
-   * Metoda prihvaća dolaznu mrežnu utičnicu i obrađuje komande:
-   * - PARTNER ...   → registracija novog partnera
-   * - OBRIŠI ...    → brisanje postojećeg partnera
-   * - POPIS         → dohvaćanje popisa svih partnera
+   * Metoda prihvaća dolaznu mrežnu utičnicu i obrađuje komande: - PARTNER ... → registracija novog
+   * partnera - OBRIŠI ... → brisanje postojećeg partnera - POPIS → dohvaćanje popisa svih partnera
    * 
-   * Sve specifične komande obrađuju se svojim metodama:
-   * - {@code obradiPartnerKomandu}
-   * - {@code obradiObrisiKomandu}
-   * - {@code obradiKomanduPopis}
+   * Sve specifične komande obrađuju se svojim metodama: - {@code obradiPartnerKomandu} -
+   * {@code obradiObrisiKomandu} - {@code obradiKomanduPopis}
    *
    * @param uticnica mrežna utičnica s koje je primljen zahtjev za registraciju
    */
@@ -491,8 +468,6 @@ public class PosluziteljTvrtka {
       var linija = ulaz.readLine();
       var komanda = linija.trim();
       var dijelovi = komanda.split("\\s+", 2);
-      // PRIVREMENI ISPIS
-      //System.out.println("primljena linija: " + linija);
 
       if (dijelovi.length < 1) {
         izlaz.write("ERROR 20 - Format komande nije ispravan\n");
@@ -515,7 +490,6 @@ public class PosluziteljTvrtka {
         brojZatvorenihVeza++;
       }
     } catch (IOException | NumberFormatException e) {
-      System.err.println("Greška u obradi registracije: " + e.getMessage());
     }
   }
 
@@ -538,9 +512,9 @@ public class PosluziteljTvrtka {
   /**
    * Obradi komandu za brisanje partnera iz sustava.
    *
-   * Metoda provjerava ispravnost komande "OBRIŠI <id> <sigurnosniKod>", 
-   * validira postoji li partner s danim ID-jem i je li sigurnosni kod točan. 
-   * Ako su uvjeti ispunjeni, partner se uklanja iz kolekcije i ažurira se datoteka partnera.
+   * Metoda provjerava ispravnost komande "OBRIŠI <id> <sigurnosniKod>", validira postoji li partner
+   * s danim ID-jem i je li sigurnosni kod točan. Ako su uvjeti ispunjeni, partner se uklanja iz
+   * kolekcije i ažurira se datoteka partnera.
    *
    * @param izlaz ispis odgovora klijentu
    * @param komanda puna komanda za brisanje partnera
@@ -570,10 +544,9 @@ public class PosluziteljTvrtka {
   /**
    * Obradi komandu za registraciju novog partnera.
    *
-   * Metoda provjerava format komande "PARTNER", parsira podatke
-   * o partneru (ID, naziv, vrsta kuhinje, adresa, mrežna vrata, GPS koordinate) 
-   * te provjerava postoji li već partner s istim ID-jem.
-   * Ako ne postoji, partner se dodaje u kolekciju i sprema u datoteku.
+   * Metoda provjerava format komande "PARTNER", parsira podatke o partneru (ID, naziv, vrsta
+   * kuhinje, adresa, mrežna vrata, GPS koordinate) te provjerava postoji li već partner s istim
+   * ID-jem. Ako ne postoji, partner se dodaje u kolekciju i sprema u datoteku.
    *
    * @param izlaz ispis prema partneru
    * @param komanda puna komanda za registraciju partnera
@@ -606,21 +579,21 @@ public class PosluziteljTvrtka {
     }
   }
 
-  /** 
-   * Objekt za zaključavanje pristupa datoteci obračuna.
-   * Koristi se u metodi {@code odradiLokotObracuna} za sinkronizaciju.
+  /**
+   * Objekt za zaključavanje pristupa datoteci obračuna. Koristi se u metodi
+   * {@code odradiLokotObracuna} za sinkronizaciju.
    */
   private final Object lokotObracuna = new Object();
 
   /**
    * Obrada zahtjeva partnera tijekom rada poslužitelja.
    *
-   * Prima mrežnu utičnicu, čita prvu liniju zahtjeva te na temelju
-   * komande prosljeđuje obradu jednoj od metoda:
+   * Prima mrežnu utičnicu, čita prvu liniju zahtjeva te na temelju komande prosljeđuje obradu
+   * jednoj od metoda:
    * <ul>
-   *   <li>{@code obradiJelovnikKomandu}</li>
-   *   <li>{@code obradiKartaPicaKomandu}</li>
-   *   <li>{@code obradiObracunKomandu}</li>
+   * <li>{@code obradiJelovnikKomandu}</li>
+   * <li>{@code obradiKartaPicaKomandu}</li>
+   * <li>{@code obradiObracunKomandu}</li>
    * </ul>
    * U slučaju neispravne komande, vraća odgovarajuću grešku partneru.
    *
@@ -632,7 +605,6 @@ public class PosluziteljTvrtka {
 
       var linija = ulaz.readLine();
       var komanda = linija.trim();
-      //System.out.println("Primljena komanda: " + komanda);
 
       if (komanda.startsWith("JELOVNIK")) {
         obradiJelovnikKomandu(izlaz, komanda);
@@ -650,7 +622,6 @@ public class PosluziteljTvrtka {
         brojZatvorenihVeza++;
       }
     } catch (IOException e) {
-      System.err.println("Greška u obradi partnera: " + e.getMessage());
     }
   }
 
@@ -687,7 +658,6 @@ public class PosluziteljTvrtka {
       Gson gson = new Gson();
       odradiLokotObracuna(gson, novi);
       izlaz.write("OK\n");
-
     } catch (JsonSyntaxException e) {
       izlaz.write("ERROR 35 - Neispravan obračun\n");
     } catch (Exception e) {
@@ -698,7 +668,7 @@ public class PosluziteljTvrtka {
   /**
    * Učitava JSON zapis obračuna iz ulaznog toka i pretvara ga u niz objekata
    * 
-   * Metoda čita ulazni tok sve dok ne pročita cijeli JSON
+   * Metoda čita ulazni tok sve dok ne pročita cijeli JSON.
    *
    * @param ulaz ulazni tok podataka koji sadrži JSON zapis
    * @return niz objekata tipa {@code Obracun} učitanih iz JSON zapisa
@@ -743,9 +713,8 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Sinkronizirano zapisuje obračune u datoteku koristeći hehanizam 
-   * međusobnog isključivanja kako bi se spriječila
-   * istovremena izmjena podataka iz više dretvi.
+   * Sinkronizirano zapisuje obračune u datoteku koristeći hehanizam međusobnog isključivanja kako
+   * bi se spriječila istovremena izmjena podataka iz više dretvi.
    * 
    * Metoda za zapis u obračun za obraduObračunKomandu
    *
@@ -760,8 +729,8 @@ public class PosluziteljTvrtka {
 
       Obracun[] postojeci = new Obracun[0];
       if (Files.exists(datoteka) && Files.size(datoteka) > 0) {
-        try (var reader = Files.newBufferedReader(datoteka)) {
-          postojeci = gson.fromJson(reader, Obracun[].class);
+        try (var citac = Files.newBufferedReader(datoteka)) {
+          postojeci = gson.fromJson(citac, Obracun[].class);
         }
       }
 
@@ -777,8 +746,8 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Obradi komandu KARTAPIĆA i pošalji partneru njegovu kartu pića.
-   * Provodi validaciju partnera i njegovog sigurnosnog koda.
+   * Obradi komandu KARTAPIĆA i pošalji partneru njegovu kartu pića. Provodi validaciju partnera i
+   * njegovog sigurnosnog koda.
    *
    * @param izlaz izlazni tok za slanje odgovora partneru
    * @param komanda ulazna komanda u obliku "KARTAPIĆA <id> <sigurnosniKod>"
@@ -810,8 +779,8 @@ public class PosluziteljTvrtka {
   }
 
   /**
-   * Obradi komandu JELOVNIK i pošalji partneru njegov jelovnik.
-   * Provodi validaciju partnera, sigurnosnog koda i postoji li jelovnik za traženu vrstu kuhinje.
+   * Obradi komandu JELOVNIK i pošalji partneru njegov jelovnik. Provodi validaciju partnera,
+   * sigurnosnog koda i postoji li jelovnik za traženu vrstu kuhinje.
    *
    * @param izlaz izlazni tok za slanje odgovora partneru
    * @param komanda ulazna komanda u obliku "JELOVNIK <id> <sigurnosniKod>"
