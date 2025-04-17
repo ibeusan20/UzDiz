@@ -56,10 +56,10 @@ public class PosluziteljTvrtka {
 
   /** Future objekti za dretve. */
   public Future<?> dretvaZaKraj;
-  
+
   /** Dretva za registraciju. */
   public Future<?> dretvaRegistracija;
-  
+
   /** Dretva za rad partnera. */
   public Future<?> dretvaRadPartnera;
 
@@ -74,13 +74,13 @@ public class PosluziteljTvrtka {
 
   /** Thread-safe kolekcija kuhinja. */
   private Map<Integer, String> kuhinje = new ConcurrentHashMap<>();
-  
+
   /** Thread-safe kolekcija jelovnika. */
   public Map<String, Map<String, Jelovnik>> jelovnici = new ConcurrentHashMap<>();
-  
+
   /** Thread-safe kolekcija karta pića. */
   public Map<String, KartaPica> kartaPica = new ConcurrentHashMap<>();
-  
+
   /** Thread-safe kolekcija partnera. */
   public Map<Integer, Partner> partneri = new ConcurrentHashMap<>();
 
