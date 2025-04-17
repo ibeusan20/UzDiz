@@ -35,6 +35,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -247,7 +248,7 @@ class PosluziteljTvrtkaTest {
     posluziteljTvrtka.dretvaRegistracija = future1;
     posluziteljTvrtka.dretvaRadPartnera = future1;
     posluziteljTvrtka.dretvaZaKraj = future1;
-    int broj = posluziteljTvrtka.zatvoriDretveIMrezneVeze();
+    int broj = posluziteljTvrtka.zatvoriDretveIMrezneVeze(0);
     assertEquals(4, broj, "Broj zatvorenih dretvi nije točan");
   }
 

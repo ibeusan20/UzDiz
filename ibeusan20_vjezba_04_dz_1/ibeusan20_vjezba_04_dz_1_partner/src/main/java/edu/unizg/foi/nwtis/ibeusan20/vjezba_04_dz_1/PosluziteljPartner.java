@@ -110,7 +110,7 @@ public class PosluziteljPartner {
       return;
     } else if (program.predlozakPartner.matcher(drugiArg).matches()) {
       if (!program.poveziSeITraziJelovnikIKartu()) {
-        //System.out.println("Neuspješno učitavanje jelovnika ili karte pića.");
+        System.out.println("Neuspješno učitavanje jelovnika ili karte pića. Kraj rada."); //OBAVEZNO
         return;
       }
       // System.out.println("Poslužitelj kupaca pokrenut: " + drugiArg);
@@ -751,7 +751,7 @@ public class PosluziteljPartner {
     uticnica.shutdownInput();
 
     if ("OK".equals(linija)) {
-      System.out.println("Uspješan kraj poslužitelja.");
+      System.out.println("Uspješan kraj poslužitelja."); //obavezno
     } else {
       System.out.println("Greška prilikom slanja komande KRAJ.");
     }
