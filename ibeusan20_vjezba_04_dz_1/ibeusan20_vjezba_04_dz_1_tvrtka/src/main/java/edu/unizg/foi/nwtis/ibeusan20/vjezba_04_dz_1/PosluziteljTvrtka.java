@@ -19,7 +19,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -50,11 +49,6 @@ public class PosluziteljTvrtka {
   
   /** Broj zatvorenih veza. */
   private int brojZatvorenihVeza = 0;
-  
-  private AtomicInteger zatvoreneDretve = new AtomicInteger(0);
-  
-  /** Broj otvorenih dretvi. */
-  private AtomicInteger brojOtvorenihDretvi = new AtomicInteger(0);
 
   /** Future objekti za dretve */
   public Future<?> dretvaZaKraj;
@@ -128,11 +122,8 @@ public class PosluziteljTvrtka {
     this.executor = Executors.newThreadPerTaskExecutor(factory);
 
     this.dretvaZaKraj = this.executor.submit(() -> this.pokreniPosluziteljKraj());
-    brojOtvorenihDretvi.getAndIncrement();
     this.dretvaRegistracija = this.executor.submit(() -> this.pokreniPosluziteljRegistracija());
-    brojOtvorenihDretvi.getAndIncrement();
     this.dretvaRadPartnera = this.executor.submit(() -> this.pokreniPosluziteljRad());
-    brojOtvorenihDretvi.getAndIncrement();
 
     while (!dretvaZaKraj.isDone()) {
       try {
@@ -174,23 +165,19 @@ public class PosluziteljTvrtka {
       if (!dretva.isDone()) {
         dretva.cancel(true);
         zatvorene++;
-        brojOtvorenihDretvi.getAndDecrement();
       }
     }
     if (dretvaRegistracija != null && !dretvaRegistracija.isDone()) {
       dretvaRegistracija.cancel(true);
       zatvorene++;
-      brojOtvorenihDretvi.getAndDecrement();
     }
     if (dretvaRadPartnera != null && !dretvaRadPartnera.isDone()) {
       dretvaRadPartnera.cancel(true);
       zatvorene++;
-      brojOtvorenihDretvi.getAndDecrement();
     }
     if (dretvaZaKraj != null && !dretvaZaKraj.isDone()) {
       dretvaZaKraj.cancel(true);
       zatvorene++;
-      brojOtvorenihDretvi.getAndDecrement();
       System.out.println("[INFO] Gašenje poslužitelja za kraj, zatvorena 1 veza.");
     }
     return zatvorene;
