@@ -876,8 +876,7 @@ class PosluziteljTvrtkaTest {
   void testProvjeriIspravnostObracuna_NeispravanIdStavke() throws Exception {
     var partner = posluziteljTvrtka.partneri.get(1);
     assertNotNull(partner);
-    Obracun[] obracuni =
-        {new Obracun(1, "nePostoji", true, 1.0f, 1.0f, new Date().getTime())};
+    Obracun[] obracuni = {new Obracun(1, "nePostoji", true, 1.0f, 1.0f, new Date().getTime())};
     StringWriter sw = new StringWriter();
     PrintWriter pw = new PrintWriter(sw, true);
     boolean rezultat = posluziteljTvrtka.provjeriIspravnostObracuna(partner, obracuni, pw);
@@ -1105,8 +1104,7 @@ class PosluziteljTvrtkaTest {
       final int id = i;
       executor.submit(() -> {
         try {
-          Obracun obracun =
-              new Obracun(1, "p1", false, 1.0f + id, 2.0f + id, new Date().getTime());
+          Obracun obracun = new Obracun(1, "p1", false, 1.0f + id, 2.0f + id, new Date().getTime());
           Obracun[] niz = new Obracun[] {obracun};
           posluziteljTvrtka.odradiLokotObracuna(gson, niz);
         } catch (IOException e) {

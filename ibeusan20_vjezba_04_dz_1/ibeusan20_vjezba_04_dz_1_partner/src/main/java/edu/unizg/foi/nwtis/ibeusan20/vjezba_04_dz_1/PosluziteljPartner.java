@@ -15,8 +15,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import com.google.gson.Gson;
 import edu.unizg.foi.nwtis.konfiguracije.Konfiguracija;
@@ -109,7 +107,7 @@ public class PosluziteljPartner {
       return;
     } else if (program.predlozakPartner.matcher(drugiArg).matches()) {
       if (!program.poveziSeITraziJelovnikIKartu()) {
-        System.out.println("Neuspješno učitavanje jelovnika ili karte pića. Kraj rada."); //OBAVEZNO
+        System.out.println("Neuspješno učitavanje jelovnika ili karte pića. Kraj rada."); // OBAVEZNO
         return;
       }
       program.pokreniPosluziteljKupaca();
@@ -133,7 +131,8 @@ public class PosluziteljPartner {
         Socket uticnica = entry.getValue();
 
         boolean prekinuta = dretva.cancel(true);
-        if (prekinuta) brojPrekinutihDretvi++;
+        if (prekinuta)
+          brojPrekinutihDretvi++;
 
         try {
           if (uticnica != null && !uticnica.isClosed()) {
@@ -151,8 +150,7 @@ public class PosluziteljPartner {
         }
       }
       System.out.println("[INFO] Ukupan broj zatvorenih veza: " + brojZatvorenih);
-      System.out
-          .println("[INFO] Ukupan broj prekinutih dretvi: " + brojPrekinutihDretvi);
+      System.out.println("[INFO] Ukupan broj prekinutih dretvi: " + brojPrekinutihDretvi);
     }));
   }
 
@@ -243,7 +241,7 @@ public class PosluziteljPartner {
         return false;
       if (!ucitajKartuPica(adresa, vrata))
         return false;
-      
+
       return true;
 
     } catch (Exception e) {
@@ -261,7 +259,8 @@ public class PosluziteljPartner {
   private boolean ucitajJelovnik(String adresa, int vrata) {
     String komanda = "JELOVNIK " + idPartnera + " " + sigKodPartnera;
     try (Socket socket = new Socket(adresa, vrata);
-        PrintWriter pisac = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"));
+        PrintWriter pisac =
+            new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"));
         BufferedReader citac =
             new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"))) {
 
@@ -293,7 +292,8 @@ public class PosluziteljPartner {
   private boolean ucitajKartuPica(String adresa, int vrata) {
     String komanda = "KARTAPIĆA " + idPartnera + " " + sigKodPartnera;
     try (Socket mreznaUticnica = new Socket(adresa, vrata);
-        PrintWriter pisac = new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"));
+        PrintWriter pisac =
+            new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"));
         BufferedReader citac =
             new BufferedReader(new InputStreamReader(mreznaUticnica.getInputStream(), "utf8"))) {
 
@@ -349,7 +349,7 @@ public class PosluziteljPartner {
         var izlaz = new PrintWriter(new OutputStreamWriter(uticnica.getOutputStream(), "utf8"))) {
 
       var linija = ulaz.readLine();
-      
+
       if (linija == null || linija.isBlank()) {
         izlaz.write("ERROR 40 - Format komande nije ispravan\n");
       } else if (linija.startsWith("JELOVNIK")) {
@@ -526,7 +526,7 @@ public class PosluziteljPartner {
     if (!matcher.matches()) {
       izlaz.write("ERROR 40 - Format komande nije ispravan\n");
       return;
-    } 
+    }
 
     String korisnik = matcher.group(1);
     synchronized (lokotNarudzbe) {
@@ -632,10 +632,10 @@ public class PosluziteljPartner {
       boolean uspjeh = false;
       String odgovor;
       while ((odgovor = in.readLine()) != null) {
-          if (odgovor.trim().startsWith("OK")) {
-              uspjeh = true;
-              break;
-          }
+        if (odgovor.trim().startsWith("OK")) {
+          uspjeh = true;
+          break;
+        }
       }
       uticnica.shutdownInput();
       uticnica.close();
@@ -701,7 +701,7 @@ public class PosluziteljPartner {
     uticnica.shutdownInput();
 
     if ("OK".equals(linija)) {
-      System.out.println("Uspješan kraj poslužitelja."); //obavezno
+      System.out.println("Uspješan kraj poslužitelja."); // obavezno
     }
   }
 }

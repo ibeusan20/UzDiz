@@ -11,8 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import edu.unizg.foi.nwtis.konfiguracije.Konfiguracija;
 import edu.unizg.foi.nwtis.konfiguracije.KonfiguracijaApstraktna;
@@ -20,14 +18,14 @@ import edu.unizg.foi.nwtis.konfiguracije.NeispravnaKonfiguracija;
 
 // TODO: Auto-generated Javadoc
 /**
- * Klasa KorisnikKupac. Šalje poslužiteljuPartneru komande iz CSV datoteke 
+ * Klasa KorisnikKupac. Šalje poslužiteljuPartneru komande iz CSV datoteke
  * 
  */
 public class KorisnikKupac {
 
   /** Definiranje varijable konfiguracije. */
   private Konfiguracija konfig;
-  
+
   /** Predložak za prepoznavanje komande "KRAJ". */
   private Pattern predlozakKraj = Pattern.compile("^KRAJ$");
 
@@ -91,13 +89,13 @@ public class KorisnikKupac {
           BufferedReader citac =
               new BufferedReader(new InputStreamReader(uticnica.getInputStream(), "utf8"))) {
 
-         pisac.println("KRAJ " + kodZaKraj);
-         String odgovor = citac.readLine();
-         if ("OK".equals(odgovor)) {
-         System.out.println("[INFO] Uspješno poslan KRAJ.");
-         } else {
-         System.out.println("[GREŠKA] Odgovor: " + odgovor);
-         } 
+        pisac.println("KRAJ " + kodZaKraj);
+        String odgovor = citac.readLine();
+        if ("OK".equals(odgovor)) {
+          System.out.println("[INFO] Uspješno poslan KRAJ.");
+        } else {
+          System.out.println("[GREŠKA] Odgovor: " + odgovor);
+        }
       }
     } catch (IOException e) {
     }
@@ -150,11 +148,13 @@ public class KorisnikKupac {
    */
   private void posaljiKomandu(String korisnik, String adresa, int port, String komanda) {
     if (!provjeriImeKorisnikaUKomandi(korisnik, komanda)) {
-      //System.err.println("[SIGURNOST] Korisnik '" + korisnik + "' pokušao slati komandu u tuđe ime: " + komanda);
+      // System.err.println("[SIGURNOST] Korisnik '" + korisnik + "' pokušao slati komandu u tuđe
+      // ime: " + komanda);
       return;
     }
     try (Socket mreznaUticnica = new Socket(adresa, port);
-         PrintWriter pisac = new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"), true)) {
+        PrintWriter pisac = new PrintWriter(
+            new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"), true)) {
 
       pisac.println(komanda);
       mreznaUticnica.shutdownOutput();
@@ -163,7 +163,7 @@ public class KorisnikKupac {
     } catch (IOException e) {
     }
   }
-  
+
   /**
    * Provjeri ime korisnika U komandi.
    *
@@ -172,7 +172,7 @@ public class KorisnikKupac {
    * @return true, ako je upsješno
    */
   private boolean provjeriImeKorisnikaUKomandi(String korisnikCSV, String komanda) {
-    String[] komande = { "JELOVNIK", "JELO", "PIĆE", "RAČUN", "NARUDŽBA", "KARTAPIĆA"};
+    String[] komande = {"JELOVNIK", "JELO", "PIĆE", "RAČUN", "NARUDŽBA", "KARTAPIĆA"};
 
     for (String naredba : komande) {
       if (komanda.startsWith(naredba + " ")) {
