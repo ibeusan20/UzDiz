@@ -8,6 +8,8 @@
   <artifactId>ibeusan20_vjezba_05_app</artifactId>
   <name>ibeusan20_vjezba_05_app</name>
   
+  <packaging>jlink</packaging>
+  
   <properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>23</java.version>
