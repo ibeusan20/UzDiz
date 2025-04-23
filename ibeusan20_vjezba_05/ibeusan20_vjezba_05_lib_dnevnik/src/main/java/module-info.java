@@ -4,4 +4,5 @@ module ibeusan20_vjezba_05_lib_dnevnik {
 
   requires java.sql;
   requires org.apache.commons.csv;
+  requires org.hsqldb;
 }
