@@ -3,5 +3,5 @@
 klasaDnevnika=edu.unizg.foi.nwtis.ibeusan20.vjezba_05.dnevnik.BazaPodatakaDnevnik
 korisnickoImeBazaPodataka=nwtis_2
 lozinkaBazaPodataka=nwtis#2
-urlBazaPodataka=jdbc:h2:tcp://localhost/nwtis
+urlBazaPodataka=jdbc:h2:tcp://localhost/nwtis_2
 upravljacBazaPodataka=org.h2.Driver
