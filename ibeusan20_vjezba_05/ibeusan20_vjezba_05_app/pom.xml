@@ -8,7 +8,7 @@
   <artifactId>ibeusan20_vjezba_05_app</artifactId>
   <name>ibeusan20_vjezba_05_app</name>
   
-  <packaging>jlink</packaging>
+  <packaging>jar</packaging>
   
   <properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
