@@ -34,7 +34,7 @@ docker rm tvrtka_ibeusan20
 //docker rmi tvrtka_ibeusan20
 
 #-----------------------PARTNER/SLIKA--------------U SVOME DIREKTORIJU--------
-docker build -t Partner_ibeusan20 -f Dockerfile .
+docker build -t partner_ibeusan20 -f Dockerfile .
 docker run -it -d --network=mreza_ibeusan20 --ip 20.24.5.3 \
  --name=partner_ibeusan20 --hostname=partner_ibeusan20 \
  --mount source=svezak_ibeusan20,target=/usr/app/podaci \
