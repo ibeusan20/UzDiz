@@ -1,0 +1,45 @@
+#komande
+
+#DOCKER
+docker ps
+docker cp target/libs/ {slika}:/user/app/libs
+docker inspect {slika}
+docker image ls
+docker image prune
+
+docker exec -t {slika} /bin/bash
+ps -ef
+ls -al
+
+#-----------------------MREŽA----------------KORIJENSKI DIREKTORIJ--------------
+docker network create --subnet=20.24.5.0/24 mreza_ibeusan20
+docker network rm mreza_ibeusan20
+docker network ls
+docker network inspect mreza_ibeusan20
+
+#-----------------------SVEZAK/VOLUME--------KORIJENSKI DIREKTORIJ--------------
+docker volume create svezak_ibeusan20
+docker volume inspect svezak_ibeusan20
+sudo cp podaci/*.* /var/lib/docker/volumes/svezak_ibeusan20/_data
+
+#-----------------------TVRTKA/SLIKA----------------U SVOME DIREKTORIJU--------
+docker build -t tvrtka_ibeusan20 -f Dockerfile .
+docker run -it -d --network=mreza_ibeusan20 --ip 20.24.5.2 \
+ --name=tvrtka_ibeusan20 --hostname=tvrtka_ibeusan20 \
+ --mount source=svezak_ibeusan20,target=/usr/app/podaci \
+ tvrtka_ibeusan20:latest
+docker stop tvrtka_ibeusan20
+docker start tvrtka_ibeusan20
+docker rm tvrtka_ibeusan20
+//docker rmi tvrtka_ibeusan20
+
+#-----------------------PARTNER/SLIKA--------------U SVOME DIREKTORIJU--------
+docker build -t Partner_ibeusan20 -f Dockerfile .
+docker run -it -d --network=mreza_ibeusan20 --ip 20.24.5.3 \
+ --name=partner_ibeusan20 --hostname=partner_ibeusan20 \
+ --mount source=svezak_ibeusan20,target=/usr/app/podaci \
+ partner_ibeusan20:latest
+docker stop partner_ibeusan20
+docker start partner_ibeusan20
+docker rm partner_ibeusan20
+ 
