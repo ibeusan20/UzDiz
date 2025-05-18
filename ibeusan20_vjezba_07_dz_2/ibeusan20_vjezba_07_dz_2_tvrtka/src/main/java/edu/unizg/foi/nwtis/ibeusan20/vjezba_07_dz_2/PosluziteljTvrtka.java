@@ -572,7 +572,9 @@ public class PosluziteljTvrtka {
         izlaz.write("ERROR 21 - Već postoji partner s id u kolekciji partnera\n");
       } else {
         String kod = Integer.toHexString((naziv + adresa).hashCode());
-        Partner novi = new Partner(id, naziv, vrsta, adresa, vrata, sirina, duzina, kod);
+        String kodAdmin = this.konfig.dajPostavku("kodZaAdminTvrtke");
+        int vrataKraj = Integer.parseInt(this.konfig.dajPostavku("mreznaVrataKraj"));
+        Partner novi = new Partner(id, naziv, vrsta, adresa, vrata, vrataKraj, sirina, duzina, kod, kodAdmin);
         this.partneri.put(id, novi);
         spremiPartnere();
         izlaz.write("OK " + kod + "\n");

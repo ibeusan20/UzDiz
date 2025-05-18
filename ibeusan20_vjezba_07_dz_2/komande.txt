@@ -62,3 +62,5 @@ docker run -it -d \
  --hostname=bp_ibeusan20_h2 \
  --mount type=bind,source=/opt/database,target=/opt/database \
  bp_ibeusan20_h2:latest
+ 
+ 
