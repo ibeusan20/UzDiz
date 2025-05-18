@@ -63,4 +63,17 @@ docker run -it -d \
  --mount type=bind,source=/opt/database,target=/opt/database \
  bp_ibeusan20_h2:latest
  
+ #-----------------------SERVISI/SLIKA--------------U SVOME DIREKTORIJU--------
+docker build -t servis_ibeusan20 -f Dockerfile .
+docker run -it -d \
+ --network=mreza_ibeusan20 \
+ --ip 20.24.5.20 \
+ --name=servis_ibeusan20 \
+ --hostname=servis_ibeusan20 \
+ servis_ibeusan20:latest
+ #-------PROVJERA RADA SERVISA ----------
+curl -X GET "http://20.24.5.20:8080/nwtis/v1/api/tvrtka/partner" \
+-H "Accept: application/json"
+curl -X GET "http://20.24.5.20:8080/nwtis/v1/api/tvrtka/partner/1" \
+-H "Accept: application/json"
  

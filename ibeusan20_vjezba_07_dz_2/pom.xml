@@ -81,11 +81,13 @@
 	<modules>
 		<module>ibeusan20_vjezba_07_dz_2_lib_konfig</module>
 		<module>ibeusan20_vjezba_07_dz_2_lib_podaci</module>
+		<module>ibeusan20_vjezba_07_dz_2_lib_rest</module>
 		<module>ibeusan20_vjezba_07_dz_2_tvrtka</module>
 		<module>ibeusan20_vjezba_07_dz_2_partner</module>
 		<module>ibeusan20_vjezba_07_dz_2_kupac</module>
 		<!--<module>ibeusan20_vjezba_07_dz_2_lib_rest</module>
 		<module>ibeusan20_vjezba_07_dz_2_servisi</module>
 		<module>ibeusan20_vjezba_07_dz_2_klijenti</module>-->
+		<module>ibeusan20_vjezba_07_dz_2_servisi</module>
 	</modules>
 </project>
