@@ -28,7 +28,7 @@ INSERT INTO grupe (grupa, naziv) VALUES
 	 ('admin-gui','Admin GUI'),
 	 ('admin-script','Admin Script'),
 	 ('nwtis','NWTiS korisnik'),
-	 ('admin','NWTiS Asmin');
+	 ('admin','NWTiS Admin');
 	 
 INSERT INTO uloge (korisnik, grupa) VALUES
 	 ('pkos', 'manager-gui'),
@@ -50,7 +50,7 @@ INSERT INTO uloge (korisnik, grupa) VALUES
 	 
 
 INSERT INTO partneri (id, naziv, vrstaKuhinje, adresa, mreznaVrata, mreznaVrataKraj, gpsSirina, gpsDuzina, sigurnosniKod, adminKod) VALUES
-	 (1,'FOLT 1 - Varaždin, Pavlinska 9','MK','202.24.5.3', 8010, 8011, 46.30803, 16.34009, 'BABECABACC', 'CACEDACEAA'),
+	 (1,'FOLT 1 - Varaždin, Pavlinska 9','MK','202.24.5.3', 8010, 8011, 46.30803, 16.34009, '6b5a4711', 'CACEDACEAA'),
 	 (2,'FOLT 2 - Varaždin, Ul. Julija Merlića 9','KK','202.24.5.3', 8020, 8021, 46.30835, 16.347809, 'BABECABACC', 'CACEDACEBB'),
 	 (3,'FOLT 3 - Varaždin, Varaždin, Ul. Braće Radić 102','VK','202.24.5.3', 8030, 8031, 46.3015, 16.32023, 'BABECABACC', 'CACEDACECC'),
 	 (4,'FOLT 4 - Varaždin, Trg Ivana Perkovca 39','KK','202.24.5.3', 8040, 8041, 46.28918, 16.33620, 'BABECABACC', 'CACEDACEDD');
