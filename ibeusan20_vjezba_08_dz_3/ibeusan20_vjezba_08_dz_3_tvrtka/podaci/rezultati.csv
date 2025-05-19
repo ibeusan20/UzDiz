@@ -1,0 +1,4 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1746263515137,44,Neispravna komanda KRAJ 1,200,OK,Grupa dretvi za kraj 1-1,text,true,,70,0,1,1,null,44,0,34
+1746263515187,2,Neispravna komanda KRAJ 2,200,OK,Grupa dretvi za kraj 1-1,text,true,,70,0,1,1,null,2,0,1
+1746263515190,2,Ispravna komanda KRAJ,200,OK,Grupa dretvi za kraj 1-1,text,true,,3,0,1,1,null,2,0,0
