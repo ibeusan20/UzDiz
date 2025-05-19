@@ -1,5 +1,18 @@
 #komande
+#------------------------------------------VJ08------------------------------------------------
+#-----------------PAYARA--------------------------------------
+#------------------------------U SVOM TERMINALU----------------------------
+cd /opt/payara_web/glassfish/bin
+./startserv
+---------------------{LDAP_korisnik}_vjezba_08_dz_3_klijenti---------------------------
+mvn cargo:redeploy -P ServerEE-local
+xdg-open http://localhost:8080
 
+
+
+
+
+#------------------------------------------VJ07------------------------------------------------
 #DOCKER
 docker ps
 docker cp target/libs/ {slika}:/user/app/libs
