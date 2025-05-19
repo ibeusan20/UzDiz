@@ -1,4 +1,4 @@
-package org.unizg.foi.nwtis.ibeusan20.rest;
+package edu.unizg.foi.nwtis.ibeusan20.rest;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
