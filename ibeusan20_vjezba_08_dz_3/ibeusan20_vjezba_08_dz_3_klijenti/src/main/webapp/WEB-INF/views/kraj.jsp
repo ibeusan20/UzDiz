@@ -8,6 +8,6 @@
     <body>
         <h1>Kraj rada poslužitelja tvrtka</h1>
 		<%String status = (String) request.getAttribute("status"); %>        
-        <p>Status poslužitelja: <%= "status" %></p>        
+        <p>Status poslužitelja: <%= status %></p>        
     </body>
 </html>
