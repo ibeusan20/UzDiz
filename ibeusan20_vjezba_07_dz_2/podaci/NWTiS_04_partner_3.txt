@@ -10,6 +10,7 @@ mreznaVrata=8030
 mreznaVrataKraj=8000
 mreznaVrataRad=8002
 mreznaVrataRegistracija=8001
+mreznaVrataKrajPartner=8011
 naziv=FOLT 3 - Varaždin, Ul. Braće Radić 102
 pauzaDretve=100
 kvotaNarudzbi=5

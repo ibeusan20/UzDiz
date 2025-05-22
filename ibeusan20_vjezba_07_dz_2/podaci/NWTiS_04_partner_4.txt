@@ -10,6 +10,7 @@ mreznaVrata=8040
 mreznaVrataKraj=8000
 mreznaVrataRad=8002
 mreznaVrataRegistracija=8001
+mreznaVrataKrajPartner=8011
 naziv=FOLT 4 - Varaždin, Trg Ivana Perkovca 39
 pauzaDretve=100
 kvotaNarudzbi=5
