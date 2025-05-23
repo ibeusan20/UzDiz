@@ -554,7 +554,7 @@ public class PosluziteljTvrtka {
    */
   public void obradiPartnerKomandu(PrintWriter izlaz, String komanda) {
     String regex =
-        "^PARTNER\\s+(\\d+)\\s+\"(.+?)\"\\s+(\\S+)\\s+(\\S+)\\s+(\\d+)\\s+([+-]?\\d*\\.?\\d+)\\s+([+-]?\\d*\\.?\\d+)$";
+        "^PARTNER\\s([0-9]+)\\s\"([^\"]+)\"\\s([A-Za-z]+)\\s(\\S+)\\s([0-9]+)\\s([0-9]*\\.[0-9]+)\\s([0-9]*\\.[0-9]+)\\s([0-9]+)\\s([A-Za-z0-9]+)$";
     var matcher = Pattern.compile(regex).matcher(komanda);
     if (!matcher.matches()) {
       izlaz.write("ERROR 20 - Format komande nije ispravan\n");
@@ -567,13 +567,16 @@ public class PosluziteljTvrtka {
       int vrata = Integer.parseInt(matcher.group(5));
       float sirina = Float.parseFloat(matcher.group(6));
       float duzina = Float.parseFloat(matcher.group(7));
+      int vrataKraj = Integer.parseInt(matcher.group(8));
+      String adminKod = matcher.group(9);
+      
 
       if (this.partneri.containsKey(id)) {
         izlaz.write("ERROR 21 - Već postoji partner s id u kolekciji partnera\n");
       } else {
         String kod = Integer.toHexString((naziv + adresa).hashCode());
-        String kodAdmin = this.konfig.dajPostavku("kodZaAdminTvrtke");
-        int vrataKraj = Integer.parseInt(this.konfig.dajPostavku("mreznaVrataKraj"));
+        String kodAdmin = adminKod;
+        //int vrataKraj = Integer.parseInt(this.konfig.dajPostavku("mreznaVrataKraj"));
         Partner novi = new Partner(id, naziv, vrsta, adresa, vrata, vrataKraj, sirina, duzina, kod, kodAdmin);
         this.partneri.put(id, novi);
         spremiPartnere();

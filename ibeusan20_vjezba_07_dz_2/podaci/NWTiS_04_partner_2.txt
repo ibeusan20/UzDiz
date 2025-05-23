@@ -14,3 +14,4 @@ mreznaVrataKrajPartner=8011
 naziv=FOLT 2 - Varaždin, Ul. Julija Merlića 9
 pauzaDretve=100
 kvotaNarudzbi=5
+sigKod=7680bac3

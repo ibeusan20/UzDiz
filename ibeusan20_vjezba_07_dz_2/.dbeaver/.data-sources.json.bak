@@ -16,6 +16,54 @@
 				"closeIdleConnection": true,
 				"auth-model": "native"
 			}
+		},
+		"h2_server-196e409ab4a-34332e762d2cd66e": {
+			"provider": "h2",
+			"driver": "h2_server",
+			"name": "H2 - nwtis_2 - SA",
+			"save-password": true,
+			"configuration": {
+				"host": "localhost",
+				"port": "9092",
+				"database": "nwtis_2",
+				"url": "jdbc:h2:tcp://localhost:9092/nwtis_2",
+				"configurationType": "MANUAL",
+				"type": "dev",
+				"closeIdleConnection": true,
+				"auth-model": "native"
+			}
+		},
+		"hsqldb_server-196e409ac5f-5f4e2df99a4fe735": {
+			"provider": "generic",
+			"driver": "hsqldb_server",
+			"name": "HSQLDB - nwtis_2 - nwtis_2",
+			"save-password": true,
+			"configuration": {
+				"host": "20.24.5.30",
+				"port": "9001",
+				"database": "nwtis_2",
+				"url": "jdbc:hsqldb:hsql://20.24.5.30:9001/nwtis_2",
+				"configurationType": "MANUAL",
+				"type": "dev",
+				"closeIdleConnection": true,
+				"auth-model": "native"
+			}
+		},
+		"hsqldb_server-196e409ad25-1c93710b1e066f88": {
+			"provider": "generic",
+			"driver": "hsqldb_server",
+			"name": "HSQLDB - nwtis_2 - SA",
+			"save-password": true,
+			"configuration": {
+				"host": "20.24.5.30",
+				"port": "9001",
+				"database": "nwtis_2",
+				"url": "jdbc:hsqldb:hsql://20.24.5.30:9001/nwtis_2",
+				"configurationType": "MANUAL",
+				"type": "dev",
+				"closeIdleConnection": true,
+				"auth-model": "native"
+			}
 		}
 	},
 	"connection-types": {

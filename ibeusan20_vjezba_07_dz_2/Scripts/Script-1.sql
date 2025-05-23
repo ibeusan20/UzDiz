@@ -56,3 +56,8 @@ INSERT INTO partneri (id, naziv, vrstaKuhinje, adresa, mreznaVrata, mreznaVrataK
 	 (4,'FOLT 4 - Varaždin, Trg Ivana Perkovca 39','KK','202.24.5.3', 8040, 8041, 46.28918, 16.33620, 'BABECABACC', 'CACEDACEDD');
 
 SELECT * FROM uloge
+
+UPDATE partneri
+SET sigurnosniKod = '6b5a4711'
+WHERE id = 1;
+

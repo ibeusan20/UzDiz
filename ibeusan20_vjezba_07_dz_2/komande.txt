@@ -44,6 +44,9 @@ docker start partner_ibeusan20
 docker rm partner_ibeusan20
 
 #-----------------------HSQLDB/SLIKA--------------RODITELJSKI DIREKTORIJ--------
+cd /opt/hsql/hsqldb/data
+sudo java -classpath ../lib/hsqldb.jar org.hsqldb.server.Server --database.0 file:nwtis_2 --dbname.0 nwtis_2 --port 9001
+
 docker build -t bp_ibeusan20_hsql -f Dockerfile.hsql .
 docker run --env-file hsqldb.env -it -d \
  --network=mreza_ibeusan20 \
@@ -54,6 +57,9 @@ docker run --env-file hsqldb.env -it -d \
  bp_ibeusan20_hsql:latest
 
 #-----------------------H2/SLIKA--------------RODITELJSKI DIREKTORIJ-------
+cd /opt/h2
+sudo java -Dfile.encoding=UTF-8 -cp /opt/h2/bin/h2-2.3.232.jar org.h2.tools.Server -tcp -tcpAllowOthers -webAllowOthers -baseDir /opt/database -ifNotExists
+
 docker build -t bp_ibeusan20_h2 -f Dockerfile.h2 .
 docker run -it -d \
  --network=mreza_ibeusan20 \
@@ -64,6 +70,8 @@ docker run -it -d \
  bp_ibeusan20_h2:latest
  
  #-----------------------SERVISI/SLIKA--------------U SVOME DIREKTORIJU--------
+mvn clean package
+
 docker build -t servis_ibeusan20 -f Dockerfile .
 docker run -it -d \
  --network=mreza_ibeusan20 \
