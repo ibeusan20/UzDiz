@@ -217,9 +217,11 @@ public class PosluziteljPartner {
     var mreznaVrata = konfig.dajPostavku("mreznaVrata");
     var gpsSirina = konfig.dajPostavku("gpsSirina");
     var gpsDuzina = konfig.dajPostavku("gpsDuzina");
+    var mreznaVrataKraj = konfig.dajPostavku("mreznaVrataKrajPartner");
+    var adminKod = konfig.dajPostavku("kodZaAdmin");
 
-    return String.format("PARTNER %d \"%s\" %s %s %s %s %s", id, naziv, vrsta, adresa, mreznaVrata,
-        gpsSirina, gpsDuzina);
+    return String.format("PARTNER %d \"%s\" %s %s %s %s %s %s %s", id, naziv, vrsta, adresa, mreznaVrata,
+        gpsSirina, gpsDuzina, mreznaVrataKraj, adminKod);
   }
 
   /**

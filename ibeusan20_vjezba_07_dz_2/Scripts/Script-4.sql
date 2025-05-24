@@ -74,3 +74,15 @@ GRANT SELECT, UPDATE, INSERT ON TABLE obracuni TO "aplikacija";
 INSERT INTO obracuni (PARTNER,ID,JELO,KOLICINA,CIJENA,VRIJEME) VALUES
 	 (1,'p1',false,2.0,3.0,now()),
 	 (1,'MK1',true,1.0,12.0,now());
+
+UPDATE partneri
+SET sigurnosniKod = '6b5a4711'
+WHERE id = 1;
+
+UPDATE partneri
+SET sigurnosniKod = '7680bac3'
+WHERE id = 2;
+
+UPDATE partneri
+SET adresa = '20.24.5.3'
+WHERE adresa = '202.24.5.3';

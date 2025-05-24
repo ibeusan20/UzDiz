@@ -40,7 +40,7 @@
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda dodaj partnera 1" enabled="false">
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda dodaj partnera 1">
           <stringProp name="TCPSampler.server">${adresa}</stringProp>
           <boolProp name="TCPSampler.reUseConnection">true</boolProp>
           <stringProp name="TCPSampler.port">${mvRegistracija}</stringProp>
@@ -66,14 +66,14 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda dodaj partnera 2" enabled="false">
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda dodaj partnera 2">
           <stringProp name="TCPSampler.server">${adresa}</stringProp>
           <boolProp name="TCPSampler.reUseConnection">true</boolProp>
           <stringProp name="TCPSampler.port">${mvRegistracija}</stringProp>
           <boolProp name="TCPSampler.nodelay">false</boolProp>
           <stringProp name="TCPSampler.timeout"></stringProp>
           <stringProp name="TCPSampler.ctimeout">100</stringProp>
-          <stringProp name="TCPSampler.request">PARTNER 2 &quot;FOLT 2 - Varaždin, Ul. Julija Merlića 9&quot; KK 20.24.5.3 8020 46.30838 16.34782 8011 CACEDACEBB
+          <stringProp name="TCPSampler.request">PARTNER 2 &quot;FOLT 2 - Varaždin, Ul. Julija Merlića 9&quot; KK 20.24.5.3 8020 46.30838 16.34782 8021 CACEDACEBB
 </stringProp>
           <boolProp name="TCPSampler.closeConnection">true</boolProp>
           <stringProp name="ConfigTestElement.username"></stringProp>
@@ -118,14 +118,14 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda obriši partnera 1">
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda obriši partnera 1" enabled="false">
           <stringProp name="TCPSampler.server">${adresa}</stringProp>
           <boolProp name="TCPSampler.reUseConnection">true</boolProp>
           <stringProp name="TCPSampler.port">${mvRegistracija}</stringProp>
           <boolProp name="TCPSampler.nodelay">false</boolProp>
           <stringProp name="TCPSampler.timeout"></stringProp>
           <stringProp name="TCPSampler.ctimeout">100</stringProp>
-          <stringProp name="TCPSampler.request">OBRIŠI 1 6b5a4712
+          <stringProp name="TCPSampler.request">OBRIŠI 1 6b5a4711
 </stringProp>
           <boolProp name="TCPSampler.closeConnection">true</boolProp>
           <stringProp name="ConfigTestElement.username"></stringProp>

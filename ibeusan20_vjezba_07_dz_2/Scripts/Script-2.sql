@@ -80,5 +80,5 @@ SET sigurnosniKod = '6b5a4711'
 WHERE id = 1;
 
 UPDATE partneri
-SET sigurnosniKod = '7680bac3'
-WHERE id = 2;
+SET adresa = '20.24.5.3'
+WHERE adresa = '202.24.5.3';
