@@ -142,6 +142,7 @@ public class TvrtkaResource {
       description = "Koliko puta je pozvana operacija servisa")
   @Timed(name = "trajanjeMetode_headPosluziteljKrajInfo", description = "Vrijeme trajanja metode")
   public Response headPosluziteljKrajInfo() {
+    System.out.println("[REST] headPosluziteljKrajInfo() POZVANA");
     System.out.println("PosluziteljTvrtka je završio rad.");
     return Response.status(Response.Status.OK).build();
   }

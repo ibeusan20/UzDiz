@@ -8,6 +8,10 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -33,10 +37,7 @@ import edu.unizg.foi.nwtis.podaci.KartaPica;
 import edu.unizg.foi.nwtis.podaci.Obracun;
 import edu.unizg.foi.nwtis.podaci.Partner;
 import edu.unizg.foi.nwtis.podaci.PartnerPopis;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.URI;
+
 
 // TODO: Auto-generated Javadoc
 /**
@@ -241,6 +242,18 @@ public class PosluziteljTvrtka {
             if (dijelovi.length != 2 || !dijelovi[1].equals(kodZaKraj)) {
               izlaz.write("ERROR 10 - Format komande nije ispravan ili nije ispravan kod za kraj\n");
             } else {
+              boolean sviPartneri = posaljiKrajPartnerima(kodZaKraj);
+              if (!sviPartneri) {
+                izlaz.write("ERROR 14 - Barem jedan partner nije završio rad\n");
+                break;
+              }
+
+              boolean rest = posaljiRestZahtjevKraj();
+              if (!rest) {
+                izlaz.write("ERROR 17 - RESTful zahtjev nije uspješan\n");
+                break;
+              }
+
               kraj.set(true);
               izlaz.write("OK\n");
             }
@@ -401,6 +414,7 @@ public class PosluziteljTvrtka {
 
         String odgovor = ulaz.readLine();
         if (!"OK".equals(odgovor)) return false;
+        System.out.println("[DEBUG] Partneri OK: " + p);
 
         socket.shutdownInput();
       } catch (Exception e) {
@@ -412,18 +426,31 @@ public class PosluziteljTvrtka {
   
   private boolean posaljiRestZahtjevKraj() {
     try {
-      HttpClient client = HttpClient.newHttpClient();
-      String url = this.konfig.dajPostavku("restAdresa") + "/kraj/info";
-      HttpRequest request = HttpRequest.newBuilder()
-          .uri(URI.create(url))
-          .method("HEAD", HttpRequest.BodyPublishers.noBody())
-          .build();
-      HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
-      return response.statusCode() == 200;
+        HttpClient client = HttpClient.newHttpClient();
+        String url = this.konfig.dajPostavku("restAdresa") + "/kraj/info";
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .method("HEAD", HttpRequest.BodyPublishers.noBody())
+            .build();
+        System.out.println("[DEBUG] URL za REST: " + url);
+
+
+        System.out.println("[DEBUG] REST URL: " + url);
+
+        HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
+        System.out.println("[DEBUG] REST status: " + response.statusCode());
+        System.out.println("[DEBUG] REST response headers: " + response.headers());
+
+        return response.statusCode() == 200;
     } catch (Exception e) {
-      return false;
+        e.printStackTrace(); // privremeno za dijagnostiku
+        return false;
     }
-  }
+}
+
+
+
 
 
   /**
