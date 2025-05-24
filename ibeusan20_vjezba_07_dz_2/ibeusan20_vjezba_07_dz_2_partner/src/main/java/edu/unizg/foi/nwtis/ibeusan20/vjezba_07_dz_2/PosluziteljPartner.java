@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import com.google.gson.Gson;
 import edu.unizg.foi.nwtis.konfiguracije.Konfiguracija;
@@ -62,6 +63,10 @@ public class PosluziteljPartner {
 
   /** Executor servis. */
   private ExecutorService executor;
+  
+  private ExecutorService executorKraj;
+  private final AtomicBoolean kraj = new AtomicBoolean(false);
+
 
   /** Lista otvorenih narudžbi. */
   private Map<String, List<Narudzba>> otvoreneNarudzbe = new ConcurrentHashMap<>();
@@ -110,10 +115,53 @@ public class PosluziteljPartner {
         System.out.println("Neuspješno učitavanje jelovnika ili karte pića. Kraj rada."); // OBAVEZNO
         return;
       }
+      program.pokreniPosluziteljKraj();
       program.pokreniPosluziteljKupaca();
       return;
     }
     System.out.println("ERROR 40 - Format komande nije ispravan");
+  }
+  
+  private void pokreniPosluziteljKraj() {
+    int vrata = Integer.parseInt(konfig.dajPostavku("mreznaVrataKrajPartner"));
+    this.executorKraj = Executors.newVirtualThreadPerTaskExecutor();
+
+    this.executorKraj.submit(() -> {
+      try (var ss = new java.net.ServerSocket(vrata)) {
+        while (!kraj.get()) {
+          var uticnica = ss.accept();
+          executorKraj.submit(() -> obradiKrajKomandu(uticnica));
+        }
+      } catch (IOException e) {
+      }
+    });
+  }
+  
+  private void obradiKrajKomandu(Socket uticnica) {
+    try (var ulaz = new BufferedReader(new InputStreamReader(uticnica.getInputStream(), "utf8"));
+         var izlaz = new PrintWriter(new OutputStreamWriter(uticnica.getOutputStream(), "utf8"))) {
+
+      String linija = ulaz.readLine();
+      if (linija == null || !linija.trim().startsWith("KRAJ")) {
+        izlaz.write("ERROR 10 - Format komande nije ispravan\n");
+      } else {
+        var dijelovi = linija.trim().split("\\s+");
+        if (dijelovi.length != 2 || !dijelovi[1].equals(konfig.dajPostavku("kodZaKraj"))) {
+          izlaz.write("ERROR 10 - Format komande nije ispravan ili nije ispravan kod za kraj\n");
+        } else {
+          izlaz.write("OK\n");
+          izlaz.flush();
+          System.out.println("[INFO] Primljen KRAJ - partner završava rad.");
+          try {
+            Thread.sleep(100);
+          } catch (InterruptedException e) {
+          }
+          System.exit(0);
+        }
+      }
+      izlaz.flush();
+    } catch (IOException e) {
+    }
   }
 
   /**

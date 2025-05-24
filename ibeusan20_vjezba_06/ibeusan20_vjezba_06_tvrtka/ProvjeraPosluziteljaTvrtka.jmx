@@ -29,7 +29,7 @@
         <boolProp name="UserParameters.per_iteration">false</boolProp>
       </UserParameters>
       <hashTree/>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Grupa dretvi za registraciju partnera">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Grupa dretvi za registraciju partnera" enabled="false">
         <intProp name="ThreadGroup.num_threads">1</intProp>
         <intProp name="ThreadGroup.ramp_time">7</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
@@ -40,7 +40,7 @@
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda dodaj partnera 1">
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda dodaj partnera 1" enabled="false">
           <stringProp name="TCPSampler.server">${adresa}</stringProp>
           <boolProp name="TCPSampler.reUseConnection">true</boolProp>
           <stringProp name="TCPSampler.port">${mvRegistracija}</stringProp>
@@ -66,7 +66,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda dodaj partnera 2">
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda dodaj partnera 2" enabled="false">
           <stringProp name="TCPSampler.server">${adresa}</stringProp>
           <boolProp name="TCPSampler.reUseConnection">true</boolProp>
           <stringProp name="TCPSampler.port">${mvRegistracija}</stringProp>
@@ -395,7 +395,7 @@
           <hashTree/>
         </hashTree>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Grupa dretvi za kraj" enabled="false">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Grupa dretvi za kraj">
         <intProp name="ThreadGroup.num_threads">1</intProp>
         <intProp name="ThreadGroup.ramp_time">2</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
@@ -406,7 +406,7 @@
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Neispravna komanda KRAJ 1" enabled="true">
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Neispravna komanda KRAJ 1" enabled="false">
           <stringProp name="TCPSampler.server">${adresa}</stringProp>
           <boolProp name="TCPSampler.reUseConnection">true</boolProp>
           <stringProp name="TCPSampler.port">${mvKraj}</stringProp>
@@ -420,7 +420,7 @@
           <stringProp name="ConfigTestElement.password"></stringProp>
         </TCPSampler>
         <hashTree>
-          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion">
             <collectionProp name="Asserion.test_strings">
               <stringProp name="66247144">ERROR</stringProp>
             </collectionProp>
@@ -432,7 +432,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Neispravna komanda KRAJ 2" enabled="true">
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Neispravna komanda KRAJ 2" enabled="false">
           <stringProp name="TCPSampler.server">${adresa}</stringProp>
           <boolProp name="TCPSampler.reUseConnection">true</boolProp>
           <stringProp name="TCPSampler.port">${mvKraj}</stringProp>
@@ -458,7 +458,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda KRAJ" enabled="true">
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda KRAJ" enabled="false">
           <stringProp name="TCPSampler.server">${adresa}</stringProp>
           <boolProp name="TCPSampler.reUseConnection">true</boolProp>
           <stringProp name="TCPSampler.port">${mvKraj}</stringProp>
@@ -473,6 +473,266 @@
         </TCPSampler>
         <hashTree>
           <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="2524">OK</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+            <stringProp name="Assertion.scope">all</stringProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda STATUS 1">
+          <stringProp name="TCPSampler.server">${adresa}</stringProp>
+          <boolProp name="TCPSampler.reUseConnection">true</boolProp>
+          <stringProp name="TCPSampler.port">${mvKraj}</stringProp>
+          <boolProp name="TCPSampler.nodelay">false</boolProp>
+          <stringProp name="TCPSampler.timeout"></stringProp>
+          <stringProp name="TCPSampler.ctimeout">100</stringProp>
+          <stringProp name="TCPSampler.request">STATUS AB12CD23EF45 1
+</stringProp>
+          <boolProp name="TCPSampler.closeConnection">true</boolProp>
+          <stringProp name="ConfigTestElement.username"></stringProp>
+          <stringProp name="ConfigTestElement.password"></stringProp>
+        </TCPSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="2524">OK</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+            <stringProp name="Assertion.scope">all</stringProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda STATUS 2">
+          <stringProp name="TCPSampler.server">${adresa}</stringProp>
+          <boolProp name="TCPSampler.reUseConnection">true</boolProp>
+          <stringProp name="TCPSampler.port">${mvKraj}</stringProp>
+          <boolProp name="TCPSampler.nodelay">false</boolProp>
+          <stringProp name="TCPSampler.timeout"></stringProp>
+          <stringProp name="TCPSampler.ctimeout">100</stringProp>
+          <stringProp name="TCPSampler.request">STATUS AB12CD23EF45 2
+</stringProp>
+          <boolProp name="TCPSampler.closeConnection">true</boolProp>
+          <stringProp name="ConfigTestElement.username"></stringProp>
+          <stringProp name="ConfigTestElement.password"></stringProp>
+        </TCPSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="2524">OK</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+            <stringProp name="Assertion.scope">all</stringProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="NEIspravna komanda STATUS 1" enabled="false">
+          <stringProp name="TCPSampler.server">${adresa}</stringProp>
+          <boolProp name="TCPSampler.reUseConnection">true</boolProp>
+          <stringProp name="TCPSampler.port">${mvKraj}</stringProp>
+          <boolProp name="TCPSampler.nodelay">false</boolProp>
+          <stringProp name="TCPSampler.timeout"></stringProp>
+          <stringProp name="TCPSampler.ctimeout">100</stringProp>
+          <stringProp name="TCPSampler.request">STATUS BLABLABALABLABALALBA 1
+</stringProp>
+          <boolProp name="TCPSampler.closeConnection">true</boolProp>
+          <stringProp name="ConfigTestElement.username"></stringProp>
+          <stringProp name="ConfigTestElement.password"></stringProp>
+        </TCPSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="-2116256935">ERROR 12</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+            <stringProp name="Assertion.scope">all</stringProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda PAUZA 1" enabled="false">
+          <stringProp name="TCPSampler.server">${adresa}</stringProp>
+          <boolProp name="TCPSampler.reUseConnection">true</boolProp>
+          <stringProp name="TCPSampler.port">${mvKraj}</stringProp>
+          <boolProp name="TCPSampler.nodelay">false</boolProp>
+          <stringProp name="TCPSampler.timeout"></stringProp>
+          <stringProp name="TCPSampler.ctimeout">100</stringProp>
+          <stringProp name="TCPSampler.request">PAUZA AB12CD23EF45 1
+</stringProp>
+          <boolProp name="TCPSampler.closeConnection">true</boolProp>
+          <stringProp name="ConfigTestElement.username"></stringProp>
+          <stringProp name="ConfigTestElement.password"></stringProp>
+        </TCPSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="2524">OK</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+            <stringProp name="Assertion.scope">all</stringProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda PAUZA 2" enabled="false">
+          <stringProp name="TCPSampler.server">${adresa}</stringProp>
+          <boolProp name="TCPSampler.reUseConnection">true</boolProp>
+          <stringProp name="TCPSampler.port">${mvKraj}</stringProp>
+          <boolProp name="TCPSampler.nodelay">false</boolProp>
+          <stringProp name="TCPSampler.timeout"></stringProp>
+          <stringProp name="TCPSampler.ctimeout">100</stringProp>
+          <stringProp name="TCPSampler.request">PAUZA AB12CD23EF45 2
+</stringProp>
+          <boolProp name="TCPSampler.closeConnection">true</boolProp>
+          <stringProp name="ConfigTestElement.username"></stringProp>
+          <stringProp name="ConfigTestElement.password"></stringProp>
+        </TCPSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="2524">OK</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+            <stringProp name="Assertion.scope">all</stringProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda START 1" enabled="false">
+          <stringProp name="TCPSampler.server">${adresa}</stringProp>
+          <boolProp name="TCPSampler.reUseConnection">true</boolProp>
+          <stringProp name="TCPSampler.port">${mvKraj}</stringProp>
+          <boolProp name="TCPSampler.nodelay">false</boolProp>
+          <stringProp name="TCPSampler.timeout"></stringProp>
+          <stringProp name="TCPSampler.ctimeout">100</stringProp>
+          <stringProp name="TCPSampler.request">START AB12CD23EF45 1
+</stringProp>
+          <boolProp name="TCPSampler.closeConnection">true</boolProp>
+          <stringProp name="ConfigTestElement.username"></stringProp>
+          <stringProp name="ConfigTestElement.password"></stringProp>
+        </TCPSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="2524">OK</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+            <stringProp name="Assertion.scope">all</stringProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda START 2" enabled="false">
+          <stringProp name="TCPSampler.server">${adresa}</stringProp>
+          <boolProp name="TCPSampler.reUseConnection">true</boolProp>
+          <stringProp name="TCPSampler.port">${mvKraj}</stringProp>
+          <boolProp name="TCPSampler.nodelay">false</boolProp>
+          <stringProp name="TCPSampler.timeout"></stringProp>
+          <stringProp name="TCPSampler.ctimeout">100</stringProp>
+          <stringProp name="TCPSampler.request">START AB12CD23EF45 2
+</stringProp>
+          <boolProp name="TCPSampler.closeConnection">true</boolProp>
+          <stringProp name="ConfigTestElement.username"></stringProp>
+          <stringProp name="ConfigTestElement.password"></stringProp>
+        </TCPSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="2524">OK</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+            <stringProp name="Assertion.scope">all</stringProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda SPAVA 1" enabled="false">
+          <stringProp name="TCPSampler.server">${adresa}</stringProp>
+          <boolProp name="TCPSampler.reUseConnection">true</boolProp>
+          <stringProp name="TCPSampler.port">${mvKraj}</stringProp>
+          <boolProp name="TCPSampler.nodelay">false</boolProp>
+          <stringProp name="TCPSampler.timeout"></stringProp>
+          <stringProp name="TCPSampler.ctimeout">100</stringProp>
+          <stringProp name="TCPSampler.request">SPAVA AB12CD23EF45 2000
+</stringProp>
+          <boolProp name="TCPSampler.closeConnection">true</boolProp>
+          <stringProp name="ConfigTestElement.username"></stringProp>
+          <stringProp name="ConfigTestElement.password"></stringProp>
+        </TCPSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="2524">OK</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+            <stringProp name="Assertion.scope">all</stringProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda OSVJEŽI 1" enabled="false">
+          <stringProp name="TCPSampler.server">${adresa}</stringProp>
+          <boolProp name="TCPSampler.reUseConnection">true</boolProp>
+          <stringProp name="TCPSampler.port">${mvKraj}</stringProp>
+          <boolProp name="TCPSampler.nodelay">false</boolProp>
+          <stringProp name="TCPSampler.timeout"></stringProp>
+          <stringProp name="TCPSampler.ctimeout">100</stringProp>
+          <stringProp name="TCPSampler.request">OSVJEŽI AB12CD23EF45
+</stringProp>
+          <boolProp name="TCPSampler.closeConnection">true</boolProp>
+          <stringProp name="ConfigTestElement.username"></stringProp>
+          <stringProp name="ConfigTestElement.password"></stringProp>
+        </TCPSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="2524">OK</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">2</intProp>
+            <stringProp name="Assertion.scope">all</stringProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda KRAJWS 1">
+          <stringProp name="TCPSampler.server">${adresa}</stringProp>
+          <boolProp name="TCPSampler.reUseConnection">true</boolProp>
+          <stringProp name="TCPSampler.port">${mvKraj}</stringProp>
+          <boolProp name="TCPSampler.nodelay">false</boolProp>
+          <stringProp name="TCPSampler.timeout"></stringProp>
+          <stringProp name="TCPSampler.ctimeout">100</stringProp>
+          <stringProp name="TCPSampler.request">KRAJWS BABECABACC
+</stringProp>
+          <boolProp name="TCPSampler.closeConnection">true</boolProp>
+          <stringProp name="ConfigTestElement.username"></stringProp>
+          <stringProp name="ConfigTestElement.password"></stringProp>
+        </TCPSampler>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion">
             <collectionProp name="Asserion.test_strings">
               <stringProp name="2524">OK</stringProp>
             </collectionProp>
