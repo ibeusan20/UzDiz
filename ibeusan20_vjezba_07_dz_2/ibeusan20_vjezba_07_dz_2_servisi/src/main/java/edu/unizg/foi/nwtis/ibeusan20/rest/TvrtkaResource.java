@@ -6,13 +6,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.List;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.metrics.annotation.Counted;
 import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import edu.unizg.foi.nwtis.ibeusan20.vjezba_07_dz_2.dao.ObracunDAO;
 import edu.unizg.foi.nwtis.ibeusan20.vjezba_07_dz_2.dao.PartnerDAO;
+import edu.unizg.foi.nwtis.podaci.Obracun;
 import edu.unizg.foi.nwtis.podaci.Partner;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -235,4 +238,31 @@ public class TvrtkaResource {
     }
     return null;
   }
+  
+  @Path("obracun")
+  @POST
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Dodavanje više obračuna")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "201", description = "Obračuni su uspješno pohranjeni"),
+      @APIResponse(responseCode = "409", description = "Pogreška pri pohrani obračuna"),
+      @APIResponse(responseCode = "500", description = "Interna pogreška")
+  })
+  @Counted(name = "brojZahtjeva_postObracun", description = "Koliko puta je pozvana POST /obracun")
+  @Timed(name = "trajanjeMetode_postObracun", description = "Vrijeme trajanja metode postObracun")
+  public Response postObracun(List<Obracun> obracuni) {
+    try (var vezaBP = this.restConfiguration.dajVezu()) {
+      var obracunDAO = new ObracunDAO(vezaBP);
+      boolean uspjeh = obracunDAO.dodajSve(obracuni);
+      if (uspjeh)
+        return Response.status(Response.Status.CREATED).build();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+    return Response.status(Response.Status.CONFLICT).build();
+  }
+
+
 }
