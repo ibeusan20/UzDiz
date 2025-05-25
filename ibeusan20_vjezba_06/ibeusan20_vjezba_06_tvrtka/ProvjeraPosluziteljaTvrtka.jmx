@@ -504,7 +504,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="ISPRAVNA komanda START partner1">
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="ISPRAVNA komanda START partner1" enabled="false">
           <stringProp name="TCPSampler.server">${adresaPartner1}</stringProp>
           <boolProp name="TCPSampler.reUseConnection">true</boolProp>
           <stringProp name="TCPSampler.port">${mvKrajPartner1}</stringProp>
@@ -556,14 +556,14 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda jelovnik 1" enabled="false">
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda STANJE 1">
           <stringProp name="TCPSampler.server">${adresaPartner1}</stringProp>
           <boolProp name="TCPSampler.reUseConnection">true</boolProp>
           <stringProp name="TCPSampler.port">${mvPartner1}</stringProp>
           <boolProp name="TCPSampler.nodelay">false</boolProp>
           <stringProp name="TCPSampler.timeout"></stringProp>
           <stringProp name="TCPSampler.ctimeout">100</stringProp>
-          <stringProp name="TCPSampler.request">JELOVNIK mato
+          <stringProp name="TCPSampler.request">STANJE pero
 </stringProp>
           <boolProp name="TCPSampler.closeConnection">true</boolProp>
           <stringProp name="ConfigTestElement.username"></stringProp>
@@ -1053,7 +1053,7 @@
           <hashTree/>
         </hashTree>
         <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda narudzba 1" enabled="false">
-          <stringProp name="TCPSampler.server">${adresa}</stringProp>
+          <stringProp name="TCPSampler.server">${adresaPartner1}</stringProp>
           <boolProp name="TCPSampler.reUseConnection">true</boolProp>
           <stringProp name="TCPSampler.port">${mvPartner1}</stringProp>
           <boolProp name="TCPSampler.nodelay">false</boolProp>
@@ -1079,7 +1079,7 @@
           <hashTree/>
         </hashTree>
         <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda jelo 1" enabled="false">
-          <stringProp name="TCPSampler.server">${adresa}</stringProp>
+          <stringProp name="TCPSampler.server">${adresaPartner1}</stringProp>
           <boolProp name="TCPSampler.reUseConnection">true</boolProp>
           <stringProp name="TCPSampler.port">${mvPartner1}</stringProp>
           <boolProp name="TCPSampler.nodelay">false</boolProp>
@@ -1105,7 +1105,7 @@
           <hashTree/>
         </hashTree>
         <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda pice 1" enabled="false">
-          <stringProp name="TCPSampler.server">${adresa}</stringProp>
+          <stringProp name="TCPSampler.server">${adresaPartner1}</stringProp>
           <boolProp name="TCPSampler.reUseConnection">true</boolProp>
           <stringProp name="TCPSampler.port">${mvPartner1}</stringProp>
           <boolProp name="TCPSampler.nodelay">false</boolProp>
@@ -1131,7 +1131,7 @@
           <hashTree/>
         </hashTree>
         <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Ispravna komanda racun 1" enabled="false">
-          <stringProp name="TCPSampler.server">${adresa}</stringProp>
+          <stringProp name="TCPSampler.server">${adresaPartner1}</stringProp>
           <boolProp name="TCPSampler.reUseConnection">true</boolProp>
           <stringProp name="TCPSampler.port">${mvPartner1}</stringProp>
           <boolProp name="TCPSampler.nodelay">false</boolProp>
@@ -1156,7 +1156,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Kupac traži popis" enabled="true">
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="Kupac traži popis" enabled="false">
           <stringProp name="TCPSampler.server">${adresa}</stringProp>
           <boolProp name="TCPSampler.reUseConnection">true</boolProp>
           <stringProp name="TCPSampler.port">8001</stringProp>

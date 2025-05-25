@@ -488,6 +488,8 @@ public class PosluziteljPartner {
         obradiPiceKupca(izlaz, linija);
       } else if (linija.startsWith("RAČUN")) {
         obradiRacunKupca(izlaz, linija);
+      } else if (linija.startsWith("STANJE")) {
+        obradiStanjeKupca(izlaz, linija);
       } else {
         izlaz.write("ERROR 40 - Format komande nije ispravan\n");
       }
@@ -495,6 +497,31 @@ public class PosluziteljPartner {
       uticnica.shutdownOutput();
       uticnica.close();
     } catch (IOException e) {
+    }
+  }
+  
+  private void obradiStanjeKupca(PrintWriter izlaz, String linija) {
+    var matcher = Pattern.compile("^STANJE\\s+(\\w+)$").matcher(linija);
+    if (!matcher.matches()) {
+      izlaz.write("ERROR 40 - Format komande nije ispravan\n");
+      return;
+    }
+
+    if (pauzaKupci.get()) {
+      izlaz.write("ERROR 48 - Poslužitelj za prijem zahtjeva kupaca u pauzi\n");
+      return;
+    }
+
+    String korisnik = matcher.group(1);
+    synchronized (lokotNarudzbe) {
+      var narudzba = otvoreneNarudzbe.get(korisnik);
+      if (narudzba == null) {
+        izlaz.write("ERROR 43 - Ne postoji otvorena narudžba za korisnika/kupca\n");
+        return;
+      }
+
+      izlaz.write("OK\n");
+      izlaz.write(new Gson().toJson(narudzba) + "\n");
     }
   }
 
