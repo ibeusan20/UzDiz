@@ -1,0 +1,4 @@
+
+
+----------------------------{LDAP_korisnik}_vjezba_08_dz_3_klijenti------------------------------
+mvn cargo:redeploy -P ServerEE-local

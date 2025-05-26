@@ -9,10 +9,10 @@
         <h1>Naslov početne stranice</h1>
         <ul>
             <li>
-                <a href="${pageContext.servletContext.contextPath}/mvc/pocetak">Početna stranica</a>
+                <a href="${pageContext.servletContext.contextPath}/mvc/tvrtka/pocetak">Početna stranica</a>
             </li>
             <li>
-                <a href="${pageContext.servletContext.contextPath}/mvc/kraj">Šalji komandu za kraj</a>
+                <a href="${pageContext.servletContext.contextPath}/mvc/tvrtka/kraj">Šalji komandu za kraj</a>
             </li>        
         </ul>          
     </body>
