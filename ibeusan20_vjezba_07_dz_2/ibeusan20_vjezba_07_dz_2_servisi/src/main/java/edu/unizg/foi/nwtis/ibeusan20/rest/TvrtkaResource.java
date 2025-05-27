@@ -72,7 +72,7 @@ public class TvrtkaResource {
   @HEAD
   @Operation(summary = "Provjera statusa dijela poslužitelja tvrtka")
   @APIResponses(value = {@APIResponse(responseCode = "200", description = "Uspješna operacija"),
-      @APIResponse(responseCode = "409", description = "Pogrešna operacija")})
+      @APIResponse(responseCode = "204", description = "Pogrešna operacija")})
   @Counted(name = "brojZahtjeva_eadPosluziteljStatus",
       description = "Koliko puta je pozvana operacija servisa")
   @Timed(name = "trajanjeMetode_eadPosluziteljStatus", description = "Vrijeme trajanja metode")
@@ -123,7 +123,7 @@ public class TvrtkaResource {
   @HEAD
   @Operation(summary = "Zaustavljanje poslužitelja tvrtka")
   @APIResponses(value = {@APIResponse(responseCode = "200", description = "Uspješna operacija"),
-      @APIResponse(responseCode = "409", description = "Pogrešna operacija")})
+      @APIResponse(responseCode = "204", description = "Pogrešna operacija")})
   @Counted(name = "brojZahtjeva_headPosluziteljKraj",
       description = "Koliko puta je pozvana operacija servisa")
   @Timed(name = "trajanjeMetode_headPosluziteljKraj", description = "Vrijeme trajanja metode")
@@ -140,7 +140,7 @@ public class TvrtkaResource {
   @HEAD
   @Operation(summary = "Informacija o zaustavljanju poslužitelja tvrtka")
   @APIResponses(value = {@APIResponse(responseCode = "200", description = "Uspješna operacija"),
-      @APIResponse(responseCode = "409", description = "Pogrešna operacija")})
+      @APIResponse(responseCode = "204", description = "Pogrešna operacija")})
   @Counted(name = "brojZahtjeva_headPosluziteljKrajInfo",
       description = "Koliko puta je pozvana operacija servisa")
   @Timed(name = "trajanjeMetode_headPosluziteljKrajInfo", description = "Vrijeme trajanja metode")
@@ -200,7 +200,7 @@ public class TvrtkaResource {
   @Operation(summary = "Dohvat jednog partnera")
   @APIResponses(
       value = {@APIResponse(responseCode = "201", description = "Uspješna kreiran resurs"),
-          @APIResponse(responseCode = "409", description = "Već postoji resurs ili druga pogreška"),
+          @APIResponse(responseCode = "204", description = "Već postoji resurs ili druga pogreška"),
           @APIResponse(responseCode = "500", description = "Interna pogreška")})
   @Counted(name = "brojZahtjeva_postPartner",
       description = "Koliko puta je pozvana operacija servisa")
@@ -246,7 +246,7 @@ public class TvrtkaResource {
   @Operation(summary = "Dodavanje više obračuna")
   @APIResponses(value = {
       @APIResponse(responseCode = "201", description = "Obračuni su uspješno pohranjeni"),
-      @APIResponse(responseCode = "409", description = "Pogreška pri pohrani obračuna"),
+      @APIResponse(responseCode = "204", description = "Pogreška pri pohrani obračuna"),
       @APIResponse(responseCode = "500", description = "Interna pogreška")
   })
   @Counted(name = "brojZahtjeva_postObracun", description = "Koliko puta je pozvana POST /obracun")

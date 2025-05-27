@@ -189,6 +189,16 @@
 							<artifactId>jakarta.xml.bind-api</artifactId>
 							<version>4.0.2</version>
 						</dependency>
+						<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>2.7.4</version>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>2.3.232</version>
+		</dependency>
 					</dependencies>
 				</plugin>
 			</plugins>
