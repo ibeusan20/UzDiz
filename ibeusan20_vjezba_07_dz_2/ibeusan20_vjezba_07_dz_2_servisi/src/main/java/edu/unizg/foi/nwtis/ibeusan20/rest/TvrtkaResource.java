@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
+import java.util.Map;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.metrics.annotation.Counted;
 import org.eclipse.microprofile.metrics.annotation.Timed;
@@ -191,6 +192,60 @@ public class TvrtkaResource {
         return Response.status(Response.Status.NOT_FOUND).build();
       }
     } catch (Exception e) {
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+  
+  @Path("partner/provjera")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Dohvat partnera koji su trenutno registrirani na poslužitelju PosluziteljTvrtka")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", description = "Uspješno dohvaćeni registrirani partneri"),
+      @APIResponse(responseCode = "500", description = "Greška prilikom dohvata")
+  })
+  @Counted(name = "brojZahtjeva_getPartneriProvjera",
+      description = "Broj zahtjeva za dohvat registriranih partnera")
+  @Timed(name = "trajanjeMetode_getPartneriProvjera",
+      description = "Vrijeme dohvaćanja registriranih partnera")
+  public Response getPartneriProvjera() {
+    try (var veza = this.restConfiguration.dajVezu()) {
+      var partnerDAO = new PartnerDAO(veza);
+      var sviPartneri = partnerDAO.dohvatiSve(true);
+
+      try (
+        var socket = new Socket(this.tvrtkaAdresa, Integer.parseInt(this.mreznaVrataRegistracija));
+        var ulaz = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"));
+        var izlaz = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"))
+      ) {
+        System.out.println("[DEBUG] Slanje komande: POPIS");
+        izlaz.println("POPIS");
+        izlaz.flush();
+        socket.shutdownOutput();
+
+        var prviRed = ulaz.readLine();
+        var drugiRed = ulaz.readLine();
+        System.out.println("[DEBUG] POPIS status: " + prviRed);
+        System.out.println("[DEBUG] POPIS JSON: " + drugiRed);
+
+        if (!"OK".equals(prviRed)) {
+          return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+
+        var gson = new com.google.gson.Gson();
+        List<Map<String, Object>> partneriJson = gson.fromJson(drugiRed, List.class);
+        List<Integer> registriraniIdjevi = partneriJson.stream()
+            .map(map -> ((Double) map.get("id")).intValue())
+            .toList();
+
+        var aktivniPartneri = sviPartneri.stream()
+            .filter(p -> registriraniIdjevi.contains(p.id()))
+            .toList();
+
+        return Response.ok(aktivniPartneri).build();
+      }
+    } catch (Exception e) {
+      e.printStackTrace(System.err);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }

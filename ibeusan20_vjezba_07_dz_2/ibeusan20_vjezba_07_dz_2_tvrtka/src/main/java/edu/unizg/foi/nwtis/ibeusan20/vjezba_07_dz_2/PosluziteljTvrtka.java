@@ -705,7 +705,7 @@ public class PosluziteljTvrtka {
         obradiPartnerKomandu(izlaz, komanda);
       } else if (komanda.startsWith("OBRIŠI")) {
         obradiObrisiKomandu(izlaz, komanda);
-      } else if (komanda.equals("POPIS")) {
+      } else if (komanda != null && komanda.trim().equalsIgnoreCase("POPIS")) {
         obradiKomanduPopis(izlaz);
       } else {
         izlaz.write("ERROR 20 - Format komande nije ispravan\n");
