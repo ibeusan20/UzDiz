@@ -533,12 +533,16 @@ public class PosluziteljPartner {
    * @param linija je primljena komanda
    */
   private void obradiJelovnikKupca(BufferedReader ulaz, PrintWriter izlaz, String linija) {
-    var matcher = Pattern.compile("^JELOVNIK\\s+(\\w+)$").matcher(linija);
+    var matcher = Pattern.compile("^JELOVNIK\\s+(\\d+)$").matcher(linija);
     if (!matcher.matches()) {
       izlaz.write("ERROR 40 - Format komande nije ispravan\n");
       return;
     }
     String korisnik = matcher.group(1);
+    if (Integer.parseInt(korisnik) != this.idPartnera) {
+      izlaz.write("ERROR 49 - Neodgovarajući ID partnera\n");
+      return;
+    }
     if (this.jelovnik.isEmpty()) {
       izlaz.write("ERROR 46 - Neuspješno preuzimanje jelovnika\n");
     } else {
@@ -556,7 +560,7 @@ public class PosluziteljPartner {
    * @param linija je primljena komanda
    */
   private void obradiKartaPicaKupca(BufferedReader ulaz, PrintWriter izlaz, String linija) {
-    var matcher = Pattern.compile("^KARTAPIĆA\\s+(\\w+)$").matcher(linija);
+    var matcher = Pattern.compile("^KARTAPIĆA\\s+(\\d+)$").matcher(linija);
     if (!matcher.matches()) {
       izlaz.write("ERROR 40 - Format komande nije ispravan\n");
       return;
@@ -584,6 +588,10 @@ public class PosluziteljPartner {
       return;
     }
     String korisnik = matcher.group(1);
+    if (Integer.parseInt(korisnik) != this.idPartnera) {
+      izlaz.write("ERROR 49 - Neodgovarajući ID partnera\n");
+      return;
+    }
     synchronized (lokotNarudzbe) {
       if (otvoreneNarudzbe.containsKey(korisnik)) {
         izlaz.write("ERROR 44 - Već postoji otvorena narudžba za korisnika/kupca\n");

@@ -15,6 +15,8 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import edu.unizg.foi.nwtis.ibeusan20.vjezba_07_dz_2.dao.ObracunDAO;
 import edu.unizg.foi.nwtis.ibeusan20.vjezba_07_dz_2.dao.PartnerDAO;
+import edu.unizg.foi.nwtis.podaci.Jelovnik;
+import edu.unizg.foi.nwtis.podaci.KartaPica;
 import edu.unizg.foi.nwtis.podaci.Obracun;
 import edu.unizg.foi.nwtis.podaci.Partner;
 import jakarta.inject.Inject;
@@ -81,7 +83,7 @@ public class TvrtkaResource {
     if (status != null) {
       return Response.status(Response.Status.OK).build();
     } else {
-      return Response.status(Response.Status.CONFLICT).build();
+      return Response.status(Response.Status.NO_CONTENT).build();
     }
   }
 
@@ -89,7 +91,7 @@ public class TvrtkaResource {
   @HEAD
   @Operation(summary = "Postavljanje dijela poslužitelja tvrtka u pauzu")
   @APIResponses(value = {@APIResponse(responseCode = "200", description = "Uspješna operacija"),
-      @APIResponse(responseCode = "409", description = "Pogrešna operacija")})
+      @APIResponse(responseCode = "204", description = "Pogrešna operacija")})
   @Counted(name = "brojZahtjeva_headPosluziteljPauza",
       description = "Koliko puta je pozvana operacija servisa")
   @Timed(name = "trajanjeMetode_headPosluziteljPauza", description = "Vrijeme trajanja metode")
@@ -98,7 +100,7 @@ public class TvrtkaResource {
     if (status != null) {
       return Response.status(Response.Status.OK).build();
     } else {
-      return Response.status(Response.Status.CONFLICT).build();
+      return Response.status(Response.Status.NO_CONTENT).build();
     }
   }
 
@@ -106,16 +108,16 @@ public class TvrtkaResource {
   @HEAD
   @Operation(summary = "Postavljanje dijela poslužitelja tvrtka u rad")
   @APIResponses(value = {@APIResponse(responseCode = "200", description = "Uspješna operacija"),
-      @APIResponse(responseCode = "409", description = "Pogrešna operacija")})
+      @APIResponse(responseCode = "204", description = "Pogrešna operacija")})
   @Counted(name = "brojZahtjeva_headPosluziteljStart",
       description = "Koliko puta je pozvana operacija servisa")
   @Timed(name = "trajanjeMetode_headPosluziteljStart", description = "Vrijeme trajanja metode")
   public Response headPosluziteljStart(@PathParam("id") int id) {
     var status = posaljiKomandu("START " + this.kodZaAdminTvrtke + " " + id);
-    if (status == null) {
+    if (status != null) {
       return Response.status(Response.Status.OK).build();
     } else {
-      return Response.status(Response.Status.CONFLICT).build();
+      return Response.status(Response.Status.NO_CONTENT).build();
     }
   }
 
@@ -129,10 +131,10 @@ public class TvrtkaResource {
   @Timed(name = "trajanjeMetode_headPosluziteljKraj", description = "Vrijeme trajanja metode")
   public Response headPosluziteljKraj() {
     var status = posaljiKomandu("KRAJ " + this.kodZaKraj);
-    if (status == null) {
+    if (status != null) {
       return Response.status(Response.Status.OK).build();
     } else {
-      return Response.status(Response.Status.CONFLICT).build();
+      return Response.status(Response.Status.NO_CONTENT).build();
     }
   }
 
@@ -200,7 +202,7 @@ public class TvrtkaResource {
   @Operation(summary = "Dohvat jednog partnera")
   @APIResponses(
       value = {@APIResponse(responseCode = "201", description = "Uspješna kreiran resurs"),
-          @APIResponse(responseCode = "204", description = "Već postoji resurs ili druga pogreška"),
+          @APIResponse(responseCode = "409", description = "Već postoji resurs ili druga pogreška"),
           @APIResponse(responseCode = "500", description = "Interna pogreška")})
   @Counted(name = "brojZahtjeva_postPartner",
       description = "Koliko puta je pozvana operacija servisa")
@@ -246,7 +248,6 @@ public class TvrtkaResource {
   @Operation(summary = "Dodavanje više obračuna")
   @APIResponses(value = {
       @APIResponse(responseCode = "201", description = "Obračuni su uspješno pohranjeni"),
-      @APIResponse(responseCode = "204", description = "Pogreška pri pohrani obračuna"),
       @APIResponse(responseCode = "500", description = "Interna pogreška")
   })
   @Counted(name = "brojZahtjeva_postObracun", description = "Koliko puta je pozvana POST /obracun")
@@ -261,7 +262,139 @@ public class TvrtkaResource {
       e.printStackTrace();
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
-    return Response.status(Response.Status.CONFLICT).build();
+    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+  }
+  
+  @Path("jelovnik")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Dohvat svih jelovnika registriranih partnera")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", description = "Uspješan dohvat jelovnika"),
+      @APIResponse(responseCode = "500", description = "Greška pri dohvaćanju jelovnika")
+  })
+  @Counted(name = "brojZahtjeva_getJelovnici", description = "Broj GET /jelovnik poziva")
+  @Timed(name = "trajanjeMetode_getJelovnici", description = "Trajanje GET /jelovnik metode")
+  public Response getJelovnik() {
+    try (var vezaBP = this.restConfiguration.dajVezu()) {
+      var partnerDAO = new PartnerDAO(vezaBP);
+      var partneri = partnerDAO.dohvatiSve(false);
+      var tvrtkaAdresa = this.tvrtkaAdresa;
+      var mreznaVrataRad = Integer.parseInt(this.mreznaVrataRad);
+
+      var gson = new com.google.gson.Gson();
+      var sviJelovnici = new java.util.ArrayList<>();
+
+      for (Partner p : partneri) {
+        try (Socket s = new Socket(tvrtkaAdresa, mreznaVrataRad)) {
+          var out = new PrintWriter(new OutputStreamWriter(s.getOutputStream(), "utf8"));
+          var in = new BufferedReader(new InputStreamReader(s.getInputStream(), "utf8"));
+          System.out.println("[DEBUG] Pozivam partnera " + p.id() + " s kodom: " + p.sigurnosniKod() + " na socketu " + p.mreznaVrata());
+          out.write("JELOVNIK " + p.id() + " " + p.sigurnosniKod() + "\n");
+          out.flush();
+          s.shutdownOutput();
+          if (!"OK".equals(in.readLine())) continue;
+          String json = in.readLine();
+          Jelovnik[] jelovnici = gson.fromJson(json, Jelovnik[].class);
+          sviJelovnici.addAll(java.util.List.of(jelovnici));
+          s.shutdownInput();
+        } catch (Exception e) {
+          System.out.println("[WARN] Neuspješan partner ID: " + p.id());
+        }
+      }
+      return Response.ok(sviJelovnici).build();
+    } catch (Exception e) {
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+  
+  @Path("jelovnik/{id}")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Dohvat jelovnika partnera po ID-u")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", description = "Uspješan dohvat jelovnika"),
+      @APIResponse(responseCode = "404", description = "Partner nije pronađen"),
+      @APIResponse(responseCode = "500", description = "Greška prilikom dohvaćanja jelovnika")
+  })
+  @Counted(name = "brojZahtjeva_getJelovnik", description = "Koliko puta je pozvana metoda /jelovnik/{id}")
+  @Timed(name = "trajanjeMetode_getJelovnik", description = "Vrijeme trajanja metode /jelovnik/{id}")
+  public Response getJelovnikPartnera(@PathParam("id") int id) {
+    try (var veza = restConfiguration.dajVezu()) {
+      var partnerDAO = new PartnerDAO(veza);
+      var partner = partnerDAO.dohvati(id, false);
+      if (partner == null) {
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
+
+      String adresa = this.tvrtkaAdresa;
+      int port = Integer.parseInt(this.mreznaVrataRad);
+      String sigKod = partner.sigurnosniKod();
+
+      try (Socket socket = new Socket(adresa, port);
+           PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"));
+           BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"))) {
+
+        String komanda = "JELOVNIK " + id + " " + sigKod;
+        out.write(komanda + "\n");
+        out.flush();
+        socket.shutdownOutput();
+
+        String odgovor = in.readLine();
+        if (!"OK".equals(odgovor)) {
+          return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+
+        String json = in.readLine();
+        return Response.ok(json, MediaType.APPLICATION_JSON).build();
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  @Path("kartapica")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Dohvat karte pića registriranih partnera")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", description = "Uspješan dohvat karte pića"),
+      @APIResponse(responseCode = "500", description = "Greška pri dohvaćanju podataka")
+  })
+  @Counted(name = "brojZahtjeva_getKartaPica", description = "Broj GET /kartapica poziva")
+  @Timed(name = "trajanjeMetode_getKartaPica", description = "Trajanje GET /kartapica metode")
+  public Response getKartaPica() {
+    try (var vezaBP = this.restConfiguration.dajVezu()) {
+      var partnerDAO = new PartnerDAO(vezaBP);
+      var partneri = partnerDAO.dohvatiSve(false);
+      var tvrtkaAdresa = this.tvrtkaAdresa;
+      var mreznaVrataRad = Integer.parseInt(this.mreznaVrataRad);
+
+      var gson = new com.google.gson.Gson();
+      var svePice = new java.util.ArrayList<>();
+
+      for (Partner p : partneri) {
+        try (Socket s = new Socket(tvrtkaAdresa, mreznaVrataRad)) {
+          var out = new PrintWriter(new OutputStreamWriter(s.getOutputStream(), "utf8"));
+          var in = new BufferedReader(new InputStreamReader(s.getInputStream(), "utf8"));
+          out.write("KARTAPIĆA " + p.id() + " " + p.sigurnosniKod() + "\n");
+          out.flush();
+          s.shutdownOutput();
+          if (!"OK".equals(in.readLine())) continue;
+          String json = in.readLine();
+          KartaPica[] pica = gson.fromJson(json, KartaPica[].class);
+          svePice.addAll(java.util.List.of(pica));
+          s.shutdownInput();
+        } catch (Exception e) {
+          System.out.println("[WARN] Neuspješan partner ID: " + p.id());
+        }
+      }
+      return Response.ok(svePice).build();
+    } catch (Exception e) {
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
   }
 
 
