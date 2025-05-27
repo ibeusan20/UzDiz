@@ -132,7 +132,7 @@ public class TvrtkaResource {
       description = "Koliko puta je pozvana operacija servisa")
   @Timed(name = "trajanjeMetode_headPosluziteljKraj", description = "Vrijeme trajanja metode")
   public Response headPosluziteljKraj() {
-    var status = posaljiKomandu("KRAJ " + this.kodZaKraj);
+    var status = posaljiKomandu("KRAJWS " + this.kodZaKraj);
     if (status != null) {
       return Response.status(Response.Status.OK).build();
     } else {
