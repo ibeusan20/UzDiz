@@ -28,6 +28,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -296,6 +297,72 @@ public class TvrtkaResource {
     return null;
   }
   
+  @POST
+  @Path("obracun/ws")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Dodavanje novog obračuna i slanje komande PosluziteljTvrtka")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "201", description = "Obračun dodan i komanda poslana"),
+      @APIResponse(responseCode = "500", description = "Greška u dodavanju obračuna")
+  })
+  @Counted(name = "brojZahtjeva_postObracunWS", description = "Broj POST zahtjeva na /obracun/ws")
+  @Timed(name = "trajanjeMetode_postObracunWS", description = "Vrijeme izvršavanja metode postObracunWS")
+  public Response postObracunWs(List<Obracun> stavkeObracuna) {
+    if (stavkeObracuna == null || stavkeObracuna.isEmpty()) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("Obračun je prazan").build();
+    }
+
+    try (var veza = this.restConfiguration.dajVezu()) {
+      var partnerDAO = new PartnerDAO(veza);
+      var obracunDAO = new ObracunDAO(veza);
+
+      int idPartnera = stavkeObracuna.get(0).partner();
+      boolean sviIstiPartner = stavkeObracuna.stream().allMatch(o -> o.partner() == idPartnera);
+      if (!sviIstiPartner) {
+        return Response.status(Response.Status.BAD_REQUEST)
+            .entity("Sve stavke moraju biti za istog partnera").build();
+      }
+
+      var partner = partnerDAO.dohvati(idPartnera, false);
+      if (partner == null) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Nepostojeći partner").build();
+      }
+
+      boolean dodan = obracunDAO.dodajSve(stavkeObracuna);
+      if (!dodan) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+      }
+
+      var gson = new com.google.gson.Gson();
+      var json = gson.toJson(stavkeObracuna);
+
+      try (
+        var socket = new Socket(this.tvrtkaAdresa, Integer.parseInt(this.mreznaVrataRad));
+        var ulaz = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"));
+        var izlaz = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"))
+      ) {
+        izlaz.write("OBRAČUN " + idPartnera + " " + partner.sigurnosniKod() + "\n");
+        izlaz.write(json + "\n");
+        izlaz.flush();
+
+        var odgovor = ulaz.readLine();
+        System.out.println("[DEBUG] OBRACUN odgovor: " + odgovor);
+
+        if (!"OK".equalsIgnoreCase(odgovor)) {
+          return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+
+        return Response.status(Response.Status.CREATED).entity(stavkeObracuna).build();
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  
   @Path("obracun")
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
@@ -319,6 +386,103 @@ public class TvrtkaResource {
     }
     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
   }
+  
+  @Path("obracun")
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Dohvat obračuna s opcionalnim vremenskim filtrima")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", description = "Obračuni dohvaćeni"),
+      @APIResponse(responseCode = "500", description = "Interna pogreška")
+  })
+  @Counted(name = "brojZahtjeva_getObracuni", description = "Broj GET /obracun poziva")
+  @Timed(name = "trajanjeMetode_getObracuni", description = "Trajanje metode GET /obracun")
+  public Response getObracuni(
+      @QueryParam("od") Long vrijemeOd,
+      @QueryParam("do") Long vrijemeDo
+  ) {
+    try (var veza = this.restConfiguration.dajVezu()) {
+      var obracunDAO = new ObracunDAO(veza);
+      var sviObracuni = obracunDAO.dohvatiSve();
+
+      List<Obracun> filtrirano = sviObracuni.stream()
+        .filter(o -> (vrijemeOd == null || o.vrijeme() >= vrijemeOd) &&
+                     (vrijemeDo == null || o.vrijeme() <= vrijemeDo))
+        .toList();
+
+      return Response.ok(filtrirano).build();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+  
+  @GET
+  @Path("obracun/jelo")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Dohvat obračuna za jela")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", description = "Lista obračuna za jela"),
+      @APIResponse(responseCode = "500", description = "Greška kod dohvaćanja")
+  })
+  public Response getObracuniJelo(@QueryParam("od") Long od, @QueryParam("do") Long kraj) {
+    try (var veza = this.restConfiguration.dajVezu()) {
+      var dao = new ObracunDAO(veza);
+      var lista = dao.dohvatiSve().stream()
+          .filter(o -> o.jelo())
+          .filter(o -> (od == null || o.vrijeme() >= od) && (kraj == null || o.vrijeme() <= kraj))
+          .toList();
+      return Response.ok(lista).build();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  @GET
+  @Path("obracun/pice")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Dohvat obračuna za pića")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", description = "Lista obračuna za pića"),
+      @APIResponse(responseCode = "500", description = "Greška kod dohvaćanja")
+  })
+  public Response getObracuniPice(@QueryParam("od") Long od, @QueryParam("do") Long kraj) {
+    try (var veza = this.restConfiguration.dajVezu()) {
+      var dao = new ObracunDAO(veza);
+      var lista = dao.dohvatiSve().stream()
+          .filter(o -> !o.jelo())
+          .filter(o -> (od == null || o.vrijeme() >= od) && (kraj == null || o.vrijeme() <= kraj))
+          .toList();
+      return Response.ok(lista).build();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  @GET
+  @Path("obracun/{id}")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Dohvat obračuna za određenog partnera")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", description = "Lista obračuna za partnera"),
+      @APIResponse(responseCode = "500", description = "Greška kod dohvaćanja")
+  })
+  public Response getObracuniZaPartnera(@PathParam("id") int id, @QueryParam("od") Long od, @QueryParam("do") Long kraj) {
+    try (var veza = this.restConfiguration.dajVezu()) {
+      var dao = new ObracunDAO(veza);
+      var lista = dao.dohvatiSve().stream()
+          .filter(o -> o.partner() == id)
+          .filter(o -> (od == null || o.vrijeme() >= od) && (kraj == null || o.vrijeme() <= kraj))
+          .toList();
+      return Response.ok(lista).build();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
   
   @Path("jelovnik")
   @GET
