@@ -615,6 +615,49 @@ public class TvrtkaResource {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
+  
+  @GET
+  @Path("spava")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Zatraži od PosluziteljTvrtka da spava određeni broj milisekundi")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", description = "Poslužitelj je uspješno prešao u stanje spavanja"),
+      @APIResponse(responseCode = "400", description = "Parametar 'vrijeme' nije valjan"),
+      @APIResponse(responseCode = "500", description = "Greška u komunikaciji s poslužiteljem")
+  })
+  @Counted(name = "brojZahtjeva_getSpava", description = "Broj GET zahtjeva na /spava")
+  @Timed(name = "trajanjeMetode_getSpava", description = "Vrijeme izvršavanja metode getSpava")
+  public Response getSpava(@QueryParam("vrijeme") Long trajanje) {
+    if (trajanje == null || trajanje < 0) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("Parametar 'vrijeme' mora biti pozitivan broj").build();
+    }
+
+    try (
+      var socket = new Socket(this.tvrtkaAdresa, Integer.parseInt(this.mreznaVrataKraj));
+      var ulaz = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"));
+      var izlaz = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"))
+    ) {
+      izlaz.write("SPAVA " + this.kodZaAdminTvrtke + " " + trajanje + "\n");
+      izlaz.flush();
+
+      var odgovor = ulaz.readLine();
+      System.out.println("[DEBUG] SPAVA odgovor: " + odgovor);
+
+      if (!"OK".equalsIgnoreCase(odgovor)) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            .entity("Poslužitelj nije prihvatio SPAVA komandu").build();
+      }
+
+      return Response.status(Response.Status.OK).build();
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+          .entity("Greška prilikom slanja SPAVA komande").build();
+    }
+  }
+
 
 
 }
