@@ -152,7 +152,7 @@ public class PosluziteljPartner {
       String komanda = dijelovi[0];
       String adminKod = konfig.dajPostavku("kodZaAdmin");
 
-      if (pauzaKupci.get() && !(komanda.equals("START") || komanda.equals("STATUS"))) {
+      if (pauzaKupci.get() && !(komanda.equals("START") || komanda.equals("STATUS") || komanda.equals("OSVJEŽI"))) {
         izlaz.write("ERROR 48 - Poslužitelj za prijem zahtjeva kupaca u pauzi\n");
         return;
       }
