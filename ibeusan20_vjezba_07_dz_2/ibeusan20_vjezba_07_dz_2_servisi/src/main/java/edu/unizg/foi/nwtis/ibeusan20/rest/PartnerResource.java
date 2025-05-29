@@ -6,13 +6,14 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.sql.Connection;
+import java.util.List;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import edu.unizg.foi.nwtis.ibeusan20.vjezba_07_dz_2.dao.KorisnikDAO;
+import edu.unizg.foi.nwtis.podaci.Korisnik;
 import edu.unizg.foi.nwtis.podaci.Narudzba;
-import edu.unizg.foi.nwtis.podaci.Obracun;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -21,6 +22,7 @@ import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -114,7 +116,7 @@ public class PartnerResource {
     }
     return Response.status(Response.Status.NO_CONTENT).build();
   }
-
+/////////////////////treba vratiti mapu  itd //////////////////////////////
   @GET
   @Path("jelovnik")
   @Operation(summary = "Vraća jelovnik")
@@ -202,7 +204,6 @@ public class PartnerResource {
         .entity("Neuspješno dodavanje narudžbe").build();
   }
   
-  ///////////////////////////////////////////////////////////////////////////
   @POST
   @Path("jelo")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -219,7 +220,6 @@ public class PartnerResource {
       if (!autentificirajKorisnika(korisnik, lozinka)) {
           return Response.status(Response.Status.UNAUTHORIZED).build();
       }
-
       String komanda = String.format("JELO %s %s %.1f", korisnik, narudzba.id(), narudzba.kolicina());
       String odgovor = posaljiKomandu(komanda);
 
@@ -230,7 +230,6 @@ public class PartnerResource {
       } else if (odgovor.startsWith("OK")) {
           return Response.status(Response.Status.CREATED).build();
       }
-
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Greška u dodavanju jela").build();
   }
 
@@ -261,7 +260,6 @@ public class PartnerResource {
       } else if (odgovor.startsWith("OK")) {
           return Response.status(Response.Status.CREATED).build();
       }
-
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Greška u dodavanju pića").build();
   }
   
@@ -297,8 +295,78 @@ public class PartnerResource {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                      .entity("Neuspješno slanje zahtjeva za račun").build();
   }
+  
+  @GET
+  @Path("korisnik")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Vraća korisnike")
+  @APIResponses({
+      @APIResponse(responseCode = "200", description = "Lista korisnika vraćena"),
+      @APIResponse(responseCode = "500", description = "Greška u komunikaciji")
+  })
+  public Response getKorisnici() {
+    try (var vezaBP = this.restConfiguration.dajVezu()) {
+      var korisnikDAO = new KorisnikDAO(vezaBP);
+      var korisnici = korisnikDAO.dohvatiSve();
+      return Response.ok(korisnici).status(Response.Status.OK).build();
+    } catch (Exception e) {
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
 
+  @GET
+  @Path("korisnik/{id}")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Vraća korisnika prema ID")
+  @APIResponses({
+      @APIResponse(responseCode = "200", description = "Korisnik pronađen"),
+      @APIResponse(responseCode = "404", description = "Korisnik nije pronađen"),
+      @APIResponse(responseCode = "500", description = "Greška u komunikaciji")
+  })
+  public Response getKorisnik(@PathParam("id") String id) {
+      try (var vezaBP = this.restConfiguration.dajVezu()) {
+        var korisnikDAO = new KorisnikDAO(vezaBP);
+        var korisnik = korisnikDAO.dohvati(id, null, false);
+        
+        if (korisnik == null) {
+          return Response.status(Response.Status.NOT_FOUND)
+                         .entity("Korisnik s ID '" + id + "' nije pronađen")
+                         .build();
+      }
+        return Response.ok(korisnik).status(Response.Status.OK).build();
+      } catch (Exception e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+      }
+  }
 
+  @POST
+  @Path("korisnik")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Dodaje novog korisnika")
+  @APIResponses({
+      @APIResponse(responseCode = "201", description = "Korisnik uspješno dodan"),
+      @APIResponse(responseCode = "409", description = "Korisnik već postoji"),
+      @APIResponse(responseCode = "500", description = "Greška u komunikaciji")
+  })
+  public Response postKorisnik(Korisnik korisnik) {
+      try (var vezaBP = this.restConfiguration.dajVezu()) {
+          var korisnikDAO = new KorisnikDAO(vezaBP);
+
+          boolean postoji = korisnikDAO.dohvati(korisnik.korisnik(), null, false) != null;
+          if (postoji) {
+              return Response.status(Response.Status.CONFLICT).entity("Korisnik već postoji").build();
+          }
+          boolean dodan = korisnikDAO.dodaj(korisnik);
+          if (dodan) {
+              return Response.status(Response.Status.CREATED).build();
+          } else {
+              return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Greška u dodavanju korisnika").build();
+          }
+      } catch (Exception e) {
+          e.printStackTrace();
+          return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Greška u komunikaciji s bazom").build();
+      }
+  }
 
   private String posaljiKomandu(String komanda) {
     try {
@@ -310,11 +378,9 @@ public class PartnerResource {
       izlaz.println(komanda);
       izlaz.flush();
       socket.shutdownOutput();
-
       String linija1 = ulaz.readLine();
       String linija2 = ulaz.readLine();
       socket.shutdownInput();
-
       System.out.println(komanda + "->" + linija1 + " " + linija2);
       socket.close();
       if (linija1 == null) {

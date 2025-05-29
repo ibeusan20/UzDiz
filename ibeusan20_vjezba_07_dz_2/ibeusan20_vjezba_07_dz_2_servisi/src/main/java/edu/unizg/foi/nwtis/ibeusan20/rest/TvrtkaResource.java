@@ -255,7 +255,7 @@ public class TvrtkaResource {
   @POST
   @Consumes({MediaType.APPLICATION_JSON})
   @Produces({MediaType.APPLICATION_JSON})
-  @Operation(summary = "Dohvat jednog partnera")
+  @Operation(summary = "Postavljanje jednog partnera")
   @APIResponses(
       value = {@APIResponse(responseCode = "201", description = "Uspješna kreiran resurs"),
           @APIResponse(responseCode = "409", description = "Već postoji resurs ili druga pogreška"),
