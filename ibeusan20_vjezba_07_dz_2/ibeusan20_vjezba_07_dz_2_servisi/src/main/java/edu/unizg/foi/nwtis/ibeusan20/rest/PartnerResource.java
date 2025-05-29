@@ -11,14 +11,16 @@ import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import edu.unizg.foi.nwtis.ibeusan20.vjezba_07_dz_2.dao.KorisnikDAO;
+import edu.unizg.foi.nwtis.podaci.Narudzba;
+import edu.unizg.foi.nwtis.podaci.Obracun;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HEAD;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -113,7 +115,6 @@ public class PartnerResource {
     return Response.status(Response.Status.NO_CONTENT).build();
   }
 
-  ///////////////////////////////////////////////////////////////////////////////////////
   @GET
   @Path("jelovnik")
   @Operation(summary = "Vraća jelovnik")
@@ -200,6 +201,103 @@ public class PartnerResource {
     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
         .entity("Neuspješno dodavanje narudžbe").build();
   }
+  
+  ///////////////////////////////////////////////////////////////////////////
+  @POST
+  @Path("jelo")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Dodaje novo jelo u narudžbu")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "201", description = "Jelo dodano u narudžbu"),
+      @APIResponse(responseCode = "401", description = "Neautoriziran pristup"),
+      @APIResponse(responseCode = "409", description = "Ne postoji otvorena narudžba"),
+      @APIResponse(responseCode = "500", description = "Greška prilikom komunikacije")
+  })
+  public Response postJelo(@HeaderParam("korisnik") String korisnik,
+                           @HeaderParam("lozinka") String lozinka,
+                           Narudzba narudzba) {
+      if (!autentificirajKorisnika(korisnik, lozinka)) {
+          return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
+
+      String komanda = String.format("JELO %s %s %.1f", korisnik, narudzba.id(), narudzba.kolicina());
+      String odgovor = posaljiKomandu(komanda);
+
+      if (odgovor == null) {
+          return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+      } else if (odgovor.startsWith("ERROR 48")) {
+          return Response.status(Response.Status.CONFLICT).entity("Nema otvorene narudžbe").build();
+      } else if (odgovor.startsWith("OK")) {
+          return Response.status(Response.Status.CREATED).build();
+      }
+
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Greška u dodavanju jela").build();
+  }
+
+  @POST
+  @Path("pice")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Dodaje novo piće u narudžbu")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "201", description = "Piće dodano u narudžbu"),
+      @APIResponse(responseCode = "401", description = "Neautoriziran pristup"),
+      @APIResponse(responseCode = "409", description = "Ne postoji otvorena narudžba"),
+      @APIResponse(responseCode = "500", description = "Greška prilikom komunikacije")
+  })
+  public Response postPice(@HeaderParam("korisnik") String korisnik,
+                           @HeaderParam("lozinka") String lozinka,
+                           Narudzba narudzba) {
+      if (!autentificirajKorisnika(korisnik, lozinka)) {
+          return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
+
+      String komanda = String.format("PIĆE %s %s %.1f", korisnik, narudzba.id(), narudzba.kolicina());
+      String odgovor = posaljiKomandu(komanda);
+
+      if (odgovor == null) {
+          return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+      } else if (odgovor.startsWith("ERROR 44")) {
+          return Response.status(Response.Status.CONFLICT).entity("Nema otvorene narudžbe").build();
+      } else if (odgovor.startsWith("OK")) {
+          return Response.status(Response.Status.CREATED).build();
+      }
+
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Greška u dodavanju pića").build();
+  }
+  
+  @POST
+  @Path("racun")
+  @Operation(summary = "Zahtijeva račun za otvorenu narudžbu korisnika")
+  @APIResponses(value = {
+      @APIResponse(responseCode = "201", description = "Račun uspješno generiran"),
+      @APIResponse(responseCode = "401", description = "Neautoriziran pristup"),
+      @APIResponse(responseCode = "409", description = "Nema otvorene narudžbe"),
+      @APIResponse(responseCode = "500", description = "Greška prilikom komunikacije")
+  })
+  public Response postRacun(
+      @HeaderParam("korisnik") String korisnik,
+      @HeaderParam("lozinka") String lozinka
+  ) {
+      if (!autentificirajKorisnika(korisnik, lozinka)) {
+          return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
+
+      String odgovor = posaljiKomandu("RAČUN " + korisnik);
+      if (odgovor == null) {
+          return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                         .entity("Greška prilikom komunikacije").build();
+      } else if (odgovor.startsWith("ERROR 44")) {
+          return Response.status(Response.Status.CONFLICT)
+                         .entity("Nema otvorene narudžbe").build();
+      } else if (odgovor.startsWith("OK")) {
+          return Response.status(Response.Status.CREATED)
+              .entity("Račun uspješno kreiran").build();
+      }
+
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                     .entity("Neuspješno slanje zahtjeva za račun").build();
+  }
+
 
 
   private String posaljiKomandu(String komanda) {
