@@ -11,19 +11,33 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import edu.unizg.foi.nwtis.podaci.Partner;
 
-
 /**
+ * Klasa PartnerDAO.
  *
  * @author Ivan Beusan
  */
 public class PartnerDAO {
+  
+  /** Veza na bazu podataka */
   private Connection vezaBP;
 
+  /**
+   * Instancira novi partner DAO.
+   *
+   * @param vezaBP the veza BP
+   */
   public PartnerDAO(Connection vezaBP) {
     super();
     this.vezaBP = vezaBP;
   }
 
+  /**
+   * Dohvati partnera
+   *
+   * @param id id partnera
+   * @param sakriKodove zastavica hoće li kodovi biti sakriveni
+   * @return vraća partnera
+   */
   public Partner dohvati(int id, boolean sakriKodove) {
     String upit =
         "SELECT naziv, vrstaKuhinje, adresa, mreznaVrata, mreznaVrataKraj, gpsSirina, gpsDuzina, sigurnosniKod, adminKod FROM partneri WHERE id = ?";
@@ -59,6 +73,12 @@ public class PartnerDAO {
     return null;
   }
 
+  /**
+   * Dohvati sve partnere.
+   *
+   * @param sakriKodove zastavica hoće li kodovi biti sakriveni
+   * @return vraća listu partnera
+   */
   public List<Partner> dohvatiSve(boolean sakriKodove) {
     String upit =
         "SELECT id, naziv, vrstaKuhinje, adresa, mreznaVrata, mreznaVrataKraj, gpsSirina, gpsDuzina, sigurnosniKod, adminKod FROM partneri ORDER BY id";
@@ -94,6 +114,12 @@ public class PartnerDAO {
     return null;
   }
 
+  /**
+   * Azuriraj partnera.
+   *
+   * @param p partner
+   * @return true, ako je uspješno
+   */
   public boolean azuriraj(Partner p) {
     String upit = "UPDATE partneri SET naziv = ?, adresa = ?, mreznaVrata = ?, mreznaVrataKraj = ?, gpsSirina = ?, gpsDuzina = ?, sigurnosniKod = ?, adminKod = ? "
         + " WHERE korisnik = ?";
@@ -119,6 +145,12 @@ public class PartnerDAO {
     return false;
   }
 
+  /**
+   * Dodaj partnera
+   *
+   * @param p partner
+   * @return true, ako je uspješno
+   */
   public boolean dodaj(Partner p) {
     String upit = "INSERT INTO partneri (id, naziv, vrstaKuhinje, adresa, mreznaVrata, mreznaVrataKraj, gpsSirina, gpsDuzina, sigurnosniKod, adminKod) "
         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";

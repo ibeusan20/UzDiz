@@ -13,17 +13,33 @@ import edu.unizg.foi.nwtis.podaci.Korisnik;
 
 
 /**
+ * Klasa KorisnikDAO.
  *
  * @author Ivan Beusan
  */
 public class KorisnikDAO {
+  
+  /** Veza na bazu podataka. */
   private Connection vezaBP;
 
+  /**
+   * Instancira novi korisnik DAO.
+   *
+   * @param vezaBP veza na bazu podataka
+   */
   public KorisnikDAO(Connection vezaBP) {
     super();
     this.vezaBP = vezaBP;
   }
 
+  /**
+   * Dohvaća korisnika po korisničkom imenu.
+   *
+   * @param korisnik korisničko ime korisnika
+   * @param lozinka lozinka korisnika
+   * @param prijava je li bila potrebna prijava
+   * @return korisnik se vraća
+   */
   public Korisnik dohvati(String korisnik, String lozinka, Boolean prijava) {
     String upit = "SELECT ime, prezime, korisnik, lozinka, email FROM korisnici WHERE korisnik = ?";
 
@@ -54,6 +70,11 @@ public class KorisnikDAO {
     return null;
   }
 
+  /**
+   * Dohvati sve korisnike.
+   *
+   * @return vraća listu korisnika
+   */
   public List<Korisnik> dohvatiSve() {
     String upit = "SELECT ime, prezime, email, korisnik, lozinka FROM korisnici";
 
@@ -78,6 +99,13 @@ public class KorisnikDAO {
     return null;
   }
 
+  /**
+   * Dohvati prezime ime.
+   *
+   * @param pPrezime prezime
+   * @param pIme ime
+   * @return vraća listu
+   */
   public List<Korisnik> dohvatiPrezimeIme(String pPrezime, String pIme) {
     String upit =
         "SELECT ime, prezime, email, korisnik, lozinka FROM korisnici WHERE prezime LIKE ? AND ime LIKE ?";
@@ -108,6 +136,13 @@ public class KorisnikDAO {
     return null;
   }
 
+  /**
+   * Ažuriranje korisnika
+   *
+   * @param k korisnik
+   * @param lozinka lozinka kosirnika
+   * @return true, ako je uspješno
+   */
   public boolean azuriraj(Korisnik k, String lozinka) {
     String upit = "UPDATE korisnici SET ime = ?, prezime = ?, email = ?, lozinka = ? "
         + " WHERE korisnik = ?";
@@ -130,6 +165,12 @@ public class KorisnikDAO {
     return false;
   }
 
+  /**
+   * Dodavanje korisnika.
+   *
+   * @param k korinsik
+   * @return true, ako je uspješno
+   */
   public boolean dodaj(Korisnik k) {
     String upit = "INSERT INTO korisnici (ime, prezime, email, korisnik, lozinka) "
         + "VALUES (?, ?, ?, ?, ?)";

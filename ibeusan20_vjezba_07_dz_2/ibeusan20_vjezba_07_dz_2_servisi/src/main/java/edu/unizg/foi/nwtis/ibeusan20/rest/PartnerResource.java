@@ -32,28 +32,53 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+/**
+ * REST resurs za upravljanje funkcionalnostima PosluziteljaPartner.
+ * Omogućuje upravljanje statusom poslužitelja, radom s korisnicima,
+ * jelovnikom, pićem, narudžbama i izradom računa.
+ * Također komunicira s poslužiteljem preko socket veza.
+ * 
+ * Ruta resursa: /api/partner
+ * 
+ * @author Ivan Beusan
+ */
 @Path("api/partner")
 public class PartnerResource {
 
+  /** Rest konfiguracija. */
   @Inject
   RestConfiguration restConfiguration;
 
+  /** Adresa partnera. */
   @Inject
   @ConfigProperty(name = "adresaPartner")
   String partnerAdresa;
+  
+  /** Mrežna vrata za rad partnera. */
   @Inject
   @ConfigProperty(name = "mreznaVrataRadPartner")
   String partnerPort;
+  
+  /** Mrežna vrata za kraj partnera. */
   @Inject
   @ConfigProperty(name = "mreznaVrataKrajPartner")
   String partnerPortKraj;
+  
+  /** Kod za admin partnera. */
   @Inject
   @ConfigProperty(name = "kodZaAdminPartnera")
   String kodZaAdminPartnera;
+  
+  /** Kod za kraj. */
   @Inject
   @ConfigProperty(name = "kodZaKraj")
   String kodZaKraj;
 
+  /**
+   * Provjerava je li poslužitelj partner aktivan.
+   * 
+   * @return HTTP 200 ako je aktivan, 500 ako nije.
+   */
   @HEAD
   @Operation(summary = "Provjerava da li radi PosluziteljPartner")
   @APIResponse(responseCode = "200", description = "Poslužitelj je aktivan")
@@ -70,6 +95,12 @@ public class PartnerResource {
     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
   }
 
+  /**
+   * Dohvaća status dijela poslužitelja.
+   * 
+   * @param id ID dijela poslužitelja.
+   * @return HTTP 200 ako je aktivan, 204 ako nije pronađen.
+   */
   @HEAD
   @Path("status/{id}")
   @Operation(summary = "Vraća status dijela poslužitelja PosluziteljPartner")
@@ -84,6 +115,12 @@ public class PartnerResource {
     return Response.status(Response.Status.NO_CONTENT).build();
   }
 
+  /**
+   * Pauzira rad dijela poslužitelja.
+   * 
+   * @param id ID dijela poslužitelja.
+   * @return HTTP 200 ako je pauziran, 204 ako nije pronađen.
+   */
   @HEAD
   @Path("pauza/{id}")
   @Operation(summary = "Pauzira rad dijela poslužitelja osim kontrola")
@@ -97,6 +134,12 @@ public class PartnerResource {
     return Response.status(Response.Status.NO_CONTENT).build();
   }
 
+  /**
+   * Pokreće rad dijela poslužitelja.
+   * 
+   * @param id ID dijela poslužitelja.
+   * @return HTTP 200 ako je pokrenut, 204 ako nije pronađen.
+   */
   @HEAD
   @Path("start/{id}")
   @Operation(summary = "Pokreće rad dijela poslužitelja osim kontrola")
@@ -110,6 +153,11 @@ public class PartnerResource {
     return Response.status(Response.Status.NO_CONTENT).build();
   }
 
+  /**
+   * Zaustavlja poslužitelj partnera.
+   * 
+   * @return HTTP 200 ako je poslužitelj ugašen, 204 ako nije.
+   */
   @HEAD
   @Path("kraj")
   @Operation(summary = "Šalje komandu za kraj rada poslužitelja")
@@ -123,8 +171,16 @@ public class PartnerResource {
     return Response.status(Response.Status.NO_CONTENT).build();
   }
   
+  /**
+   * Vraća jelovnik nakon provjere autentikacije korisnika.
+   * 
+   * @param korisnik korisničko ime.
+   * @param lozinka korisnička lozinka.
+   * @return HTTP 200 i JSON jelovnik ili odgovarajući kod greške.
+   */
   @GET
   @Path("jelovnik")
+  @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "Vraća jelovnik")
   @APIResponses(
       value = {@APIResponse(responseCode = "200", description = "Uspješan dohvat jelovnika"),
@@ -150,8 +206,16 @@ public class PartnerResource {
     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
   }
 
+  /**
+   * Vraća kartu pića nakon autentikacije korisnika.
+   * 
+   * @param korisnik korisničko ime.
+   * @param lozinka korisnička lozinka.
+   * @return HTTP 200 i JSON lista pića ili odgovarajući kod greške.
+   */
   @GET
   @Path("kartapica")
+  @Produces(MediaType.APPLICATION_JSON)
   @Operation(summary = "Vraća kartu pića")
   @APIResponses(
       value = {@APIResponse(responseCode = "200", description = "Uspješan dohvat karte pića"),
@@ -177,6 +241,13 @@ public class PartnerResource {
     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
   }
   
+  /**
+   * Dohvaća stavke otvorene narudžbe korisnika.
+   * 
+   * @param korisnik korisničko ime.
+   * @param lozinka korisnička lozinka.
+   * @return HTTP 200 s JSON stavkama ili odgovarajući kod greške.
+   */
   @GET
   @Path("narudzba")
   @Produces(MediaType.APPLICATION_JSON)
@@ -218,6 +289,13 @@ public class PartnerResource {
                      .entity("Neočekivan odgovor poslužitelja").build();
   }
 
+  /**
+   * Dodaje novu narudžbu za korisnika.
+   * 
+   * @param korisnik korisničko ime.
+   * @param lozinka korisnička lozinka.
+   * @return HTTP 201 ako je dodano, 409 ako već postoji, 401/500 za greške.
+   */
   @POST
   @Path("narudzba")
   @Operation(summary = "Dodaje novu narudžbu korisniku")
@@ -242,6 +320,14 @@ public class PartnerResource {
         .entity("Neuspješno dodavanje narudžbe").build();
   }
   
+  /**
+   * Dodaje novo jelo u narudžbu.
+   * 
+   * @param korisnik korisničko ime.
+   * @param lozinka korisnička lozinka.
+   * @param narudzba objekt narudžbe.
+   * @return HTTP 201 ako je dodano, 409 ako nema narudžbe, 401/500 za greške.
+   */
   @POST
   @Path("jelo")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -271,6 +357,14 @@ public class PartnerResource {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Greška u dodavanju jela").build();
   }
 
+  /**
+   * Dodaje novo piće u narudžbu.
+   * 
+   * @param korisnik korisničko ime.
+   * @param lozinka korisnička lozinka.
+   * @param narudzba objekt narudžbe.
+   * @return HTTP 201 ako je dodano, 409 ako nema narudžbe, 401/500 za greške.
+   */
   @POST
   @Path("pice")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -299,6 +393,13 @@ public class PartnerResource {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Greška u dodavanju pića").build();
   }
   
+  /**
+   * Generira račun za otvorenu narudžbu korisnika.
+   * 
+   * @param korisnik korisničko ime.
+   * @param lozinka korisnička lozinka.
+   * @return HTTP 201 ako je generirano, 409/401/500 za greške.
+   */
   @POST
   @Path("racun")
   @Operation(summary = "Zahtijeva račun za otvorenu narudžbu korisnika")
@@ -330,6 +431,11 @@ public class PartnerResource {
                      .entity("Neuspješno slanje zahtjeva za račun").build();
   }
   
+  /**
+   * Vraća sve korisnike iz baze.
+   * 
+   * @return HTTP 200 s listom korisnika ili 500 za grešku.
+   */
   @GET
   @Path("korisnik")
   @Produces(MediaType.APPLICATION_JSON)
@@ -348,6 +454,12 @@ public class PartnerResource {
     }
   }
 
+  /**
+   * Vraća podatke korisnika po ID-u.
+   * 
+   * @param id identifikator korisnika.
+   * @return HTTP 200 ako je pronađen, 404/500 ako nije ili je greška.
+   */
   @GET
   @Path("korisnik/{id}")
   @Produces(MediaType.APPLICATION_JSON)
@@ -372,6 +484,12 @@ public class PartnerResource {
       }
   }
 
+  /**
+   * Dodaje novog korisnika u bazu.
+   * 
+   * @param korisnik objekt korisnika.
+   * @return HTTP 201 ako je dodano, 409/500 za greške.
+   */
   @POST
   @Path("korisnik")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -401,6 +519,12 @@ public class PartnerResource {
       }
   }
   
+  /**
+   * Poslužitelj spava određeno vrijeme u milisekundama.
+   * 
+   * @param vrijeme vrijeme spavanja u milisekundama.
+   * @return HTTP 200 ako je uspješno, 500 za greške.
+   */
   @GET
   @Path("spava")
   @Operation(summary = "Poslužitelj spava zadano vrijeme")
@@ -427,6 +551,12 @@ public class PartnerResource {
   }
 
 
+  /**
+   * Pomoćna metoda za slanje komandi na port za rad.
+   * 
+   * @param komanda tekst komande
+   * @return odgovor poslužitelja ili null
+   */
   private String posaljiKomandu(String komanda) {
     try {
       var socket = new Socket(this.partnerAdresa, Integer.parseInt(this.partnerPort));
@@ -455,6 +585,12 @@ public class PartnerResource {
     }
   }
 
+  /**
+   * Pomoćna metoda za slanje komandi na administrativni port.
+   * 
+   * @param komanda tekst komande
+   * @return odgovor poslužitelja ili null
+   */
   private String posaljiKomanduNaKraj(String komanda) {
     try {
       var socket = new Socket(this.partnerAdresa, Integer.parseInt(this.partnerPortKraj));
@@ -476,6 +612,13 @@ public class PartnerResource {
     }
   }
 
+  /**
+   * Provjerava korisničke podatke na temelju korisničkog imena i lozinke.
+   * 
+   * @param korisnik korisničko ime
+   * @param lozinka lozinka korisnika
+   * @return true ako je korisnik autentificiran, inače false
+   */
   private boolean autentificirajKorisnika(String korisnik, String lozinka) {
     try (Connection con = restConfiguration.dajVezu()) {
       KorisnikDAO dao = new KorisnikDAO(con);
@@ -485,6 +628,4 @@ public class PartnerResource {
       return false;
     }
   }
-
-
 }

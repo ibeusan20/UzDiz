@@ -9,13 +9,30 @@ import java.util.ArrayList;
 import java.util.List;
 import edu.unizg.foi.nwtis.podaci.Obracun;
 
+/**
+ * Klasa ObracunDAO.
+ */
 public class ObracunDAO {
+  
+  /** Veza na bazu podataka. */
   private final Connection veza;
 
+  /**
+   * Instancira novi obracun DAO.
+   *
+   * @param veza veza na bazu
+   */
   public ObracunDAO(Connection veza) {
     this.veza = veza;
   }
 
+  /**
+   * Dodaj sve.
+   *
+   * @param obracuni obracuni za dodavanje
+   * @return true, ako je uspješno
+   * @throws SQLException moguća SQL iznimka
+   */
   public boolean dodajSve(List<Obracun> obracuni) throws SQLException {
     String sql = """
         INSERT INTO OBRACUNI (PARTNER, ID, JELO, KOLICINA, CIJENA, VRIJEME)
@@ -38,6 +55,12 @@ public class ObracunDAO {
     return true;
   }
   
+  /**
+   * Dodaj obračun.
+   *
+   * @param o obračun
+   * @return true, ako je uspješno
+   */
   public boolean dodaj(Obracun o) {
     String upit = """
         INSERT INTO OBRACUNI (PARTNER, ID, JELO, KOLICINA, CIJENA, VRIJEME)
@@ -58,6 +81,11 @@ public class ObracunDAO {
   }
 
   
+  /**
+   * Dohvati sve obračune.
+   *
+   * @return lista obračuna
+   */
   public List<Obracun> dohvatiSve() {
     List<Obracun> obracuni = new ArrayList<>();
     String sql = "SELECT partner, id, jelo, kolicina, cijena, vrijeme FROM OBRACUNI";

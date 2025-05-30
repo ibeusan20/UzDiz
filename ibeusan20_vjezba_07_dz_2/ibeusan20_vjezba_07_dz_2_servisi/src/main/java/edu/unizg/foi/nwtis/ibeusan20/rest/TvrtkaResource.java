@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -32,31 +34,51 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+/**
+ * Klasa TvrtkaResource rest servisa za posluziteljtvrtka.
+ */
 @Path("api/tvrtka")
 public class TvrtkaResource {
 
+  /** Adresa tvrtke. */
   @Inject
   @ConfigProperty(name = "adresa")
   private String tvrtkaAdresa;
+  
+  /** Mrezna vrata za KRAJ */
   @Inject
   @ConfigProperty(name = "mreznaVrataKraj")
   private String mreznaVrataKraj;
+  
+  /** Mrezna vrata za registraciju. */
   @Inject
   @ConfigProperty(name = "mreznaVrataRegistracija")
   private String mreznaVrataRegistracija;
+  
+  /** Mrezna vrata za rad. */
   @Inject
   @ConfigProperty(name = "mreznaVrataRad")
   private String mreznaVrataRad;
+  
+  /** Kod za admina tvrtke. */
   @Inject
   @ConfigProperty(name = "kodZaAdminTvrtke")
   private String kodZaAdminTvrtke;
+  
+  /** Kod za kraj. */
   @Inject
   @ConfigProperty(name = "kodZaKraj")
   private String kodZaKraj;
 
+  /** REST konfiguracija */
   @Inject
   RestConfiguration restConfiguration;
 
+  /**
+   * Provjerava radi li poslužitelj tvrtke tako da šalje testnu komandu.
+   *
+   * @return HTTP 200 ako je poslužitelj aktivan, inače HTTP 500
+   */
   @HEAD
   @Operation(summary = "Provjera statusa poslužitelja tvrtka")
   @APIResponses(value = {@APIResponse(responseCode = "200", description = "Uspješna operacija"),
@@ -72,6 +94,12 @@ public class TvrtkaResource {
     }
   }
 
+  /**
+   * Provjerava status određenog dijela poslužitelja tvrtke.
+   *
+   * @param id identifikator dijela poslužitelja
+   * @return HTTP 200 ako je dio aktivan, HTTP 204 ako nije
+   */
   @Path("status/{id}")
   @HEAD
   @Operation(summary = "Provjera statusa dijela poslužitelja tvrtka")
@@ -89,6 +117,12 @@ public class TvrtkaResource {
     }
   }
 
+  /**
+   * Postavlja dio poslužitelja tvrtke u pauzirano stanje.
+   *
+   * @param id identifikator dijela poslužitelja
+   * @return HTTP 200 ako je uspješno, HTTP 204 ako nije
+   */
   @Path("pauza/{id}")
   @HEAD
   @Operation(summary = "Postavljanje dijela poslužitelja tvrtka u pauzu")
@@ -106,6 +140,12 @@ public class TvrtkaResource {
     }
   }
 
+  /**
+   * Postavlja dio poslužitelja tvrtke u aktivno stanje (start).
+   *
+   * @param id identifikator dijela poslužitelja
+   * @return HTTP 200 ako je uspješno, HTTP 204 ako nije
+   */
   @Path("start/{id}")
   @HEAD
   @Operation(summary = "Postavljanje dijela poslužitelja tvrtka u rad")
@@ -123,6 +163,11 @@ public class TvrtkaResource {
     }
   }
 
+  /**
+   * Šalje komandu za zaustavljanje poslužitelja tvrtke.
+   *
+   * @return HTTP 200 ako je uspješno, HTTP 204 ako nije
+   */
   @Path("kraj")
   @HEAD
   @Operation(summary = "Zaustavljanje poslužitelja tvrtka")
@@ -140,6 +185,11 @@ public class TvrtkaResource {
     }
   }
 
+  /**
+   * Ispisuje informaciju da je poslužitelj zaustavljen.
+   *
+   * @return HTTP 200 uvijek
+   */
   @Path("kraj/info")
   @HEAD
   @Operation(summary = "Informacija o zaustavljanju poslužitelja tvrtka")
@@ -154,6 +204,11 @@ public class TvrtkaResource {
     return Response.status(Response.Status.OK).build();
   }
 
+  /**
+   * Dohvaća sve partnere iz baze podataka.
+   *
+   * @return HTTP 200 s listom partnera, ili HTTP 500 u slučaju pogreške
+   */
   @Path("partner")
   @GET
   @Produces({MediaType.APPLICATION_JSON})
@@ -173,6 +228,12 @@ public class TvrtkaResource {
     }
   }
 
+  /**
+   * Dohvaća jednog partnera po ID-u iz baze.
+   *
+   * @param id identifikator partnera
+   * @return HTTP 200 s partnerom, 404 ako ne postoji, 500 ako dođe do pogreške
+   */
   @Path("partner/{id}")
   @GET
   @Produces({MediaType.APPLICATION_JSON})
@@ -197,6 +258,11 @@ public class TvrtkaResource {
     }
   }
   
+  /**
+   * Dohvaća partnere koji su trenutno registrirani na poslužitelju tvrtka.
+   *
+   * @return HTTP 200 s listom aktivnih partnera, ili HTTP 500 u slučaju pogreške
+   */
   @Path("partner/provjera")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
@@ -251,6 +317,12 @@ public class TvrtkaResource {
     }
   }
 
+  /**
+   * Dodaje partnera u bazu podataka.
+   *
+   * @param partner objekt partnera koji se dodaje
+   * @return HTTP 201 ako je uspješno dodan, 409 ako već postoji, 500 za grešku
+   */
   @Path("partner")
   @POST
   @Consumes({MediaType.APPLICATION_JSON})
@@ -277,6 +349,12 @@ public class TvrtkaResource {
     }
   }
 
+  /**
+   * Posalje komandu koju primi za slanje te varaća odgovor koji dobije
+   *
+   * @param komanda komanda za slanje
+   * @return the string string koji se vrati
+   */
   private String posaljiKomandu(String komanda) {
     try {
       var mreznaUticnica = new Socket(this.tvrtkaAdresa, Integer.parseInt(this.mreznaVrataKraj));
@@ -297,6 +375,12 @@ public class TvrtkaResource {
     return null;
   }
   
+  /**
+   * Dodaje više stavki obračuna i šalje ih na poslužitelj tvrtka.
+   *
+   * @param stavkeObracuna lista obračuna
+   * @return HTTP 201 ako je uspješno, 500 u slučaju pogrešaka
+   */
   @POST
   @Path("obracun/ws")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -363,6 +447,12 @@ public class TvrtkaResource {
   }
 
   
+  /**
+   * Dodaje više obračuna u bazu bez slanja poslužitelju.
+   *
+   * @param obracuni lista obračuna
+   * @return HTTP 201 ako je uspješno, 500 ako nije
+   */
   @Path("obracun")
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
@@ -387,6 +477,13 @@ public class TvrtkaResource {
     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
   }
   
+  /**
+   * Dohvaća sve obračune u opcionalnom vremenskom rasponu.
+   *
+   * @param vrijemeOd početno vrijeme (epoch), opcionalno
+   * @param vrijemeDo završno vrijeme (epoch), opcionalno
+   * @return HTTP 200 s listom obračuna ili 500 ako dođe do pogreške
+   */
   @Path("obracun")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
@@ -417,6 +514,13 @@ public class TvrtkaResource {
     }
   }
   
+  /**
+   * Dohvaća obračune koji se odnose samo na jela.
+   *
+   * @param od početno vrijeme (epoch), opcionalno
+   * @param kraj završno vrijeme (epoch), opcionalno
+   * @return HTTP 200 s listom jela, ili 500 u slučaju pogreške
+   */
   @GET
   @Path("obracun/jelo")
   @Produces(MediaType.APPLICATION_JSON)
@@ -439,6 +543,13 @@ public class TvrtkaResource {
     }
   }
 
+  /**
+   * Dohvaća obračune koji se odnose samo na pića.
+   *
+   * @param od početno vrijeme (epoch), opcionalno
+   * @param kraj završno vrijeme (epoch), opcionalno
+   * @return HTTP 200 s listom pića, ili 500 u slučaju pogreške
+   */
   @GET
   @Path("obracun/pice")
   @Produces(MediaType.APPLICATION_JSON)
@@ -461,6 +572,14 @@ public class TvrtkaResource {
     }
   }
 
+  /**
+   * Dohvaća sve obračune za određenog partnera, u opcionalnom vremenskom rasponu.
+   *
+   * @param id ID partnera
+   * @param od početno vrijeme (epoch), opcionalno
+   * @param kraj završno vrijeme (epoch), opcionalno
+   * @return HTTP 200 s listom obračuna, ili 500 u slučaju pogreške
+   */
   @GET
   @Path("obracun/{id}")
   @Produces(MediaType.APPLICATION_JSON)
@@ -484,6 +603,11 @@ public class TvrtkaResource {
   }
 
   
+  /**
+   * Dohvaća sve jelovnike svih registriranih partnera.
+   *
+   * @return HTTP 200 s listom jelovnika ili 500 u slučaju greške
+   */
   @Path("jelovnik")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
@@ -502,31 +626,41 @@ public class TvrtkaResource {
       var mreznaVrataRad = Integer.parseInt(this.mreznaVrataRad);
 
       var gson = new com.google.gson.Gson();
-      var sviJelovnici = new java.util.ArrayList<>();
+      var sviJelovnici = new ArrayList<>();
+      var mapaJelovnika = new HashMap<String, java.util.List<Jelovnik>>();
 
       for (Partner p : partneri) {
         try (Socket s = new Socket(tvrtkaAdresa, mreznaVrataRad)) {
           var out = new PrintWriter(new OutputStreamWriter(s.getOutputStream(), "utf8"));
           var in = new BufferedReader(new InputStreamReader(s.getInputStream(), "utf8"));
-          System.out.println("[DEBUG] Pozivam partnera " + p.id() + " s kodom: " + p.sigurnosniKod() + " na socketu " + p.mreznaVrata());
           out.write("JELOVNIK " + p.id() + " " + p.sigurnosniKod() + "\n");
           out.flush();
           s.shutdownOutput();
+
           if (!"OK".equals(in.readLine())) continue;
           String json = in.readLine();
           Jelovnik[] jelovnici = gson.fromJson(json, Jelovnik[].class);
-          sviJelovnici.addAll(java.util.List.of(jelovnici));
+          for (Jelovnik j : jelovnici) {
+            String tipKuhinje = j.id().substring(0, 2); // note to self "MK" iz "MK1"
+            mapaJelovnika.computeIfAbsent(tipKuhinje, k -> new ArrayList<>()).add(j);
+          }
           s.shutdownInput();
         } catch (Exception e) {
           System.out.println("[WARN] Neuspješan partner ID: " + p.id());
         }
       }
-      return Response.ok(sviJelovnici).build();
+      return Response.ok(mapaJelovnika).build();
     } catch (Exception e) {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
   
+  /**
+   * Dohvaća jelovnik određenog partnera.
+   *
+   * @param id ID partnera
+   * @return HTTP 200 s JSON jelovnikom, 404 ako partner ne postoji, ili 500 za ostale greške
+   */
   @Path("jelovnik/{id}")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
@@ -574,6 +708,11 @@ public class TvrtkaResource {
     }
   }
 
+  /**
+   * Dohvaća kartu pića svih registriranih partnera.
+   *
+   * @return HTTP 200 s listom pića ili 500 u slučaju greške
+   */
   @Path("kartapica")
   @GET
   @Produces(MediaType.APPLICATION_JSON)
@@ -616,6 +755,12 @@ public class TvrtkaResource {
     }
   }
   
+  /**
+   * Šalje komandu poslužitelju da spava određeni broj milisekundi.
+   *
+   * @param trajanje broj milisekundi spavanja
+   * @return HTTP 200 ako je uspješno, 400 za nevaljan parametar, 500 u slučaju greške
+   */
   @GET
   @Path("spava")
   @Produces(MediaType.APPLICATION_JSON)
@@ -632,7 +777,6 @@ public class TvrtkaResource {
       return Response.status(Response.Status.BAD_REQUEST)
           .entity("Parametar 'vrijeme' mora biti pozitivan broj").build();
     }
-
     try (
       var socket = new Socket(this.tvrtkaAdresa, Integer.parseInt(this.mreznaVrataKraj));
       var ulaz = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"));
@@ -640,7 +784,6 @@ public class TvrtkaResource {
     ) {
       izlaz.write("SPAVA " + this.kodZaAdminTvrtke + " " + trajanje + "\n");
       izlaz.flush();
-
       var odgovor = ulaz.readLine();
       System.out.println("[DEBUG] SPAVA odgovor: " + odgovor);
 
@@ -648,7 +791,6 @@ public class TvrtkaResource {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
             .entity("Poslužitelj nije prihvatio SPAVA komandu").build();
       }
-
       return Response.status(Response.Status.OK).build();
 
     } catch (Exception e) {
@@ -657,7 +799,4 @@ public class TvrtkaResource {
           .entity("Greška prilikom slanja SPAVA komande").build();
     }
   }
-
-
-
 }

@@ -115,13 +115,11 @@ public class PosluziteljTvrtka {
       return;
     }
     var program = new PosluziteljTvrtka();
-
     // Runtime.getRuntime().addShutdownHook(new Thread(() -> {
     // int br = program.kraj.get() ? 3 : 0;
     // int zatvorene = program.zatvoriDretveIMrezneVeze(br);
     // System.out.println("[INFO] Ukupan broj prekinutih dretvi: " + zatvorene);
     // }));
-
     var nazivDatoteke = args[0];
     program.pripremiKreni(nazivDatoteke);
   }
@@ -223,7 +221,7 @@ public class PosluziteljTvrtka {
             new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"))) {
       String linija = ulaz.readLine();
       mreznaUticnica.shutdownInput();
-
+      
       String[] dijelovi = linija.trim().split("\\s+");
       if (dijelovi.length == 0) {
         izlaz.write("ERROR 10 - Format komande nije ispravan\n");
@@ -256,7 +254,6 @@ public class PosluziteljTvrtka {
             break;
         }
       }
-
       izlaz.flush();
       mreznaUticnica.shutdownOutput();
       mreznaUticnica.close();
@@ -280,23 +277,19 @@ public class PosluziteljTvrtka {
       izlaz.write("ERROR 10 - Format komande nije ispravan ili nije ispravan kod za kraj\n");
       return;
     }
-
     boolean sviPartneri = posaljiKrajPartnerima(kodZaKraj);
     if (!sviPartneri) {
       izlaz.write("ERROR 14 - Barem jedan partner nije završio rad\n");
       return;
     }
-
     boolean rest = posaljiRestZahtjevKraj();
     if (!rest) {
       izlaz.write("ERROR 17 - RESTful zahtjev nije uspješan\n");
       return;
     }
-
     kraj.set(true);
     izlaz.write("OK\n");
   }
-
 
   /**
    * Obradi status komandu.
@@ -313,7 +306,6 @@ public class PosluziteljTvrtka {
       izlaz.write("ERROR 12 - Pogrešan kodZaAdminTvrtke\n");
       return;
     }
-
     int dio = Integer.parseInt(dijelovi[2]);
     boolean stanje = (dio == 1) ? !pauzaRegistracija.get() : !pauzaPartneri.get();
     izlaz.write("OK " + (stanje ? "1" : "0") + "\n");
@@ -334,7 +326,6 @@ public class PosluziteljTvrtka {
       izlaz.write("ERROR 12 - Pogrešan kodZaAdminTvrtke\n");
       return;
     }
-
     AtomicBoolean pauza = dijelovi[2].equals("1") ? pauzaRegistracija : pauzaPartneri;
     if (pauza.get()) {
       izlaz.write("ERROR 13 - Pogrešna promjena pauze ili starta\n");
@@ -369,17 +360,21 @@ public class PosluziteljTvrtka {
     }
   }
 
+  /**
+   * Obradi spava komandu.
+   *
+   * @param izlaz za pisanje
+   * @param dijelovi dijelovi komande
+   */
   private void obradiSpavaKomandu(PrintWriter izlaz, String[] dijelovi) {
     if (dijelovi.length != 3) {
       izlaz.write("ERROR 10 - Format komande nije ispravan\n");
       return;
     }
-
     if (!dijelovi[1].equals(kodZaAdminTvrtke)) {
       izlaz.write("ERROR 12 - Pogrešan kodZaAdminTvrtke\n");
       return;
     }
-
     try {
       int ms = Integer.parseInt(dijelovi[2]);
       Thread.sleep(ms);
@@ -391,25 +386,27 @@ public class PosluziteljTvrtka {
     }
   }
 
+  /**
+   * Obradi osvjezi komandu.
+   *
+   * @param izlaz za pisanje
+   * @param dijelovi dijelovi komande
+   */
   private void obradiOsvjeziKomandu(PrintWriter izlaz, String[] dijelovi) {
     if (dijelovi.length != 2) {
       izlaz.write("ERROR 10 - Format komande nije ispravan\n");
       return;
     }
-
     if (!dijelovi[1].equals(kodZaAdminTvrtke)) {
       izlaz.write("ERROR 12 - Pogrešan kodZaAdminTvrtke\n");
       return;
     }
-
     if (pauzaPartneri.get()) {
       izlaz.write("ERROR 15 - Poslužitelj za partnere u pauzi\n");
       return;
     }
-
     boolean uspjeh1 = ucitajKartuPica();
     boolean uspjeh2 = ucitajJelovnike();
-
     if (uspjeh1 && uspjeh2) {
       izlaz.write("OK\n");
     } else {
@@ -417,22 +414,32 @@ public class PosluziteljTvrtka {
     }
   }
 
+  /**
+   * Obradi kraj WS komandu.
+   *
+   * @param izlaz za pisanje
+   * @param dijelovi dijelovi komande
+   */
   private void obradiKrajWSKomandu(PrintWriter izlaz, String[] dijelovi) {
     if (dijelovi.length != 2 || !dijelovi[1].equals(kodZaKraj)) {
       izlaz.write("ERROR 10 - Format komande nije ispravan ili nije ispravan kod za kraj\n");
       return;
     }
-
     boolean sviOK = posaljiKrajPartnerima(kodZaKraj);
     if (!sviOK) {
       izlaz.write("ERROR 14 - Barem jedan partner nije završio rad\n");
       return;
     }
-
     this.kraj.set(true);
     izlaz.write("OK\n");
   }
 
+  /**
+   * Posalji kraj partnerima.
+   *
+   * @param kod kod
+   * @return true, sko je udpješno
+   */
   private boolean posaljiKrajPartnerima(String kod) {
     for (Partner p : this.partneri.values()) {
       try (Socket socket = new Socket(p.adresa(), p.mreznaVrataKraj())) {
@@ -442,12 +449,10 @@ public class PosluziteljTvrtka {
         izlaz.write("KRAJ " + kod + "\n");
         izlaz.flush();
         socket.shutdownOutput();
-
         String odgovor = ulaz.readLine();
         if (!"OK".equals(odgovor))
           return false;
         System.out.println("[DEBUG] Partneri OK: " + p);
-
         socket.shutdownInput();
       } catch (Exception e) {
         return false;
@@ -456,30 +461,28 @@ public class PosluziteljTvrtka {
     return true;
   }
 
+  /**
+   * Posalji rest zahtjev kraj.
+   *
+   * @return true, ako je upješno
+   */
   private boolean posaljiRestZahtjevKraj() {
     try {
       HttpClient client = HttpClient.newHttpClient();
       String url = this.konfig.dajPostavku("restAdresa") + "/kraj/info";
-
       HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url))
           .method("HEAD", HttpRequest.BodyPublishers.noBody()).build();
       System.out.println("[DEBUG] URL za REST: " + url);
-
-
       System.out.println("[DEBUG] REST URL: " + url);
-
       HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
       System.out.println("[DEBUG] REST status: " + response.statusCode());
       System.out.println("[DEBUG] REST response headers: " + response.headers());
 
       return response.statusCode() == 200;
     } catch (Exception e) {
-      e.printStackTrace(); // privremeno za dijagnostiku
       return false;
     }
   }
-
-
 
   /**
    * Provjerava ispravnost formata komande KRAJ.
@@ -929,6 +932,13 @@ public class PosluziteljTvrtka {
     }
   }
   
+  /**
+   * Obradi obracun rest komandu.
+   *
+   * @param ulaz za čitanjez
+   * @param izlaz za pisanje
+   * @param dijelovi dijelovi komande
+   */
   private void obradiObracunRestKomandu(BufferedReader ulaz, PrintWriter izlaz, String komanda) {
     var matcher = Pattern.compile("^OBRAČUN\\s+(\\d+)\\s+(\\S+)$").matcher(komanda);
     if (!matcher.matches()) {
@@ -944,12 +954,10 @@ public class PosluziteljTvrtka {
         izlaz.write("ERROR 31 - Ne postoji partner s id u kolekciji partnera i/ili neispravan sigurnosni kod partnera\n");
         return;
     }
-
     if (pauzaPartneri.get()) {
         izlaz.write("ERROR 36 - Poslužitelj za partnere u pauzi\n");
         return;
     }
-
     try {
         var novi = ucitajJsonObracune(ulaz);
         Gson gson = new Gson();
@@ -960,7 +968,6 @@ public class PosluziteljTvrtka {
             izlaz.write("ERROR 37 - RESTful zahtjev nije uspješan\n");
             return;
         }
-
         izlaz.write("OK\n");
     } catch (JsonSyntaxException e) {
         izlaz.write("ERROR 35 - Neispravan obračun\n");
@@ -969,6 +976,12 @@ public class PosluziteljTvrtka {
     }
 }
   
+  /**
+   * Posalji rest obracune.
+   *
+   * @param obracuni koji se šalju
+   * @return true, vraća true ako je uspješno
+   */
   private boolean posaljiRestObracune(Obracun[] obracuni) {
     try {
         String url = this.konfig.dajPostavku("restAdresa") + "/obracun";
@@ -976,7 +989,6 @@ public class PosluziteljTvrtka {
 
         Gson gson = new Gson();
         String json = gson.toJson(obracuni);
-
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(url))
             .header("Content-Type", "application/json")
@@ -992,8 +1004,6 @@ public class PosluziteljTvrtka {
         return false;
     }
 }
-
-
 
   /**
    * Učitava JSON zapis obračuna iz ulaznog toka i pretvara ga u niz objekata

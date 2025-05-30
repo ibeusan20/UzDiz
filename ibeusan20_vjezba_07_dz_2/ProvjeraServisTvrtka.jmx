@@ -132,7 +132,7 @@
           <hashTree/>
         </hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request GET partner/2" enabled="false">
-          <stringProp name="HTTPSampler.path">/nwtis/v1/api/tvrtka/partner/9</stringProp>
+          <stringProp name="HTTPSampler.path">/nwtis/v1/api/tvrtka/partner/2</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <stringProp name="HTTPSampler.method">GET</stringProp>
           <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
@@ -142,7 +142,7 @@
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="true">
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Assertion" enabled="false">
             <collectionProp name="Asserion.test_strings">
               <stringProp name="49586">200</stringProp>
             </collectionProp>
@@ -185,7 +185,7 @@
             <collectionProp name="Arguments.arguments">
               <elementProp name="" elementType="HTTPArgument">
                 <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                <stringProp name="Argument.value">{&quot;adminKod&quot;:&quot;******&quot;,&quot;adresa&quot;:&quot;20.24.5.3&quot;,&quot;gpsDuzina&quot;:16.347809,&quot;gpsSirina&quot;:46.30835,&quot;id&quot;:8,&quot;mreznaVrata&quot;:8020,&quot;mreznaVrataKraj&quot;:8021,&quot;naziv&quot;:&quot;FOLT 2 - Varaždin, Ul. Julija Merlića 9&quot;,&quot;sigurnosniKod&quot;:&quot;******&quot;,&quot;vrstaKuhinje&quot;:&quot;KK&quot;}</stringProp>
+                <stringProp name="Argument.value">{&quot;adminKod&quot;:&quot;******&quot;,&quot;adresa&quot;:&quot;20.24.5.3&quot;,&quot;gpsDuzina&quot;:16.347809,&quot;gpsSirina&quot;:46.30835,&quot;id&quot;:7,&quot;mreznaVrata&quot;:8070,&quot;mreznaVrataKraj&quot;:8071,&quot;naziv&quot;:&quot;FOLT 7 - Varaždin, Ul. Julija Merlića 9&quot;,&quot;sigurnosniKod&quot;:&quot;******&quot;,&quot;vrstaKuhinje&quot;:&quot;KK&quot;}</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
@@ -446,7 +446,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request POSTT obracun" enabled="false">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request POSTT obracun">
           <stringProp name="HTTPSampler.path">/nwtis/v1/api/tvrtka/obracun</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -610,7 +610,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request POSTT obracun/ws" enabled="false">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request POSTT obracun/ws">
           <stringProp name="HTTPSampler.path">/nwtis/v1/api/tvrtka/obracun/ws</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
@@ -729,7 +729,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request KRAJ">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request KRAJ" enabled="false">
           <stringProp name="HTTPSampler.path">/nwtis/v1/api/tvrtka/kraj</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
           <stringProp name="HTTPSampler.method">HEAD</stringProp>
