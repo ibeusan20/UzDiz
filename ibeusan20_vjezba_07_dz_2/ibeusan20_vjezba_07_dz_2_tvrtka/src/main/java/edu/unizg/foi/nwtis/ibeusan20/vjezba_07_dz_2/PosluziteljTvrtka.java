@@ -240,25 +240,7 @@ public class PosluziteljTvrtka {
             obradiStartKomandu(izlaz, dijelovi);
             break;
           case "KRAJ":
-            if (dijelovi.length != 2 || !dijelovi[1].equals(kodZaKraj)) {
-              izlaz
-                  .write("ERROR 10 - Format komande nije ispravan ili nije ispravan kod za kraj\n");
-            } else {
-              boolean sviPartneri = posaljiKrajPartnerima(kodZaKraj);
-              if (!sviPartneri) {
-                izlaz.write("ERROR 14 - Barem jedan partner nije završio rad\n");
-                break;
-              }
-
-              boolean rest = posaljiRestZahtjevKraj();
-              if (!rest) {
-                izlaz.write("ERROR 17 - RESTful zahtjev nije uspješan\n");
-                break;
-              }
-
-              kraj.set(true);
-              izlaz.write("OK\n");
-            }
+            obradiKrajKomandu(izlaz, dijelovi);
             break;
           case "SPAVA":
             obradiSpavaKomandu(izlaz, dijelovi);
@@ -286,7 +268,42 @@ public class PosluziteljTvrtka {
     }
     return Boolean.TRUE;
   }
+  
+  /**
+   * Obradi kraj komandu.
+   *
+   * @param izlaz za pisanje
+   * @param dijelovi dijelovi komande
+   */
+  private void obradiKrajKomandu(PrintWriter izlaz, String[] dijelovi) {
+    if (dijelovi.length != 2 || !dijelovi[1].equals(kodZaKraj)) {
+      izlaz.write("ERROR 10 - Format komande nije ispravan ili nije ispravan kod za kraj\n");
+      return;
+    }
 
+    boolean sviPartneri = posaljiKrajPartnerima(kodZaKraj);
+    if (!sviPartneri) {
+      izlaz.write("ERROR 14 - Barem jedan partner nije završio rad\n");
+      return;
+    }
+
+    boolean rest = posaljiRestZahtjevKraj();
+    if (!rest) {
+      izlaz.write("ERROR 17 - RESTful zahtjev nije uspješan\n");
+      return;
+    }
+
+    kraj.set(true);
+    izlaz.write("OK\n");
+  }
+
+
+  /**
+   * Obradi status komandu.
+   *
+   * @param izlaz za pisanje
+   * @param dijelovi dijelovi komande
+   */
   private void obradiStatusKomandu(PrintWriter izlaz, String[] dijelovi) {
     if (dijelovi.length != 3 || (!dijelovi[2].equals("1") && !dijelovi[2].equals("2"))) {
       izlaz.write("ERROR 10 - Format komande nije ispravan\n");
@@ -302,6 +319,12 @@ public class PosluziteljTvrtka {
     izlaz.write("OK " + (stanje ? "1" : "0") + "\n");
   }
 
+  /**
+   * Obradi pauza komandu.
+   *
+   * @param izlaz za pisanje
+   * @param dijelovi dijelovi komande
+   */
   private void obradiPauzaKomandu(PrintWriter izlaz, String[] dijelovi) {
     if (dijelovi.length != 3 || (!dijelovi[2].equals("1") && !dijelovi[2].equals("2"))) {
       izlaz.write("ERROR 10 - Format komande nije ispravan\n");
@@ -321,6 +344,12 @@ public class PosluziteljTvrtka {
     }
   }
 
+  /**
+   * Obradi start komandu.
+   *
+   * @param izlaz za pisanje
+   * @param dijelovi dijelovi komande
+   */
   private void obradiStartKomandu(PrintWriter izlaz, String[] dijelovi) {
     if (dijelovi.length != 3 || (!dijelovi[2].equals("1") && !dijelovi[2].equals("2"))) {
       izlaz.write("ERROR 10 - Format komande nije ispravan\n");
