@@ -642,7 +642,6 @@ public class PosluziteljPartner {
    */
   private void obradiNarudzbuKupca(PrintWriter izlaz, String linija) {
     var matcher = Pattern.compile("^NARUDŽBA\\s+(\\w+)$").matcher(linija);
-    System.out.println("[DEBUG] Partner primio-" + linija);
     if (!matcher.matches()) {
       izlaz.write("ERROR 40 - Format komande nije ispravan\n");
       return;

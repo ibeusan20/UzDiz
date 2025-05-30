@@ -563,14 +563,12 @@ public class PartnerResource {
       BufferedReader ulaz =
           new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"));
       PrintWriter izlaz = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"));
-      System.out.println("[DEBUG] Šaljem komandu - " + komanda);
       izlaz.println(komanda);
       izlaz.flush();
       socket.shutdownOutput();
       String linija1 = ulaz.readLine();
       String linija2 = ulaz.readLine();
       socket.shutdownInput();
-      System.out.println(komanda + "->" + linija1 + " " + linija2);
       socket.close();
       if (linija1 == null) {
         return null;
@@ -597,12 +595,10 @@ public class PartnerResource {
       BufferedReader ulaz =
           new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"));
       PrintWriter izlaz = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"));
-      System.out.println("[DEBUG] Šaljem komandu na kraj - " + komanda);
       izlaz.println(komanda);
       izlaz.flush();
       socket.shutdownOutput();
       var linija = ulaz.readLine();
-      System.out.println(komanda + "->" + linija);
       socket.shutdownInput();
       socket.close();
       return linija;

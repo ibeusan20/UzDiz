@@ -452,7 +452,6 @@ public class PosluziteljTvrtka {
         String odgovor = ulaz.readLine();
         if (!"OK".equals(odgovor))
           return false;
-        System.out.println("[DEBUG] Partneri OK: " + p);
         socket.shutdownInput();
       } catch (Exception e) {
         return false;
@@ -472,12 +471,7 @@ public class PosluziteljTvrtka {
       String url = this.konfig.dajPostavku("restAdresa") + "/kraj/info";
       HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url))
           .method("HEAD", HttpRequest.BodyPublishers.noBody()).build();
-      System.out.println("[DEBUG] URL za REST: " + url);
-      System.out.println("[DEBUG] REST URL: " + url);
       HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
-      System.out.println("[DEBUG] REST status: " + response.statusCode());
-      System.out.println("[DEBUG] REST response headers: " + response.headers());
-
       return response.statusCode() == 200;
     } catch (Exception e) {
       return false;
@@ -996,7 +990,6 @@ public class PosluziteljTvrtka {
             .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println("[DEBUG] REST POST /obracun status: " + response.statusCode());
 
         return response.statusCode() == 201;
     } catch (Exception e) {

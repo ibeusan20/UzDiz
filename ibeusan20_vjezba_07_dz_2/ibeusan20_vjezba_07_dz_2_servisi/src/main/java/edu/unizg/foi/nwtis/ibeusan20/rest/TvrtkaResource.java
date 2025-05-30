@@ -285,15 +285,12 @@ public class TvrtkaResource {
         var ulaz = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"));
         var izlaz = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"))
       ) {
-        System.out.println("[DEBUG] Slanje komande: POPIS");
         izlaz.println("POPIS");
         izlaz.flush();
         socket.shutdownOutput();
 
         var prviRed = ulaz.readLine();
         var drugiRed = ulaz.readLine();
-        System.out.println("[DEBUG] POPIS status: " + prviRed);
-        System.out.println("[DEBUG] POPIS JSON: " + drugiRed);
 
         if (!"OK".equals(prviRed)) {
           return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -312,7 +309,6 @@ public class TvrtkaResource {
         return Response.ok(aktivniPartneri).build();
       }
     } catch (Exception e) {
-      e.printStackTrace(System.err);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
@@ -366,7 +362,6 @@ public class TvrtkaResource {
       out.flush();
       mreznaUticnica.shutdownOutput();
       var linija = in.readLine();
-      System.out.println(komanda + " -> " + linija);
       mreznaUticnica.shutdownInput();
       mreznaUticnica.close();
       return linija;
@@ -431,7 +426,6 @@ public class TvrtkaResource {
         izlaz.flush();
 
         var odgovor = ulaz.readLine();
-        System.out.println("[DEBUG] OBRACUN odgovor: " + odgovor);
 
         if (!"OK".equalsIgnoreCase(odgovor)) {
           return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -646,7 +640,6 @@ public class TvrtkaResource {
           }
           s.shutdownInput();
         } catch (Exception e) {
-          System.out.println("[WARN] Neuspješan partner ID: " + p.id());
         }
       }
       return Response.ok(mapaJelovnika).build();
@@ -746,7 +739,6 @@ public class TvrtkaResource {
           svePice.addAll(java.util.List.of(pica));
           s.shutdownInput();
         } catch (Exception e) {
-          System.out.println("[WARN] Neuspješan partner ID: " + p.id());
         }
       }
       return Response.ok(svePice).build();
@@ -785,7 +777,6 @@ public class TvrtkaResource {
       izlaz.write("SPAVA " + this.kodZaAdminTvrtke + " " + trajanje + "\n");
       izlaz.flush();
       var odgovor = ulaz.readLine();
-      System.out.println("[DEBUG] SPAVA odgovor: " + odgovor);
 
       if (!"OK".equalsIgnoreCase(odgovor)) {
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
