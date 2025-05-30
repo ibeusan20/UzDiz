@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.lang.reflect.Type;
 import java.net.Socket;
 import java.sql.Connection;
 import java.util.List;
@@ -11,7 +12,11 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import edu.unizg.foi.nwtis.ibeusan20.vjezba_07_dz_2.dao.KorisnikDAO;
+import edu.unizg.foi.nwtis.podaci.Jelovnik;
+import edu.unizg.foi.nwtis.podaci.KartaPica;
 import edu.unizg.foi.nwtis.podaci.Korisnik;
 import edu.unizg.foi.nwtis.podaci.Narudzba;
 import jakarta.inject.Inject;
@@ -23,6 +28,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -116,7 +122,7 @@ public class PartnerResource {
     }
     return Response.status(Response.Status.NO_CONTENT).build();
   }
-/////////////////////treba vratiti mapu  itd //////////////////////////////
+  
   @GET
   @Path("jelovnik")
   @Operation(summary = "Vraća jelovnik")
@@ -132,8 +138,15 @@ public class PartnerResource {
     var odgovor = posaljiKomandu("JELOVNIK " + korisnik);
     if (odgovor != null && odgovor.startsWith("OK\n")) {
       String json = odgovor.substring(3).trim();
-      return Response.ok(json).build();
-    }
+      try {
+          Gson gson = new Gson();
+          Type tipListe = new TypeToken<List<Jelovnik>>() {}.getType();
+          List<Jelovnik> jelovnici = gson.fromJson(json, tipListe);
+          return Response.ok(jelovnici).build();
+      } catch (Exception e) {
+          return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Greška pri parsiranju JSON-a").build();
+      }
+  }
     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
   }
 
@@ -152,32 +165,58 @@ public class PartnerResource {
     var odgovor = posaljiKomandu("KARTAPIĆA " + korisnik);
     if (odgovor != null && odgovor.startsWith("OK\n")) {
       String json = odgovor.substring(3).trim();
-      return Response.ok(json).build();
-    }
+      try {
+          Gson gson = new Gson();
+          Type tipListe = new TypeToken<List<KartaPica>>() {}.getType();
+          List<KartaPica> kartaPica = gson.fromJson(json, tipListe);
+          return Response.ok(kartaPica).build();
+      } catch (Exception e) {
+          return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Greška pri parsiranju JSON-a").build();
+      }
+  }
     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
   }
-
-  // @Path("narudzba")
-  // @GET
-  // @Produces({MediaType.APPLICATION_JSON})
-  // @Operation(summary = "Vraća stavke otvorene narudžbe korisnika")
-  // @APIResponses(value = {
-  // @APIResponse(responseCode = "200", description = "Narudžba dohvaćena"),
-  // @APIResponse(responseCode = "401", description = "Neautoriziran pristup"),
-  // @APIResponse(responseCode = "500", description = "Greška prilikom komunikacije")
-  // })
-  // public Response getNarudzba(@HeaderParam("korisnik") String korisnik, @HeaderParam("lozinka")
-  // String lozinka) {
-  // if (!autentificirajKorisnika(korisnik, lozinka)) {
-  // return Response.status(Response.Status.UNAUTHORIZED).build();
-  // }
-  // String odgovor = posaljiKomandu("NARUDŽBA " + korisnik);
-  // if (odgovor != null && odgovor.startsWith("OK\n")) {
-  // String json = odgovor.substring(3).trim();
-  // return Response.ok(json).build();
-  // }
-  // return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-  // }
+  
+  @GET
+  @Path("narudzba")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Operation(summary = "Vraća stavke otvorene narudžbe korisnika")
+  @APIResponses({
+      @APIResponse(responseCode = "200", description = "Stavke narudžbe vraćene"),
+      @APIResponse(responseCode = "401", description = "Neautoriziran pristup"),
+      @APIResponse(responseCode = "500", description = "Ne postoji otvorena narudžba / greška")
+  })
+  public Response getNarudzba(@HeaderParam("korisnik") String korisnik,
+                              @HeaderParam("lozinka") String lozinka) {
+      if (!autentificirajKorisnika(korisnik, lozinka)) {
+          return Response.status(Response.Status.UNAUTHORIZED).build();
+      }
+      String komanda = "STANJE " + korisnik;
+      String odgovor = posaljiKomandu(komanda);
+      if (odgovor == null) {
+          return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                         .entity("Nije moguće dohvatiti stanje narudžbe").build();
+      }
+      if (odgovor.startsWith("ERROR 43")) {
+          return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                         .entity("Nema otvorene narudžbe za korisnika").build();
+      }
+      if (odgovor.startsWith("OK")) {
+        try {
+            String json = odgovor.substring(2).trim();
+            Gson gson = new Gson();
+            Type tipListe = new TypeToken<List<Narudzba>>() {}.getType();
+            List<Narudzba> narudzbe = gson.fromJson(json, tipListe);
+            return Response.ok(narudzbe).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                           .entity("Greška u parsiranju odgovora").build();
+        }
+    }
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                     .entity("Neočekivan odgovor poslužitelja").build();
+  }
 
   @POST
   @Path("narudzba")
@@ -199,7 +238,6 @@ public class PartnerResource {
     } else if (odgovor.startsWith("OK")) {
       return Response.status(Response.Status.CREATED).build();
     }
-
     return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
         .entity("Neuspješno dodavanje narudžbe").build();
   }
@@ -249,10 +287,8 @@ public class PartnerResource {
       if (!autentificirajKorisnika(korisnik, lozinka)) {
           return Response.status(Response.Status.UNAUTHORIZED).build();
       }
-
       String komanda = String.format("PIĆE %s %s %.1f", korisnik, narudzba.id(), narudzba.kolicina());
       String odgovor = posaljiKomandu(komanda);
-
       if (odgovor == null) {
           return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
       } else if (odgovor.startsWith("ERROR 44")) {
@@ -279,7 +315,6 @@ public class PartnerResource {
       if (!autentificirajKorisnika(korisnik, lozinka)) {
           return Response.status(Response.Status.UNAUTHORIZED).build();
       }
-
       String odgovor = posaljiKomandu("RAČUN " + korisnik);
       if (odgovor == null) {
           return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -291,7 +326,6 @@ public class PartnerResource {
           return Response.status(Response.Status.CREATED)
               .entity("Račun uspješno kreiran").build();
       }
-
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                      .entity("Neuspješno slanje zahtjeva za račun").build();
   }
@@ -327,7 +361,6 @@ public class PartnerResource {
       try (var vezaBP = this.restConfiguration.dajVezu()) {
         var korisnikDAO = new KorisnikDAO(vezaBP);
         var korisnik = korisnikDAO.dohvati(id, null, false);
-        
         if (korisnik == null) {
           return Response.status(Response.Status.NOT_FOUND)
                          .entity("Korisnik s ID '" + id + "' nije pronađen")
@@ -367,6 +400,32 @@ public class PartnerResource {
           return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Greška u komunikaciji s bazom").build();
       }
   }
+  
+  @GET
+  @Path("spava")
+  @Operation(summary = "Poslužitelj spava zadano vrijeme")
+  @APIResponses({
+      @APIResponse(responseCode = "200", description = "Uspješno izvršeno spavanje"),
+      @APIResponse(responseCode = "500", description = "Greška prilikom slanja zahtjeva za spavanje")
+  })
+  public Response getSpava(@QueryParam("vrijeme") long vrijeme) {
+      if (vrijeme <= 0) {
+          return Response.status(Response.Status.BAD_REQUEST)
+                         .entity("Vrijeme mora biti pozitivno").build();
+      }
+
+      String komanda = "SPAVA " + this.kodZaAdminPartnera + " " + vrijeme;
+      String odgovor = posaljiKomanduNaKraj(komanda);
+
+      if (odgovor != null && odgovor.startsWith("OK")) {
+          return Response.status(Response.Status.OK)
+              .entity("Poslužitelj je uspješno spavao " + vrijeme + " ms").build();
+      } else {
+          return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                         .entity("Neuspješan zahtjev za spavanjem").build();
+      }
+  }
+
 
   private String posaljiKomandu(String komanda) {
     try {

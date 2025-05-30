@@ -125,7 +125,7 @@ public class PosluziteljPartner {
       program.pokreniPosluziteljKupaca();
       return;
     }
-    System.out.println("ERROR 40 - Format komande nije ispravan10");
+    System.out.println("ERROR 40 - Format komande nije ispravan");
   }
   
   private void pokreniPosluziteljKraj() {
@@ -480,7 +480,7 @@ public class PosluziteljPartner {
         return;
       }
       if (linija == null || linija.isBlank()) {
-        izlaz.write("ERROR 40 - Format komande nije ispravan1\n");
+        izlaz.write("ERROR 40 - Format komande nije ispravan\n");
       } else if (linija.startsWith("JELOVNIK")) {
         obradiJelovnikKupca(ulaz, izlaz, linija);
       } else if (linija.startsWith("KARTAPIĆA")) {
@@ -496,7 +496,7 @@ public class PosluziteljPartner {
       } else if (linija.startsWith("STANJE")) {
         obradiStanjeKupca(izlaz, linija);
       } else {
-        izlaz.write("ERROR 40 - Format komande nije ispravan2\n");
+        izlaz.write("ERROR 40 - Format komande nije ispravan\n");
       }
       izlaz.flush();
       uticnica.shutdownOutput();
@@ -505,10 +505,16 @@ public class PosluziteljPartner {
     }
   }
   
+  /**
+   * Obradi stanje kupca.
+   *
+   * @param izlaz za pisanje
+   * @param linija linija koju funkcija prima
+   */
   private void obradiStanjeKupca(PrintWriter izlaz, String linija) {
     var matcher = Pattern.compile("^STANJE\\s+(\\w+)$").matcher(linija);
     if (!matcher.matches()) {
-      izlaz.write("ERROR 40 - Format komande nije ispravan3\n");
+      izlaz.write("ERROR 40 - Format komande nije ispravan\n");
       return;
     }
 
@@ -540,7 +546,7 @@ public class PosluziteljPartner {
   private void obradiJelovnikKupca(BufferedReader ulaz, PrintWriter izlaz, String linija) {
     var matcher = Pattern.compile("^JELOVNIK\\s+(\\w+)$").matcher(linija);
     if (!matcher.matches()) {
-      izlaz.write("ERROR 40 - Format komande nije ispravan4\n");
+      izlaz.write("ERROR 40 - Format komande nije ispravan\n");
       izlaz.flush();
       return;
     }
@@ -564,7 +570,7 @@ public class PosluziteljPartner {
   private void obradiKartaPicaKupca(BufferedReader ulaz, PrintWriter izlaz, String linija) {
     var matcher = Pattern.compile("^KARTAPIĆA\\s+(\\w+)$").matcher(linija);
     if (!matcher.matches()) {
-      izlaz.write("ERROR 40 - Format komande nije ispravan5\n");
+      izlaz.write("ERROR 40 - Format komande nije ispravan\n");
       return;
     }
     String korisnik = matcher.group(1);
@@ -587,7 +593,7 @@ public class PosluziteljPartner {
     var matcher = Pattern.compile("^NARUDŽBA\\s+(\\w+)$").matcher(linija);
     System.out.println("[DEBUG] Partner primio-" + linija);
     if (!matcher.matches()) {
-      izlaz.write("ERROR 40 - Format komande nije ispravan6\n");
+      izlaz.write("ERROR 40 - Format komande nije ispravan\n");
       return;
     }
     String korisnik = matcher.group(1);
@@ -612,7 +618,7 @@ public class PosluziteljPartner {
     var matcher =
         Pattern.compile("^JELO\\s+(\\w+)\\s+(\\S+)\\s+([+-]?\\d*\\.?\\d+)$").matcher(linija);
     if (!matcher.matches()) {
-      izlaz.write("ERROR 40 - Format komande nije ispravan7\n");
+      izlaz.write("ERROR 40 - Format komande nije ispravan\n");
       return;
     }
 
@@ -648,7 +654,7 @@ public class PosluziteljPartner {
     var matcher =
         Pattern.compile("^PIĆE\\s+(\\w+)\\s+(\\S+)\\s+([+-]?\\d*\\.?\\d+)$").matcher(linija);
     if (!matcher.matches()) {
-      izlaz.write("ERROR 40 - Format komande nije ispravan8\n");
+      izlaz.write("ERROR 40 - Format komande nije ispravan\n");
       return;
     }
 
@@ -683,7 +689,7 @@ public class PosluziteljPartner {
   private void obradiRacunKupca(PrintWriter izlaz, String linija) {
     var matcher = Pattern.compile("^RAČUN\\s+(\\w+)$").matcher(linija);
     if (!matcher.matches()) {
-      izlaz.write("ERROR 40 - Format komande nije ispravan9\n");
+      izlaz.write("ERROR 40 - Format komande nije ispravan\n");
       return;
     }
 
