@@ -12,7 +12,7 @@ import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
-import edu.unizg.foi.nwtis.ibeusan20.vjezba_07_dz_2.dao.PartnerDAO;
+import edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3.dao.PartnerDAO;
 import edu.unizg.foi.nwtis.podaci.Partner;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;

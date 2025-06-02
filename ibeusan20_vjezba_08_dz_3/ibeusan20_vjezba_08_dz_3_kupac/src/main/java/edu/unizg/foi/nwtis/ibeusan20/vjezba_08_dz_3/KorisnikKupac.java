@@ -1,4 +1,4 @@
-package edu.unizg.foi.nwtis.ibeusan20.vjezba_07_dz_2;
+package edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3;
 
 import java.io.BufferedReader;
 import java.io.IOException;

@@ -3,11 +3,13 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Kraj rada poslužitelja tvrtka</title>
+        <title>Vježba 8 - zadaća 3 - Kraj rada poslužitelja Tvrtka</title>
     </head>
     <body>
-        <h1>Kraj rada poslužitelja tvrtka</h1>
-		<%String status = (String) request.getAttribute("status"); %>        
-        <p>Status poslužitelja: <%= status %></p>        
+        <h1>Vježba 8 - zadaća 3 - Kraj rada poslužitelja Tvrtka</h1>
+	<%
+	String status = (String) request.getAttribute("status");
+	%>        
+		<p>Status poslužitelja: <%= status %> </p>
     </body>
 </html>

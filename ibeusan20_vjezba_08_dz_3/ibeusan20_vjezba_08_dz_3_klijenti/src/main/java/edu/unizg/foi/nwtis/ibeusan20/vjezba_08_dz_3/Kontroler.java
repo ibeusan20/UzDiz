@@ -27,7 +27,7 @@ import jakarta.ws.rs.core.GenericType;
 
 /**
  *
- * @author NWTiS
+ * @author Ivan Beusan
  */
 @Controller
 @Path("tvrtka")
@@ -53,9 +53,13 @@ public class Kontroler {
   @Path("kraj")
   @View("status.jsp")
   public void kraj() {
-    var status = this.servisTvrtka.headPosluziteljKraj().getStatus();
-    this.model.put("statusOperacije", status);
-    dohvatiStatuse();
+    try {
+      var status = this.servisTvrtka.headPosluziteljKraj().getStatus();
+      this.model.put("statusOperacije", status);
+      dohvatiStatuse();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   @GET

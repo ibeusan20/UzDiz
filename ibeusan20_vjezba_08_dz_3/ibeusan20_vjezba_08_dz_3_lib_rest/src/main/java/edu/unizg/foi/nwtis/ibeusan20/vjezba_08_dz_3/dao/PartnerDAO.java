@@ -1,4 +1,4 @@
-package edu.unizg.foi.nwtis.ibeusan20.vjezba_07_dz_2.dao;
+package edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

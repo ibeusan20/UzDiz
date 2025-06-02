@@ -6,7 +6,7 @@ services:
 
   tvrtka:
     build:
-      context: ./ibeusan20_vjezba_07_dz_2_tvrtka
+      context: ./ibeusan20_vjezba_08_dz_3_tvrtka
       dockerfile: Dockerfile
     container_name: tvrtka_ibeusan20
 #    networks:
@@ -23,7 +23,7 @@ services:
 
   partner:
     build:
-      context: ./ibeusan20_vjezba_07_dz_2_partner
+      context: ./ibeusan20_vjezba_08_dz_3_partner
       dockerfile: Dockerfile
     container_name: partner_ibeusan20
 #    networks:
@@ -41,7 +41,7 @@ services:
 
   servisi:
     build:
-      context: ./ibeusan20_vjezba_07_dz_2_servisi
+      context: ./ibeusan20_vjezba_08_dz_3_servisi
       dockerfile: Dockerfile
     container_name: servis_ibeusan20
 #    networks:
