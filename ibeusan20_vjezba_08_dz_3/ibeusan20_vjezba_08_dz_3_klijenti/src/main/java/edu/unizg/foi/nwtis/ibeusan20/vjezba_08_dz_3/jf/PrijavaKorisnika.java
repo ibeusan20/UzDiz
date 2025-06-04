@@ -3,6 +3,7 @@ package edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3.jf;
 import java.io.Serializable;
 import edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3.dao.KorisnikDAO;
 import edu.unizg.foi.nwtis.podaci.Korisnik;
+import edu.unizg.foi.nwtis.podaci.Partner;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -11,18 +12,17 @@ import jakarta.inject.Named;
 @Named("prijavaKorisnika")
 public class PrijavaKorisnika implements Serializable {
   private static final long serialVersionUID = -1826447622277477398L;
-  private Korisnik korisnik;
   private String korisnickoIme;
   private String lozinka;
-  private String ime;
-  private String prezime;
-  private String email;
+  private Korisnik korisnik;
   private boolean prijavljen = false;
   private String poruka = "";
+  private Partner odabraniPartner;
+  private boolean partnerOdabran = false;
 
   @Inject
-  RestConfiguration restConfiguration;  
-  
+  RestConfiguration restConfiguration;
+
   public String getKorisnickoIme() {
     return korisnickoIme;
   }
@@ -43,24 +43,12 @@ public class PrijavaKorisnika implements Serializable {
     return this.korisnik.ime();
   }
 
-  public void setIme(String ime) {
-    this.ime = ime;
-  }
-
   public String getPrezime() {
     return this.korisnik.prezime();
   }
 
-  public void setPrezime(String prezime) {
-    this.prezime = prezime;
-  }
-
   public String getEmail() {
     return this.korisnik.email();
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
   }
 
   public boolean isPrijavljen() {
@@ -69,6 +57,22 @@ public class PrijavaKorisnika implements Serializable {
 
   public String getPoruka() {
     return poruka;
+  }
+
+  public Partner getOdabraniPartner() {
+    return odabraniPartner;
+  }
+
+  public void setOdabraniPartner(Partner odabraniPartner) {
+    this.odabraniPartner = odabraniPartner;
+  }
+
+  public boolean isPartnerOdabran() {
+    return partnerOdabran;
+  }
+
+  public void setPartnerOdabran(boolean partnerOdabran) {
+    this.partnerOdabran = partnerOdabran;
   }
 
   public String prijavaKorisnika() {
@@ -91,4 +95,13 @@ public class PrijavaKorisnika implements Serializable {
     return "prijavaKorisnika.xhtml";
   }
 
+  public String odjavaKorisnika() {
+    if (this.prijavljen) {
+      this.prijavljen = false;
+      this.korisnik = null;
+      return "index.xhtml";
+    } else {
+      return "prijavaKorisnika.xhtml";
+    }
+  }
 }

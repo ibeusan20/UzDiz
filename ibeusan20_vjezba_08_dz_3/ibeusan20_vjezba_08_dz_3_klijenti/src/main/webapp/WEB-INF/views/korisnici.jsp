@@ -1,5 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@ page import="java.util.List, edu.unizg.foi.nwtis.podaci.Korisnik" %>
+<%@ page import="java.util.List, edu.unizg.foi.nwtis.podaci.Korisnik"%>
 <!DOCTYPE html>
 <html>
 <head>

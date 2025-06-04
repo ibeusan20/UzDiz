@@ -9,7 +9,10 @@
         <h1>Vježba 8 - zadaća 3 - Početna stranica</h1>
         <ul>
             <li>
-                <a href="${pageContext.servletContext.contextPath}/mvc/tvrtka/pocetak">Početna stranica</a>
+                <a href="${pageContext.servletContext.contextPath}/mvc/tvrtka/pocetak">Početna stranica Tvrtka</a>
+            </li>
+            <li>
+                <a href="${pageContext.servletContext.contextPath}/index.xhtml">Početna stranica Partner</a>
             </li>
             <li>
                 <a href="${pageContext.servletContext.contextPath}/mvc/tvrtka/kraj">Šalji komandu za kraj</a>
@@ -30,9 +33,11 @@
                 <a href="${pageContext.servletContext.contextPath}/mvc/tvrtka/pauza/2">Pauza poslužitelja Tvrtka - za partnere</a>
             </li>
             <li>
+                <a href="${pageContext.servletContext.contextPath}/mvc/tvrtka/nadzornaKonzolaTvrtka">Nadzorna konzola Tvrtka</a>
+            </li>
+            <li>
                 <a href="${pageContext.servletContext.contextPath}/mvc/tvrtka/partner">Pregled partnera</a>
             </li>
         </ul>          
     </body>
 </html>
-
