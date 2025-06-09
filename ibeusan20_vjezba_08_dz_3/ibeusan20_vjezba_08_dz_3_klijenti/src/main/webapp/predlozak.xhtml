@@ -22,7 +22,7 @@
 				<h:outputText style="color: yellow"
 					value="#{prijavaKorisnika.ime} #{prijavaKorisnika.prezime}" />
 				<h:form>
-					<h:link outcome="odjavaKorisnika.xhtml" value="Odjava korisnika" />
+					<h:link outcome="/privatno/odjavaKorisnika.xhtml" value="Odjava korisnika" />
 				</h:form>
 				<br />
 				<ui:fragment rendered="#{prijavaKorisnika.partnerOdabran}">
@@ -38,7 +38,7 @@
 			<li><a
 				href="#{facesContext.externalContext.requestContextPath}/mvc/tvrtka/pocetak">Početak
 					Tvrtka</a></li>
-			<li><h:link outcome="index.xhtml" value="Početak Partner" /></li>
+			<li><h:link outcome="/index.xhtml" value="Početak Partner" /></li>
 		</ul>
 		<ui:insert name="nav">Nav content</ui:insert>
 	</div>

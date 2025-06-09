@@ -86,12 +86,12 @@
 			<groupId>org.eclipse.microprofile.fault-tolerance</groupId>
 			<artifactId>microprofile-fault-tolerance-api</artifactId>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>org.primefaces</groupId>
 			<artifactId>primefaces</artifactId>
 			<version>14.0.0</version>
          <classifier>jakarta</classifier>			
-		</dependency>			
+		</dependency>	-->		
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
@@ -116,7 +116,12 @@
 			<groupId>edu.unizg.foi.nwtis.ibeusan20</groupId>
 			<artifactId>ibeusan20_vjezba_08_dz_3_lib_rest</artifactId>
 			<version>1.1.0</version>
-		</dependency>		
+		</dependency>
+		<dependency>
+			<groupId>edu.unizg.foi.nwtis.ibeusan20</groupId>
+			<artifactId>ibeusan20_vjezba_08_dz_3_jpa</artifactId>
+			<version>1.0.0</version>
+		</dependency>	
 	</dependencies>
 
 	<build>

@@ -33,7 +33,7 @@
                 <a href="${pageContext.servletContext.contextPath}/mvc/tvrtka/pauza/2">Pauza poslužitelja Tvrtka - za partnere</a>
             </li>
             <li>
-                <a href="${pageContext.servletContext.contextPath}/mvc/tvrtka/nadzornaKonzolaTvrtka">Nadzorna konzola Tvrtka</a>
+                <a href="${pageContext.servletContext.contextPath}/mvc/tvrtka/admin/nadzornaKonzolaTvrtka">Nadzorna konzola Tvrtka</a>
             </li>
             <li>
                 <a href="${pageContext.servletContext.contextPath}/mvc/tvrtka/partner">Pregled partnera</a>

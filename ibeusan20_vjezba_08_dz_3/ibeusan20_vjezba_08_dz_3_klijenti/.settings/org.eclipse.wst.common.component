@@ -20,6 +20,9 @@
         <dependent-module archiveName="ibeusan20_vjezba_08_dz_3_lib_rest-1.1.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ibeusan20_vjezba_08_dz_3_lib_rest/ibeusan20_vjezba_08_dz_3_lib_rest">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="ibeusan20_vjezba_08_dz_3_jpa-1.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/ibeusan20_vjezba_08_dz_3_jpa/ibeusan20_vjezba_08_dz_3_jpa">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
                         
         
         <property name="context-root" value="ibeusan20_vjezba_08_dz_3_klijenti"/>

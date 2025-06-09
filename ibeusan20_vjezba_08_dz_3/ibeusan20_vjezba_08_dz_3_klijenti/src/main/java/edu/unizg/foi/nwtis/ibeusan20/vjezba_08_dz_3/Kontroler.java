@@ -101,7 +101,7 @@ public class Kontroler {
   }
 
   @GET
-  @Path("nadzornaKonzolaTvrtka")
+  @Path("admin/nadzornaKonzolaTvrtka")
   @View("nadzornaKonzolaTvrtka.jsp")
   public void nadzornaKonzolaTvrtka() {}
 
