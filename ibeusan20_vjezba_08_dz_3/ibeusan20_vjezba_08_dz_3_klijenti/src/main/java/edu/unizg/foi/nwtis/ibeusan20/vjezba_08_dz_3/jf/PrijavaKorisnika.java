@@ -25,7 +25,11 @@ public class PrijavaKorisnika implements Serializable {
 
   @Inject
   RestConfiguration restConfiguration;
+
+  @Inject
   KorisniciFacade korisniciFacade;
+
+  @Inject
   private SecurityContext securityContext;
 
   public String getKorisnickoIme() {
@@ -83,19 +87,6 @@ public class PrijavaKorisnika implements Serializable {
     this.partnerOdabran = partnerOdabran;
   }
 
-
-  public String odjavaKorisnika() {
-    if (this.prijavljen) {
-      this.prijavljen = false;
-
-      FacesContext facesContext = FacesContext.getCurrentInstance();
-      facesContext.getExternalContext().invalidateSession();
-
-      return "/index.xhtml?faces-redirect=true";
-    }
-    return "";
-  }
-
   @PostConstruct
   private void provjeriPrijavuKorisnika() {
     if (this.securityContext.getCallerPrincipal() != null) {
@@ -109,5 +100,15 @@ public class PrijavaKorisnika implements Serializable {
     }
   }
 
+  public String odjavaKorisnika() {
+    if (this.prijavljen) {
+      this.prijavljen = false;
 
+      FacesContext facesContext = FacesContext.getCurrentInstance();
+      facesContext.getExternalContext().invalidateSession();
+
+      return "/index.xhtml?faces-redirect=true";
+    }
+    return "";
+  }
 }
