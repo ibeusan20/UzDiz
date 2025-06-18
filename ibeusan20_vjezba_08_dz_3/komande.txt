@@ -45,7 +45,7 @@ docker stop tvrtka_ibeusan20
 docker start tvrtka_ibeusan20
 docker rm tvrtka_ibeusan20
 //docker rmi tvrtka_ibeusan20
-
+ 
 #-----------------------PARTNER/SLIKA--------------U SVOME DIREKTORIJU--------
 docker build -t partner_ibeusan20 -f Dockerfile .
 docker run -it -d --network=mreza_ibeusan20 --ip 20.24.5.3 \
