@@ -8,6 +8,10 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -33,6 +37,7 @@ import edu.unizg.foi.nwtis.podaci.KartaPica;
 import edu.unizg.foi.nwtis.podaci.Obracun;
 import edu.unizg.foi.nwtis.podaci.Partner;
 import edu.unizg.foi.nwtis.podaci.PartnerPopis;
+
 
 // TODO: Auto-generated Javadoc
 /**
@@ -85,6 +90,11 @@ public class PosluziteljTvrtka {
   /** Thread-safe kolekcija partnera. */
   public Map<Integer, Partner> partneri = new ConcurrentHashMap<>();
 
+  private final AtomicBoolean pauzaRegistracija = new AtomicBoolean(false);
+  private final AtomicBoolean pauzaPartneri = new AtomicBoolean(false);
+  private String kodZaAdminTvrtke = "";
+
+
   /**
    * Dohvaća konfiguraciju.
    *
@@ -105,13 +115,11 @@ public class PosluziteljTvrtka {
       return;
     }
     var program = new PosluziteljTvrtka();
-
-//    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-//      int br = program.kraj.get() ? 3 : 0;
-//      int zatvorene = program.zatvoriDretveIMrezneVeze(br);
-//      System.out.println("[INFO] Ukupan broj prekinutih dretvi: " + zatvorene);
-//    }));
-
+    // Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+    // int br = program.kraj.get() ? 3 : 0;
+    // int zatvorene = program.zatvoriDretveIMrezneVeze(br);
+    // System.out.println("[INFO] Ukupan broj prekinutih dretvi: " + zatvorene);
+    // }));
     var nazivDatoteke = args[0];
     program.pripremiKreni(nazivDatoteke);
   }
@@ -127,6 +135,7 @@ public class PosluziteljTvrtka {
       return;
     }
     this.kodZaKraj = this.konfig.dajPostavku("kodZaKraj");
+    this.kodZaAdminTvrtke = this.konfig.dajPostavku("kodZaAdminTvrtke");
     this.pauzaDretve = Integer.parseInt(this.konfig.dajPostavku("pauzaDretve"));
 
     var builder = Thread.ofVirtual();
@@ -205,22 +214,46 @@ public class PosluziteljTvrtka {
    * @return vraća bool
    */
   public Boolean obradiKraj(Socket mreznaUticnica) {
-    try {
-      var ulaz = new BufferedReader(new InputStreamReader(mreznaUticnica.getInputStream(), "utf8"));
-      var izlaz = new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"));
-
+    try (
+        var ulaz =
+            new BufferedReader(new InputStreamReader(mreznaUticnica.getInputStream(), "utf8"));
+        var izlaz =
+            new PrintWriter(new OutputStreamWriter(mreznaUticnica.getOutputStream(), "utf8"))) {
       String linija = ulaz.readLine();
       mreznaUticnica.shutdownInput();
-
-      if (!provjeriFormatKomande(linija)) {
-        izlaz.write("ERROR 10 - Format komande nije ispravan ili nije ispravan kod za kraj\n");
-      } else if (!provjeriLokalnuAdresu(mreznaUticnica)) {
-        izlaz.write("ERROR 11 - Adresa računala s kojeg je poslan zahtjev nije lokalna adresa\n");
+      
+      String[] dijelovi = linija.trim().split("\\s+");
+      if (dijelovi.length == 0) {
+        izlaz.write("ERROR 10 - Format komande nije ispravan\n");
       } else {
-        kraj.set(true);
-        izlaz.write("OK\n");
+        String komanda = dijelovi[0];
+        switch (komanda) {
+          case "STATUS":
+            obradiStatusKomandu(izlaz, dijelovi);
+            break;
+          case "PAUZA":
+            obradiPauzaKomandu(izlaz, dijelovi);
+            break;
+          case "START":
+            obradiStartKomandu(izlaz, dijelovi);
+            break;
+          case "KRAJ":
+            obradiKrajKomandu(izlaz, dijelovi);
+            break;
+          case "SPAVA":
+            obradiSpavaKomandu(izlaz, dijelovi);
+            break;
+          case "OSVJEŽI":
+            obradiOsvjeziKomandu(izlaz, dijelovi);
+            break;
+          case "KRAJWS":
+            obradiKrajWSKomandu(izlaz, dijelovi);
+            break;
+          default:
+            izlaz.write("ERROR 10 - Nepoznata komanda\n");
+            break;
+        }
       }
-
       izlaz.flush();
       mreznaUticnica.shutdownOutput();
       mreznaUticnica.close();
@@ -231,6 +264,218 @@ public class PosluziteljTvrtka {
       posaljiPorukuGreske(mreznaUticnica);
     }
     return Boolean.TRUE;
+  }
+  
+  /**
+   * Obradi kraj komandu.
+   *
+   * @param izlaz za pisanje
+   * @param dijelovi dijelovi komande
+   */
+  private void obradiKrajKomandu(PrintWriter izlaz, String[] dijelovi) {
+    if (dijelovi.length != 2 || !dijelovi[1].equals(kodZaKraj)) {
+      izlaz.write("ERROR 10 - Format komande nije ispravan ili nije ispravan kod za kraj\n");
+      return;
+    }
+    boolean sviPartneri = posaljiKrajPartnerima(kodZaKraj);
+    if (!sviPartneri) {
+      izlaz.write("ERROR 14 - Barem jedan partner nije završio rad\n");
+      return;
+    }
+    boolean rest = posaljiRestZahtjevKraj();
+    if (!rest) {
+      izlaz.write("ERROR 17 - RESTful zahtjev nije uspješan\n");
+      return;
+    }
+    kraj.set(true);
+    izlaz.write("OK\n");
+  }
+
+  /**
+   * Obradi status komandu.
+   *
+   * @param izlaz za pisanje
+   * @param dijelovi dijelovi komande
+   */
+  private void obradiStatusKomandu(PrintWriter izlaz, String[] dijelovi) {
+    if (dijelovi.length != 3 || (!dijelovi[2].equals("1") && !dijelovi[2].equals("2"))) {
+      izlaz.write("ERROR 10 - Format komande nije ispravan\n");
+      return;
+    }
+    if (!dijelovi[1].equals(this.kodZaAdminTvrtke)) {
+      izlaz.write("ERROR 12 - Pogrešan kodZaAdminTvrtke\n");
+      return;
+    }
+    int dio = Integer.parseInt(dijelovi[2]);
+    boolean stanje = (dio == 1) ? !pauzaRegistracija.get() : !pauzaPartneri.get();
+    izlaz.write("OK " + (stanje ? "1" : "0") + "\n");
+  }
+
+  /**
+   * Obradi pauza komandu.
+   *
+   * @param izlaz za pisanje
+   * @param dijelovi dijelovi komande
+   */
+  private void obradiPauzaKomandu(PrintWriter izlaz, String[] dijelovi) {
+    if (dijelovi.length != 3 || (!dijelovi[2].equals("1") && !dijelovi[2].equals("2"))) {
+      izlaz.write("ERROR 10 - Format komande nije ispravan\n");
+      return;
+    }
+    if (!dijelovi[1].equals(kodZaAdminTvrtke)) {
+      izlaz.write("ERROR 12 - Pogrešan kodZaAdminTvrtke\n");
+      return;
+    }
+    AtomicBoolean pauza = dijelovi[2].equals("1") ? pauzaRegistracija : pauzaPartneri;
+    if (pauza.get()) {
+      izlaz.write("ERROR 13 - Pogrešna promjena pauze ili starta\n");
+    } else {
+      pauza.set(true);
+      izlaz.write("OK\n");
+    }
+  }
+
+  /**
+   * Obradi start komandu.
+   *
+   * @param izlaz za pisanje
+   * @param dijelovi dijelovi komande
+   */
+  private void obradiStartKomandu(PrintWriter izlaz, String[] dijelovi) {
+    if (dijelovi.length != 3 || (!dijelovi[2].equals("1") && !dijelovi[2].equals("2"))) {
+      izlaz.write("ERROR 10 - Format komande nije ispravan\n");
+      return;
+    }
+    if (!dijelovi[1].equals(kodZaAdminTvrtke)) {
+      izlaz.write("ERROR 12 - Pogrešan kodZaAdminTvrtke\n");
+      return;
+    }
+
+    AtomicBoolean pauza = dijelovi[2].equals("1") ? pauzaRegistracija : pauzaPartneri;
+    if (!pauza.get()) {
+      izlaz.write("ERROR 13 - Pogrešna promjena pauze ili starta\n");
+    } else {
+      pauza.set(false);
+      izlaz.write("OK\n");
+    }
+  }
+
+  /**
+   * Obradi spava komandu.
+   *
+   * @param izlaz za pisanje
+   * @param dijelovi dijelovi komande
+   */
+  private void obradiSpavaKomandu(PrintWriter izlaz, String[] dijelovi) {
+    if (dijelovi.length != 3) {
+      izlaz.write("ERROR 10 - Format komande nije ispravan\n");
+      return;
+    }
+    if (!dijelovi[1].equals(kodZaAdminTvrtke)) {
+      izlaz.write("ERROR 12 - Pogrešan kodZaAdminTvrtke\n");
+      return;
+    }
+    try {
+      int ms = Integer.parseInt(dijelovi[2]);
+      Thread.sleep(ms);
+      izlaz.write("OK\n");
+    } catch (InterruptedException e) {
+      izlaz.write("ERROR 16 - Prekid spavanja dretve\n");
+    } catch (NumberFormatException e) {
+      izlaz.write("ERROR 10 - Format komande nije ispravan\n");
+    }
+  }
+
+  /**
+   * Obradi osvjezi komandu.
+   *
+   * @param izlaz za pisanje
+   * @param dijelovi dijelovi komande
+   */
+  private void obradiOsvjeziKomandu(PrintWriter izlaz, String[] dijelovi) {
+    if (dijelovi.length != 2) {
+      izlaz.write("ERROR 10 - Format komande nije ispravan\n");
+      return;
+    }
+    if (!dijelovi[1].equals(kodZaAdminTvrtke)) {
+      izlaz.write("ERROR 12 - Pogrešan kodZaAdminTvrtke\n");
+      return;
+    }
+    if (pauzaPartneri.get()) {
+      izlaz.write("ERROR 15 - Poslužitelj za partnere u pauzi\n");
+      return;
+    }
+    boolean uspjeh1 = ucitajKartuPica();
+    boolean uspjeh2 = ucitajJelovnike();
+    if (uspjeh1 && uspjeh2) {
+      izlaz.write("OK\n");
+    } else {
+      izlaz.write("ERROR 17 - Greška kod učitavanja podataka\n");
+    }
+  }
+
+  /**
+   * Obradi kraj WS komandu.
+   *
+   * @param izlaz za pisanje
+   * @param dijelovi dijelovi komande
+   */
+  private void obradiKrajWSKomandu(PrintWriter izlaz, String[] dijelovi) {
+    if (dijelovi.length != 2 || !dijelovi[1].equals(kodZaKraj)) {
+      izlaz.write("ERROR 10 - Format komande nije ispravan ili nije ispravan kod za kraj\n");
+      return;
+    }
+    boolean sviOK = posaljiKrajPartnerima(kodZaKraj);
+    if (!sviOK) {
+      izlaz.write("ERROR 14 - Barem jedan partner nije završio rad\n");
+      return;
+    }
+    this.kraj.set(true);
+    izlaz.write("OK\n");
+  }
+
+  /**
+   * Posalji kraj partnerima.
+   *
+   * @param kod kod
+   * @return true, sko je udpješno
+   */
+  private boolean posaljiKrajPartnerima(String kod) {
+    for (Partner p : this.partneri.values()) {
+      try (Socket socket = new Socket(p.adresa(), p.mreznaVrataKraj())) {
+        var izlaz = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "utf8"));
+        var ulaz = new BufferedReader(new InputStreamReader(socket.getInputStream(), "utf8"));
+
+        izlaz.write("KRAJ " + kod + "\n");
+        izlaz.flush();
+        socket.shutdownOutput();
+        String odgovor = ulaz.readLine();
+        if (!"OK".equals(odgovor))
+          return false;
+        socket.shutdownInput();
+      } catch (Exception e) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Posalji rest zahtjev kraj.
+   *
+   * @return true, ako je upješno
+   */
+  private boolean posaljiRestZahtjevKraj() {
+    try {
+      HttpClient client = HttpClient.newHttpClient();
+      String url = this.konfig.dajPostavku("restAdresa") + "/kraj/info";
+      HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url))
+          .method("HEAD", HttpRequest.BodyPublishers.noBody()).build();
+      HttpResponse<Void> response = client.send(request, HttpResponse.BodyHandlers.discarding());
+      return response.statusCode() == 200;
+    } catch (Exception e) {
+      return false;
+    }
   }
 
   /**
@@ -466,33 +711,43 @@ public class PosluziteljTvrtka {
   public void obradiRegistraciju(Socket uticnica) {
     try (var ulaz = new BufferedReader(new InputStreamReader(uticnica.getInputStream(), "utf8"));
         var izlaz = new PrintWriter(new OutputStreamWriter(uticnica.getOutputStream(), "utf8"))) {
+
       var linija = ulaz.readLine();
+      if (pauzaRegistracija.get()) {
+        izlaz.write("ERROR 24 - Poslužitelj za registraciju partnera u pauzi\n");
+        izlaz.flush();
+        return;
+      }
+
       var komanda = linija.trim();
       var dijelovi = komanda.split("\\s+", 2);
-
       if (dijelovi.length < 1) {
         izlaz.write("ERROR 20 - Format komande nije ispravan\n");
         izlaz.flush();
         return;
       }
+
       if (komanda.startsWith("PARTNER")) {
         obradiPartnerKomandu(izlaz, komanda);
       } else if (komanda.startsWith("OBRIŠI")) {
         obradiObrisiKomandu(izlaz, komanda);
-      } else if (komanda.equals("POPIS")) {
+      } else if (komanda != null && komanda.trim().equalsIgnoreCase("POPIS")) {
         obradiKomanduPopis(izlaz);
       } else {
         izlaz.write("ERROR 20 - Format komande nije ispravan\n");
       }
+
       izlaz.flush();
       uticnica.shutdownOutput();
       uticnica.close();
+
       synchronized (this) {
         brojZatvorenihVeza++;
       }
     } catch (IOException | NumberFormatException e) {
     }
   }
+
 
   /**
    * Obradi komandu POPIS koja dohvaća listu svih registriranih partnera.
@@ -502,11 +757,8 @@ public class PosluziteljTvrtka {
   public void obradiKomanduPopis(PrintWriter izlaz) {
     izlaz.write("OK\n");
     Gson gson = new Gson();
-    var popis =
-        this.partneri.values().stream()
-            .map(p -> new PartnerPopis(p.id(), p.naziv(),
-                p.vrstaKuhinje(), p.adresa(), p.mreznaVrata(), p.gpsSirina(), p.gpsDuzina()))
-            .toList();
+    var popis = this.partneri.values().stream().map(p -> new PartnerPopis(p.id(), p.naziv(),
+        p.vrstaKuhinje(), p.adresa(), p.mreznaVrata(), p.gpsSirina(), p.gpsDuzina())).toList();
     izlaz.write(gson.toJson(popis) + "\n");
   }
 
@@ -554,7 +806,7 @@ public class PosluziteljTvrtka {
    */
   public void obradiPartnerKomandu(PrintWriter izlaz, String komanda) {
     String regex =
-        "^PARTNER\\s+(\\d+)\\s+\"(.+?)\"\\s+(\\S+)\\s+(\\S+)\\s+(\\d+)\\s+([+-]?\\d*\\.?\\d+)\\s+([+-]?\\d*\\.?\\d+)$";
+        "^PARTNER\\s([0-9]+)\\s\"([^\"]+)\"\\s([A-Za-z]+)\\s(\\S+)\\s([0-9]+)\\s([0-9]*\\.[0-9]+)\\s([0-9]*\\.[0-9]+)\\s([0-9]+)\\s([A-Za-z0-9]+)$";
     var matcher = Pattern.compile(regex).matcher(komanda);
     if (!matcher.matches()) {
       izlaz.write("ERROR 20 - Format komande nije ispravan\n");
@@ -567,14 +819,18 @@ public class PosluziteljTvrtka {
       int vrata = Integer.parseInt(matcher.group(5));
       float sirina = Float.parseFloat(matcher.group(6));
       float duzina = Float.parseFloat(matcher.group(7));
+      int vrataKraj = Integer.parseInt(matcher.group(8));
+      String adminKod = matcher.group(9);
+
 
       if (this.partneri.containsKey(id)) {
         izlaz.write("ERROR 21 - Već postoji partner s id u kolekciji partnera\n");
       } else {
         String kod = Integer.toHexString((naziv + adresa).hashCode());
-        String kodAdmin = this.konfig.dajPostavku("kodZaAdminTvrtke");
-        int vrataKraj = Integer.parseInt(this.konfig.dajPostavku("mreznaVrataKraj"));
-        Partner novi = new Partner(id, naziv, vrsta, adresa, vrata, vrataKraj, sirina, duzina, kod, kodAdmin);
+        String kodAdmin = adminKod;
+        // int vrataKraj = Integer.parseInt(this.konfig.dajPostavku("mreznaVrataKraj"));
+        Partner novi =
+            new Partner(id, naziv, vrsta, adresa, vrata, vrataKraj, sirina, duzina, kod, kodAdmin);
         this.partneri.put(id, novi);
         spremiPartnere();
         izlaz.write("OK " + kod + "\n");
@@ -613,8 +869,10 @@ public class PosluziteljTvrtka {
         obradiJelovnikKomandu(izlaz, komanda);
       } else if (komanda.startsWith("KARTAPIĆA")) {
         obradiKartaPicaKomandu(izlaz, komanda);
-      } else if (komanda.startsWith("OBRAČUN")) {
+      } else if (komanda.startsWith("OBRAČUNWS")) {
         obradiObracunKomandu(ulaz, izlaz, komanda);
+      } else if (komanda.startsWith("OBRAČUN")) {
+        obradiObracunRestKomandu(ulaz, izlaz, komanda);
       } else {
         izlaz.write("ERROR 30 - Format komande nije ispravan\n");
       }
@@ -667,6 +925,78 @@ public class PosluziteljTvrtka {
       izlaz.write("ERROR 39 - Nešto drugo nije u redu\n");
     }
   }
+  
+  /**
+   * Obradi obracun rest komandu.
+   *
+   * @param ulaz za čitanjez
+   * @param izlaz za pisanje
+   * @param dijelovi dijelovi komande
+   */
+  private void obradiObracunRestKomandu(BufferedReader ulaz, PrintWriter izlaz, String komanda) {
+    var matcher = Pattern.compile("^OBRAČUN\\s+(\\d+)\\s+(\\S+)$").matcher(komanda);
+    if (!matcher.matches()) {
+        izlaz.write("ERROR 30 - Format komande nije ispravan\n");
+        return;
+    }
+
+    int id = Integer.parseInt(matcher.group(1));
+    String kod = matcher.group(2);
+    var partner = this.partneri.get(id);
+
+    if (partner == null || !partner.sigurnosniKod().equals(kod)) {
+        izlaz.write("ERROR 31 - Ne postoji partner s id u kolekciji partnera i/ili neispravan sigurnosni kod partnera\n");
+        return;
+    }
+    if (pauzaPartneri.get()) {
+        izlaz.write("ERROR 36 - Poslužitelj za partnere u pauzi\n");
+        return;
+    }
+    try {
+        var novi = ucitajJsonObracune(ulaz);
+        Gson gson = new Gson();
+        odradiLokotObracuna(gson, novi);
+
+        boolean ok = posaljiRestObracune(novi);
+        if (!ok) {
+            izlaz.write("ERROR 37 - RESTful zahtjev nije uspješan\n");
+            return;
+        }
+        izlaz.write("OK\n");
+    } catch (JsonSyntaxException e) {
+        izlaz.write("ERROR 35 - Neispravan obračun\n");
+    } catch (Exception e) {
+        izlaz.write("ERROR 39 - Nešto drugo nije u redu\n");
+    }
+}
+  
+  /**
+   * Posalji rest obracune.
+   *
+   * @param obracuni koji se šalju
+   * @return true, vraća true ako je uspješno
+   */
+  private boolean posaljiRestObracune(Obracun[] obracuni) {
+    try {
+        String url = this.konfig.dajPostavku("restAdresa") + "/obracun";
+        HttpClient client = HttpClient.newHttpClient();
+
+        Gson gson = new Gson();
+        String json = gson.toJson(obracuni);
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(json))
+            .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        return response.statusCode() == 201;
+    } catch (Exception e) {
+        e.printStackTrace();
+        return false;
+    }
+}
 
   /**
    * Učitava JSON zapis obračuna iz ulaznog toka i pretvara ga u niz objekata

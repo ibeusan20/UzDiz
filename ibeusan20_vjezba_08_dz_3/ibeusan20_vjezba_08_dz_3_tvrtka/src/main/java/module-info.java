@@ -5,4 +5,5 @@ module ibeusan20_vjezba_08_dz_3_tvrtka {
   requires ibeusan20_vjezba_08_dz_3_lib_konfig;
   requires ibeusan20_vjezba_08_dz_3_lib_podaci;
   requires java.logging;
+  requires java.net.http;
 }
