@@ -4,12 +4,12 @@
  */
 package edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
-import edu.unizg.foi.nwtis.podaci.Jelovnik;
-import edu.unizg.foi.nwtis.podaci.Korisnik;
 import edu.unizg.foi.nwtis.podaci.Partner;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -17,10 +17,7 @@ import jakarta.mvc.Controller;
 import jakarta.mvc.Models;
 import jakarta.mvc.View;
 import jakarta.mvc.binding.BindingResult;
-import jakarta.mvc.binding.MvcBinding;
-import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.GenericType;
@@ -130,5 +127,45 @@ public class Kontroler {
     var statusT2 = this.servisTvrtka.headPosluziteljStatus(2).getStatus();
     this.model.put("statusT2", statusT2);
   }
+  
+  @GET
+  @Path("privatno/obracun")
+  @View("obracun.jsp")
+  public void obracun(
+      @jakarta.ws.rs.QueryParam("od") String od,
+      @jakarta.ws.rs.QueryParam("do") String ddo,
+      @jakarta.ws.rs.QueryParam("tip") String tip
+  ) {
+    List<edu.unizg.foi.nwtis.podaci.Obracun> lista = new ArrayList<>();
+
+    if (od != null && ddo != null) {
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+      long epochOd = LocalDate.parse(od, formatter)
+          .atStartOfDay(ZoneId.systemDefault())
+          .toInstant()
+          .toEpochMilli();
+
+      long epochDo = LocalDate.parse(ddo, formatter)
+          .atStartOfDay(ZoneId.systemDefault())
+          .toInstant()
+          .toEpochMilli();
+
+      switch (tip) {
+        case "jelo":
+          lista = servisTvrtka.dohvatiObracuneJelo(String.valueOf(epochOd), String.valueOf(epochDo));
+          break;
+        case "pice":
+          lista = servisTvrtka.dohvatiObracunePice(String.valueOf(epochOd), String.valueOf(epochDo));
+          break;
+        default:
+          lista = servisTvrtka.dohvatiObracune(String.valueOf(epochOd), String.valueOf(epochDo));
+          break;
+      }
+    }
+
+    model.put("obracuni", lista);
+  }
+
+
 
 }

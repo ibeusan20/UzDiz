@@ -38,6 +38,9 @@
             <li>
                 <a href="${pageContext.servletContext.contextPath}/mvc/tvrtka/partner">Pregled partnera</a>
             </li>
+            <li>
+                <a href="${pageContext.servletContext.contextPath}/mvc/tvrtka/privatno/obracun">Pregled obračuna</a>
+            </li>
         </ul>          
     </body>
 </html>
