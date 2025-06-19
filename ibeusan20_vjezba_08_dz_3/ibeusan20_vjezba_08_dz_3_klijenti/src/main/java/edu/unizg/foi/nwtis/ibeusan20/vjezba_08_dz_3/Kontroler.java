@@ -5,11 +5,13 @@
 package edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
+import edu.unizg.foi.nwtis.podaci.Obracun;
 import edu.unizg.foi.nwtis.podaci.Partner;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
@@ -161,6 +163,38 @@ public class Kontroler {
           lista = servisTvrtka.dohvatiObracune(String.valueOf(epochOd), String.valueOf(epochDo));
           break;
       }
+    }
+    model.put("obracuni", lista);
+  }
+
+  @GET
+  @Path("privatno/obracunPartner")
+  @View("obracunPartner.jsp")
+  public void obracunPartner(
+      @jakarta.ws.rs.QueryParam("id") int id,
+      @jakarta.ws.rs.QueryParam("od") String od,
+      @jakarta.ws.rs.QueryParam("do") String ddo
+  ) {
+    List<Obracun> lista = new ArrayList<>();
+    try {
+      if (od != null && ddo != null && id > 0) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+        long epochOd = LocalDateTime.parse(od, formatter)
+          .atZone(ZoneId.systemDefault())
+          .toInstant()
+          .toEpochMilli();
+        long epochDo = LocalDateTime.parse(ddo, formatter)
+          .atZone(ZoneId.systemDefault())
+          .toInstant()
+          .toEpochMilli();
+
+        var response = servisTvrtka.dohvatiObracunePartner(id, epochOd, epochDo);
+        if (response.getStatus() == 200) {
+          lista = response.readEntity(new GenericType<List<Obracun>>() {});
+        }
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
 
     model.put("obracuni", lista);

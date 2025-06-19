@@ -73,6 +73,16 @@ public interface ServisTvrtkaKlijent {
     @jakarta.ws.rs.QueryParam("od") String od,
     @jakarta.ws.rs.QueryParam("do") String ddo
   );
+  
+  @GET
+  @Path("obracun/{id}")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response dohvatiObracunePartner(
+      @PathParam("id") int id,
+      @jakarta.ws.rs.QueryParam("od") long od,
+      @jakarta.ws.rs.QueryParam("do") long ddo
+  );
+
 
 
 
