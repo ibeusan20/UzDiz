@@ -99,6 +99,22 @@ public class Kontroler {
       this.model.put("partneri", partneri);
     }
   }
+  
+  @GET
+  @Path("partner/{id}")
+  @View("partner.jsp")
+  public void partner(@PathParam("id") int id) {
+    var odgovor = this.servisTvrtka.getPartner(id);
+    var status = odgovor.getStatus();
+    if (status == 200) {
+      var partner = odgovor.readEntity(Partner.class);
+      this.model.put("status", status);
+      this.model.put("partner", partner);
+    } else {
+      this.model.put("status", status);
+    }
+  }
+
 
   @GET
   @Path("admin/nadzornaKonzolaTvrtka")

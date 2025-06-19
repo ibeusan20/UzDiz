@@ -16,6 +16,8 @@ import org.eclipse.microprofile.metrics.annotation.Timed;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3.dao.ObracunDAO;
 import edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3.dao.PartnerDAO;
 import edu.unizg.foi.nwtis.podaci.Jelovnik;
@@ -789,5 +791,20 @@ public class TvrtkaResource {
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
           .entity("Greška prilikom slanja SPAVA komande").build();
     }
+  }
+  
+  @Inject
+  @RestClient
+  TvrtkaInfoKlijent tvrtkaInfoKlijent;
+  
+  
+  @RegisterRestClient(configKey = "klijentTvrtkaInfo")
+  @Path("kraj")
+  public interface TvrtkaInfoKlijent {
+
+    @GET
+    @Path("info")
+    @Produces("application/json")
+    Response dohvatiInfoZaKraj();
   }
 }
