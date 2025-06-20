@@ -62,18 +62,18 @@ public class WebSocketTvrtka {
   public void onMessage(Session session, String poruka) {
     System.out.println("Primljena poruka: " + poruka);
 
-    String[] dijelovi = poruka.split(";", 2);
-    String status = dijelovi[0];
-    String internaPoruka = (dijelovi.length > 1) ? dijelovi[1] : "";
+    String[] dijelovi = poruka.split(";", 3);
+    String tip = dijelovi.length > 0 ? dijelovi[0].trim() : "";
+    String broj = dijelovi.length > 1 ? dijelovi[1].trim() : "";
+    String interna = dijelovi.length > 2 ? dijelovi[2].trim() : "";
 
-    if (!internaPoruka.isBlank()) {
-      globalniPodaci.setInternaPoruka(internaPoruka);
+    if ("INTERNA".equalsIgnoreCase(tip) && !interna.isBlank()) {
+      globalniPodaci.setInternaPoruka(interna);
+      System.out.println("Interna poruka postavljena: " + interna);
     }
 
-    String novaPoruka =
-        status + ";" + globalniPodaci.getBrojObracuna() + ";" + globalniPodaci.getInternaPoruka();
-
-    WebSocketTvrtka.send(novaPoruka);
+    String novaPoruka = tip + ";" + globalniPodaci.getBrojObracuna() + ";" + globalniPodaci.getInternaPoruka();
+    send(novaPoruka);
   }
 
   @OnError
