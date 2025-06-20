@@ -26,13 +26,12 @@
 	%>
 	<table border="1">
 		<tr>
-			<th>ID</th>
+			<th>Naziv</th>
 			<th>Vrijeme</th>
 			<th>Vrsta</th>
 			<th>Partner ID</th>
 			<th>Količina</th>
 			<th>Cijena</th>
-			<th>Ukupno</th>
 		</tr>
 		<%
 		for (Obracun o : obracuni) {

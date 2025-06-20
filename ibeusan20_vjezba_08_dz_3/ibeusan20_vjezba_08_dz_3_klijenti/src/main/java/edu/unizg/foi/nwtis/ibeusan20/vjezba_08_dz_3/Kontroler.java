@@ -207,7 +207,7 @@ public class Kontroler {
   @Path("admin/panel")
   @View("adminPanel.jsp")
   public void prikaziAdminPanel() {
-    // samo prikaz glavnog admin sučelja
+    dohvatiStatuse();
   }
 
   @GET

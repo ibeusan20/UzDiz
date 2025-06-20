@@ -105,18 +105,25 @@ public class TvrtkaResource {
   @Path("status/{id}")
   @HEAD
   @Operation(summary = "Provjera statusa dijela poslužitelja tvrtka")
-  @APIResponses(value = {@APIResponse(responseCode = "200", description = "Uspješna operacija"),
-      @APIResponse(responseCode = "204", description = "Pogrešna operacija")})
-  @Counted(name = "brojZahtjeva_eadPosluziteljStatus",
+  @APIResponses(value = {
+      @APIResponse(responseCode = "200", description = "Dio poslužitelja je aktivan"),
+      @APIResponse(responseCode = "204", description = "Dio poslužitelja je u pauzi ili odgovor nije prepoznat")
+  })
+  @Counted(name = "brojZahtjeva_headPosluziteljStatus",
       description = "Koliko puta je pozvana operacija servisa")
-  @Timed(name = "trajanjeMetode_eadPosluziteljStatus", description = "Vrijeme trajanja metode")
+  @Timed(name = "trajanjeMetode_headPosluziteljStatus", description = "Vrijeme trajanja metode")
   public Response headPosluziteljStatus(@PathParam("id") int id) {
-    var status = posaljiKomandu("STATUS " + this.kodZaAdminTvrtke + " " + id);
-    if (status != null) {
-      return Response.status(Response.Status.OK).build();
-    } else {
-      return Response.status(Response.Status.NO_CONTENT).build();
+    String odgovor = posaljiKomandu("STATUS " + this.kodZaAdminTvrtke + " " + id);
+    
+    if (odgovor != null && odgovor.trim().startsWith("OK")) {
+      if (odgovor.contains("1")) {
+        return Response.status(Response.Status.OK).build();
+      } else if (odgovor.contains("0")) {
+        return Response.status(Response.Status.NO_CONTENT).build();
+      }
     }
+    
+    return Response.status(Response.Status.BAD_REQUEST).build();
   }
 
   /**
