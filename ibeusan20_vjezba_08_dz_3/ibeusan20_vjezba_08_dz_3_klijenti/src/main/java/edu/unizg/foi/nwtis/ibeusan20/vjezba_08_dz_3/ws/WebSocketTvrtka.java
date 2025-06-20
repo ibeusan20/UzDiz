@@ -46,7 +46,6 @@ public class WebSocketTvrtka {
     send(poruka);
   }
 
-
   @OnOpen
   public void openConnection(Session session, EndpointConfig conf) {
     queue.add(session);

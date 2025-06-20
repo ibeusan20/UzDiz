@@ -92,29 +92,35 @@
   </p>
 
   <script>
-  const statusDiv = document.getElementById("statusWS");
-  const racuniDiv = document.getElementById("racuniWS");
-  const porukaDiv = document.getElementById("porukaWS");
+  var statusDiv = document.getElementById("statusWS");
+  var racuniDiv = document.getElementById("racuniWS");
+  var porukaDiv = document.getElementById("porukaWS");
+  
+  var brojRacuna = "0";
+  var statusRada = "NEPOZNATO";
 
-  const ws = new WebSocket("ws://" + window.location.hostname + ":8080/ibeusan20_vjezba_08_dz_3_klijenti/ws/tvrtka");
+  var ws = new WebSocket("ws://" + window.location.hostname + ":8080/ibeusan20_vjezba_08_dz_3_klijenti/ws/tvrtka");
 
   ws.onopen = function () {
     console.log("WebSocket veza otvorena.");
   };
 
   ws.onmessage = function (event) {
-    const podaci = event.data.split(";");
-    if (podaci.length === 3) {
-      const status = podaci[0].trim();
-      const racuni = podaci[1].trim();
-      const poruka = podaci[2].trim();
+	  var podaci = event.data.split(";");
+	  if (podaci.length > 1) {
+	    var status = podaci[0].trim();
+	    brojRacuna = podaci[1].trim();
+	    statusRada = status;
 
-      statusDiv.textContent = status;
-      statusDiv.style.color = (status === "RADI") ? "green" : "red";
-      racuniDiv.textContent = racuni;
-      porukaDiv.textContent = poruka || "(nema poruke)";
-    }
-  };
+	    var poruka = podaci[2].trim();
+
+	    statusDiv.textContent = status;
+	    statusDiv.style.color = (status === "RADI") ? "green" : "red";
+	    racuniDiv.textContent = brojRacuna;
+	    porukaDiv.textContent = poruka || "(nema poruke)";
+	  }
+	};
+
 
   ws.onerror = function (e) {
     console.error("WebSocket greška:", e);
@@ -129,13 +135,20 @@
   };
 
   document.getElementById("porukaForma").addEventListener("submit", function (e) {
-    e.preventDefault();
-    const poruka = document.getElementById("porukaInput").value.trim();
-    const currentStatus = statusDiv.textContent.trim();
-    const wsPoruka = `${currentStatus};;${poruka}`;
-    ws.send(wsPoruka);
-    document.getElementById("porukaInput").value = "";
-  });
+	  e.preventDefault();
+	  var poruka = document.getElementById("porukaInput").value.trim();
+	  console.log("Unesena poruka:", poruka);
+	  if (!poruka) {
+	    alert("Molim unesite poruku.");
+	    return;
+	  }
+
+	  var wsPoruka = `INTERNA;${brojRacuna};${poruka}`;
+	  console.log("Šaljem WebSocket poruku:", wsPoruka);
+	  ws.send(wsPoruka);
+	  document.getElementById("porukaInput").value = "";
+	});
+
 </script>
   
 </body>
