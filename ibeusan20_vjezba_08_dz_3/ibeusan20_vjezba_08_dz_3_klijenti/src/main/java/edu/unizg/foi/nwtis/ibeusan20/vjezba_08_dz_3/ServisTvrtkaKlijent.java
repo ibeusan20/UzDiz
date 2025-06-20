@@ -3,8 +3,10 @@ package edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3;
 import java.util.List;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 import edu.unizg.foi.nwtis.podaci.Obracun;
+import edu.unizg.foi.nwtis.podaci.Partner;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HEAD;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -82,7 +84,11 @@ public interface ServisTvrtkaKlijent {
       @jakarta.ws.rs.QueryParam("od") long od,
       @jakarta.ws.rs.QueryParam("do") long ddo
   );
-
+  
+  @POST
+  @Path("partner")
+  @Produces(MediaType.APPLICATION_JSON)
+  public Response dodajPartnera(Partner partner);
 
 
 

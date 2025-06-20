@@ -19,7 +19,9 @@ import jakarta.mvc.Controller;
 import jakarta.mvc.Models;
 import jakarta.mvc.View;
 import jakarta.mvc.binding.BindingResult;
+import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.GenericType;
@@ -199,7 +201,44 @@ public class Kontroler {
 
     model.put("obracuni", lista);
   }
+  
+  @GET
+  @Path("admin/panel")
+  @View("adminPanel.jsp")
+  public void prikaziAdminPanel() {
+    // samo prikaz glavnog admin sučelja
+  }
 
+  @GET
+  @Path("admin/dodajPartnera")
+  @View("dodajPartnera.jsp")
+  public void prikaziFormuPartnera() {
+    // samo prikaz forme
+  }
 
+  @POST
+  @Path("admin/dodajPartnera")
+  @View("dodajPartnera.jsp")
+  public void dodajPartnera(
+      @FormParam("id") int id,
+      @FormParam("naziv") String naziv,
+      @FormParam("vrstakuhinje") String vrstaKuhinje,
+      @FormParam("adresa") String adresa,
+      @FormParam("mreznaVrata") int mreznaVrata,
+      @FormParam("mreznaVrataKraj") int mreznaVrataKraj,
+      @FormParam("gpssirina") float gpsSirina,
+      @FormParam("gpsduzina") float gpsDuzina,
+      @FormParam("sigurnosnikod") String sigurnosniKod,
+      @FormParam("adminkod") String adminKod
+  ) {
+      var partner = new Partner(
+          id, naziv, vrstaKuhinje, adresa,
+          mreznaVrata, mreznaVrataKraj,
+          gpsSirina, gpsDuzina,
+          sigurnosniKod, adminKod
+      );
+      var odgovor = servisTvrtka.dodajPartnera(partner);
+      model.put("statusDodavanja", odgovor.getStatus());
+  }
 
 }

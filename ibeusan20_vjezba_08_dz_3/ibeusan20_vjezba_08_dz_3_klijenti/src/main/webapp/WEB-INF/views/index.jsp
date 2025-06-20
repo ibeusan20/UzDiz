@@ -44,6 +44,8 @@
 		<li><a
 			href="${pageContext.servletContext.contextPath}/mvc/tvrtka/privatno/obracunPartner">Obračuni
 				po partneru</a></li>
+		<li><a
+			href="${pageContext.servletContext.contextPath}/mvc/tvrtka/admin/panel">Admin panel</a></li>
 
 	</ul>
 </body>
