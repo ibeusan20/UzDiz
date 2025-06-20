@@ -13,6 +13,9 @@
         Dodaj novog partnera
       </a>
     </li>
+    <li><a
+			href="${pageContext.servletContext.contextPath}/mvc/tvrtka/admin/nadzornaKonzolaTvrtka">Nadzorna
+				konzola Tvrtka</a></li>
   </ul>
 
   <fieldset>
