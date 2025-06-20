@@ -10,6 +10,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -56,24 +57,24 @@ public interface ServisTvrtkaKlijent {
   @Path("obracun")
   @Produces(MediaType.APPLICATION_JSON)
   public List<Obracun> dohvatiObracune(
-    @jakarta.ws.rs.QueryParam("od") String od,
-    @jakarta.ws.rs.QueryParam("do") String ddo
+    @QueryParam("od") String od,
+    @QueryParam("do") String ddo
   );
 
   @GET
   @Path("obracun/jelo")
   @Produces(MediaType.APPLICATION_JSON)
   public List<Obracun> dohvatiObracuneJelo(
-    @jakarta.ws.rs.QueryParam("od") String od,
-    @jakarta.ws.rs.QueryParam("do") String ddo
+    @QueryParam("od") String od,
+    @QueryParam("do") String ddo
   );
 
   @GET
   @Path("obracun/pice")
   @Produces(MediaType.APPLICATION_JSON)
   public List<Obracun> dohvatiObracunePice(
-    @jakarta.ws.rs.QueryParam("od") String od,
-    @jakarta.ws.rs.QueryParam("do") String ddo
+    @QueryParam("od") String od,
+    @QueryParam("do") String ddo
   );
   
   @GET
@@ -81,8 +82,8 @@ public interface ServisTvrtkaKlijent {
   @Produces(MediaType.APPLICATION_JSON)
   public Response dohvatiObracunePartner(
       @PathParam("id") int id,
-      @jakarta.ws.rs.QueryParam("od") long od,
-      @jakarta.ws.rs.QueryParam("do") long ddo
+      @QueryParam("od") long od,
+      @QueryParam("do") long ddo
   );
   
   @POST
@@ -90,6 +91,9 @@ public interface ServisTvrtkaKlijent {
   @Produces(MediaType.APPLICATION_JSON)
   public Response dodajPartnera(Partner partner);
 
+  @GET
+  @Path("spava")
+  public Response aktivirajSpavanje(@QueryParam("vrijeme") int vrijeme);
 
 
   // TODO na isti način definirati za ostale operacije RESTful servisa

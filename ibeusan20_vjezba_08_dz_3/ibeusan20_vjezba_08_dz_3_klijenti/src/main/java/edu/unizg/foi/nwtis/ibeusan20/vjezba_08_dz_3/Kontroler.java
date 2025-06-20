@@ -25,6 +25,7 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.Response;
 
 /**
  *
@@ -240,5 +241,14 @@ public class Kontroler {
       var odgovor = servisTvrtka.dodajPartnera(partner);
       model.put("statusDodavanja", odgovor.getStatus());
   }
+  
+  @POST
+  @Path("admin/aktivirajSpavanje")
+  @View("adminPanel.jsp")
+  public void aktivirajSpavanje(@FormParam("vrijeme") int vrijeme) {
+      var odgovor = servisTvrtka.aktivirajSpavanje(vrijeme);
+      model.put("statusSpavanje", odgovor.getStatus());
+  }
+
 
 }
