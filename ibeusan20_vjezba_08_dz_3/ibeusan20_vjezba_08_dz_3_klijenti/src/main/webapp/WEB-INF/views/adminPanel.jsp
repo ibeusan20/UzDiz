@@ -92,32 +92,51 @@
   </p>
 
   <script>
-    const statusDiv = document.getElementById("statusWS");
-    const racuniDiv = document.getElementById("racuniWS");
-    const porukaDiv = document.getElementById("porukaWS");
-    const ws = new WebSocket("ws://" + window.location.hostname + ":8080/nwtis/ws/tvrtka");
+  const statusDiv = document.getElementById("statusWS");
+  const racuniDiv = document.getElementById("racuniWS");
+  const porukaDiv = document.getElementById("porukaWS");
 
-    ws.onmessage = function(event) {
-      const podaci = event.data.split(";");
-      if (podaci.length === 3) {
-        const status = podaci[0].trim();
-        const racuni = podaci[1].trim();
-        const poruka = podaci[2].trim();
+  const ws = new WebSocket("ws://" + window.location.hostname + ":8080/ibeusan20_vjezba_08_dz_3_klijenti/ws/tvrtka");
 
-        statusDiv.textContent = status;
-        statusDiv.style.color = (status === "RADI") ? "green" : "red";
-        racuniDiv.textContent = racuni;
-        porukaDiv.textContent = poruka || "(nema poruke)";
-      }
-    };
+  ws.onopen = function () {
+    console.log("WebSocket veza otvorena.");
+  };
 
-    document.getElementById("porukaForma").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const poruka = document.getElementById("porukaInput").value;
-      const wsPoruka = "RADI;;" + poruka;
-      ws.send(wsPoruka);
-      document.getElementById("porukaInput").value = "";
-    });
-  </script>
+  ws.onmessage = function (event) {
+    const podaci = event.data.split(";");
+    if (podaci.length === 3) {
+      const status = podaci[0].trim();
+      const racuni = podaci[1].trim();
+      const poruka = podaci[2].trim();
+
+      statusDiv.textContent = status;
+      statusDiv.style.color = (status === "RADI") ? "green" : "red";
+      racuniDiv.textContent = racuni;
+      porukaDiv.textContent = poruka || "(nema poruke)";
+    }
+  };
+
+  ws.onerror = function (e) {
+    console.error("WebSocket greška:", e);
+    statusDiv.textContent = "Greška!";
+    statusDiv.style.color = "red";
+  };
+
+  ws.onclose = function () {
+    console.warn("WebSocket zatvoren.");
+    statusDiv.textContent = "Veza zatvorena";
+    statusDiv.style.color = "red";
+  };
+
+  document.getElementById("porukaForma").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const poruka = document.getElementById("porukaInput").value.trim();
+    const currentStatus = statusDiv.textContent.trim();
+    const wsPoruka = `${currentStatus};;${poruka}`;
+    ws.send(wsPoruka);
+    document.getElementById("porukaInput").value = "";
+  });
+</script>
+  
 </body>
 </html>

@@ -38,6 +38,14 @@ public class WebSocketTvrtka {
       System.out.println("Greška pri slanju poruke: " + ex.getMessage());
     }
   }
+  
+  public static void posaljiStatus(String status, GlobalniPodaci globalniPodaci) {
+    String poruka = status + ";" +
+        globalniPodaci.getBrojObracuna() + ";" +
+        globalniPodaci.getInternaPoruka();
+    send(poruka);
+  }
+
 
   @OnOpen
   public void openConnection(Session session, EndpointConfig conf) {
@@ -63,9 +71,8 @@ public class WebSocketTvrtka {
       globalniPodaci.setInternaPoruka(internaPoruka);
     }
 
-    String novaPoruka = status + ";" +
-        globalniPodaci.getBrojObracuna() + ";" +
-        globalniPodaci.getInternaPoruka();
+    String novaPoruka =
+        status + ";" + globalniPodaci.getBrojObracuna() + ";" + globalniPodaci.getInternaPoruka();
 
     WebSocketTvrtka.send(novaPoruka);
   }
