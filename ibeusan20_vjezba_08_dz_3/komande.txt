@@ -35,6 +35,9 @@ docker volume create svezak_ibeusan20
 docker volume inspect svezak_ibeusan20
 sudo cp podaci/*.* /var/lib/docker/volumes/svezak_ibeusan20/_data
 
+sudo su
+cd /var/lib/docker/volumes/svezak_ibeusan20/_data
+
 #-----------------------TVRTKA/SLIKA----------------U SVOME DIREKTORIJU--------
 docker build -t tvrtka_ibeusan20 -f Dockerfile .
 docker run -it -d --network=mreza_ibeusan20 --ip 20.24.5.2 \
