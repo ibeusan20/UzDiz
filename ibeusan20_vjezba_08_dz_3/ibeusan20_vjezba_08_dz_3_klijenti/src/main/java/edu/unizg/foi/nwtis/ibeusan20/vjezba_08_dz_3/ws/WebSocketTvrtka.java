@@ -58,23 +58,45 @@ public class WebSocketTvrtka {
     System.out.println("Zatvorena WebSocket veza.");
   }
 
+  /*
+   * @OnMessage public void onMessage(Session session, String poruka) {
+   * System.out.println("Primljena poruka: " + poruka);
+   * 
+   * String[] dijelovi = poruka.split(";", 3); String tip = dijelovi.length > 0 ? dijelovi[0].trim()
+   * : ""; String broj = dijelovi.length > 1 ? dijelovi[1].trim() : ""; String interna =
+   * dijelovi.length > 2 ? dijelovi[2].trim() : "";
+   * 
+   * if ("INTERNA".equalsIgnoreCase(tip) && !interna.isBlank()) {
+   * globalniPodaci.setInternaPoruka(interna); System.out.println("Interna poruka postavljena: " +
+   * interna); }
+   * 
+   * String novaPoruka = tip + ";" + globalniPodaci.getBrojObracuna() + ";" +
+   * globalniPodaci.getInternaPoruka(); send(novaPoruka); }
+   */
+  
   @OnMessage
-  public void onMessage(Session session, String poruka) {
-    System.out.println("Primljena poruka: " + poruka);
+  public void onMessage(Session session, String porukica) {
+    System.out.println("Primljena poruka: " + porukica);
 
-    String[] dijelovi = poruka.split(";", 3);
+    String[] dijelovi = porukica.split(";", 3);
     String tip = dijelovi.length > 0 ? dijelovi[0].trim() : "";
     String broj = dijelovi.length > 1 ? dijelovi[1].trim() : "";
     String interna = dijelovi.length > 2 ? dijelovi[2].trim() : "";
 
-    if ("INTERNA".equalsIgnoreCase(tip) && !interna.isBlank()) {
+    if ("INTERNA".equalsIgnoreCase(tip) && !interna.trim().isEmpty()) {
       globalniPodaci.setInternaPoruka(interna);
       System.out.println("Interna poruka postavljena: " + interna);
+      System.out.println("tip: [" + tip + "]");
+      System.out.println("broj: [" + broj + "]");
+      System.out.println("interna: [" + interna + "]");
+      System.out.println("interna.isBlank(): " + interna.isBlank());
     }
 
-    String novaPoruka = tip + ";" + globalniPodaci.getBrojObracuna() + ";" + globalniPodaci.getInternaPoruka();
+    String novaPoruka =
+        tip + ";" + globalniPodaci.getBrojObracuna() + ";" + globalniPodaci.getInternaPoruka();
     send(novaPoruka);
   }
+   
 
   @OnError
   public void error(Session session, Throwable t) {

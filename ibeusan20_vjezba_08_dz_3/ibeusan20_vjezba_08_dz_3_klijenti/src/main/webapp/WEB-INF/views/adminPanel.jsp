@@ -29,7 +29,8 @@
       <input type="text" id="porukaInput" name="poruka" placeholder="Poruka..." />
       <button type="submit">Pošalji</button>
     </form>
-  </fieldset>
+  </fieldset> 
+  
 
   <fieldset>
     <legend>Aktivacija spavanja poslužitelja</legend>
@@ -136,17 +137,24 @@
 
   document.getElementById("porukaForma").addEventListener("submit", function (e) {
 	  e.preventDefault();
-	  var poruka = document.getElementById("porukaInput").value.trim();
-	  console.log("Unesena poruka:", poruka);
+	  var inputField = document.getElementById("porukaInput");
+	  var poruka = inputField ? inputField.value.trim() : null;
+
+	  console.log("Polje input:", inputField);
+	  console.log("Vrijednost poruke:", poruka);
+
 	  if (!poruka) {
 	    alert("Molim unesite poruku.");
 	    return;
 	  }
+	  var brojRacuna = brojRacuna || 7;
 
-	  var wsPoruka = `INTERNA;${brojRacuna};${poruka}`;
+	  var wsPoruka = "INTERNA" + ";" + brojRacuna + ";" + poruka;
 	  console.log("Šaljem WebSocket poruku:", wsPoruka);
+	  console.log(`INTERNA;${brojRacuna};${poruka}`);
+
 	  ws.send(wsPoruka);
-	  document.getElementById("porukaInput").value = "";
+ 	  document.getElementById("porukaInput").value = "";
 	});
 
 </script>
