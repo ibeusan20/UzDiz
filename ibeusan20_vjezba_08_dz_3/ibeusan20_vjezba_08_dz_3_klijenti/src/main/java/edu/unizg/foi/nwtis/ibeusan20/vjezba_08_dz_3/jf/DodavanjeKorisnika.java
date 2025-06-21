@@ -76,15 +76,31 @@ public class DodavanjeKorisnika implements Serializable {
   public void dodajKorisnika() {
     Korisnik korisnik = new Korisnik(korisnickoIme, lozinka, prezime, ime, email);
     ServisPartnerKlijent klijent = restConfiguration.dajServisPartner();
-    System.out.println("KLJENT1: " + klijent + "\n\n\n-------------\n\n\n");
-    System.out.println(klijent);
-    Response odgovor = klijent.dodajKorisnika(korisnik);
-    System.out.println("ODGOVOR " + odgovor);
-    System.out.println("KLJENT2: " + odgovor);
-    if (odgovor.getStatus() == 200 || odgovor.getStatus() == 201) {
-      poruka = "Korisnik uspješno dodan!";
-    } else {
-      poruka = "Greška pri dodavanju korisnika! Status: " + odgovor.getStatus();
+    try {
+      Response odgovor = klijent.dodajKorisnika(korisnik);
+
+      int status = odgovor.getStatus();
+      System.out.println("Status dodavanja korisnika: " + status);
+
+      if (status == 200 || status == 201) {
+        poruka = "Korisnik uspješno dodan!";
+      } else if (status == 409) {
+        poruka = "Korisnik već postoji!";
+      } else {
+        poruka = "Neočekivana greška! Status: " + status;
+      }
+
+    } catch (jakarta.ws.rs.WebApplicationException e) {
+      int status = e.getResponse().getStatus();
+      if (status == 409) {
+        poruka = "Korisnik već postoji! (409)";
+      } else {
+        poruka = "Greška pri dodavanju korisnika! Status: " + status;
+      }
+      e.printStackTrace();
+    } catch (Exception e) {
+      poruka = "Došlo je do greške: " + e.getMessage();
+      e.printStackTrace();
     }
   }
 }
