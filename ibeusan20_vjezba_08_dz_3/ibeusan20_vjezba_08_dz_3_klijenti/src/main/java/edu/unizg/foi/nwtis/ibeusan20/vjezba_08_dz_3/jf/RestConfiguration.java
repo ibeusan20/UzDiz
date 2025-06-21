@@ -5,9 +5,13 @@
  */
 package edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3.jf;
 
+import java.net.URI;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.time.Duration;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.rest.client.RestClientBuilder;
+import edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3.ServisPartnerKlijent;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
@@ -35,5 +39,25 @@ public class RestConfiguration {
     var vezaBazaPodataka = DriverManager.getConnection(this.urlBazaPodataka,
         this.korisnickoImeBazaPodataka, this.lozinkaBazaPodataka);
     return vezaBazaPodataka;
-  }    
+  }  
+  
+  /*
+   * public ServisPartnerKlijent dajServisPartner() { try { URI uri = new
+   * URI("http://20.24.5.20:8080/nwtis/api/partner"); return RestClientBuilder.newBuilder()
+   * .baseUri(uri) .build(ServisPartnerKlijent.class); } catch (Exception e) { throw new
+   * RuntimeException("Greška pri stvaranju REST klijenta ServisPartnerKlijent", e); } }
+   */
+  
+  public ServisPartnerKlijent dajServisPartner() {
+    try {
+      URI uri = new URI("http://20.24.5.20:8080/nwtis/v1");
+      System.out.println("BASE URI: " + uri);
+      return RestClientBuilder.newBuilder()
+          .baseUri(uri)
+          .build(ServisPartnerKlijent.class);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
 }

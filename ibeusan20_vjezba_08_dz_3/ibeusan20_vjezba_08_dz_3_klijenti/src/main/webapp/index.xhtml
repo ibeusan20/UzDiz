@@ -5,6 +5,19 @@
 	<ui:define name="title">Zadaća 3 - Početak Partner</ui:define>
 	<ui:define name="content">
 		<ul>
+			<ui:fragment>
+				<li><h:link outcome="/provjeraPosluzitelja.xhtml" value="Provjera poslužitelja" /></li>
+			</ui:fragment>
+			<ui:fragment>
+				<li><h:link outcome="/partneri.xhtml" value="Pregled partnera" /></li>
+			</ui:fragment>
+			<ui:fragment>
+				<li><h:link outcome="/detaljiPartnera.xhtml" value="Detalji partnera" /></li>
+			</ui:fragment>
+			<ui:fragment>
+				<li><h:link outcome="/dodavanjeKorisnika.xhtml" value="Dodavanje korisnika" /></li>
+			</ui:fragment>
+			<h3>---------------------------------------------------------------------</h3>
 			<ui:fragment
 				rendered="#{prijavaKorisnika.prijavljen and (!prijavaKorisnika.partnerOdabran)}">
 				<li><h:link outcome="/privatno/odabirPartnera.xhtml"
@@ -14,6 +27,7 @@
 				<li><h:link outcome="/admin/nadzornaKonzolaPartnera.xhtml" value="Nadzorna konzola partnera/restorana" /></li>
 			</ui:fragment>
 		</ul>
+		
 	</ui:define>
 	<ui:define name="nav">
 	</ui:define>

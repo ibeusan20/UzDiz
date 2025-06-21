@@ -1,15 +1,17 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>edu.unizg.foi.nwtis.ibeusan20</groupId>
-    <artifactId>ibeusan20_vjezba_08_dz_3</artifactId>
-    <version>1.0.0</version>
-  </parent>
-  <artifactId>ibeusan20_vjezba_08_dz_3_klijenti</artifactId>
-  <packaging>war</packaging>
-  <name>ibeusan20_vjezba_08_dz_3_klijenti</name>
-  
-  
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>edu.unizg.foi.nwtis.ibeusan20</groupId>
+		<artifactId>ibeusan20_vjezba_08_dz_3</artifactId>
+		<version>1.0.0</version>
+	</parent>
+	<artifactId>ibeusan20_vjezba_08_dz_3_klijenti</artifactId>
+	<packaging>war</packaging>
+	<name>ibeusan20_vjezba_08_dz_3_klijenti</name>
+
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>21</maven.compiler.source>
@@ -91,7 +93,7 @@
 			<artifactId>primefaces</artifactId>
 			<version>14.0.0</version>
          <classifier>jakarta</classifier>			
-		</dependency>	-->		
+		</dependency>	-->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
@@ -121,7 +123,7 @@
 			<groupId>edu.unizg.foi.nwtis.ibeusan20</groupId>
 			<artifactId>ibeusan20_vjezba_08_dz_3_jpa</artifactId>
 			<version>1.0.0</version>
-		</dependency>	
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -277,5 +279,5 @@
 		</repository>
 	</repositories>
 
-  
+
 </project>

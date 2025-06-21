@@ -1,0 +1,41 @@
+<ui:composition template="/predlozak.xhtml"
+  xmlns:ui="jakarta.faces.facelets"
+  xmlns:h="jakarta.faces.html"
+  xmlns:f="jakarta.faces.core">
+
+  <ui:define name="content">
+    <h:form>
+      <h2>Dodavanje novog korisnika</h2>
+
+      <h:panelGrid columns="2" cellpadding="5">
+
+        <h:outputLabel for="korime" value="Korisničko ime:" />
+        <h:inputText id="korime" value="#{dodavanjeKorisnika.korisnickoIme}" required="true" />
+
+        <h:outputLabel for="lozinka" value="Lozinka:" />
+        <h:inputSecret id="lozinka" value="#{dodavanjeKorisnika.lozinka}" required="true" />
+
+        <h:outputLabel for="ime" value="Ime:" />
+        <h:inputText id="ime" value="#{dodavanjeKorisnika.ime}" required="true" />
+
+        <h:outputLabel for="prezime" value="Prezime:" />
+        <h:inputText id="prezime" value="#{dodavanjeKorisnika.prezime}" required="true" />
+
+        <h:outputLabel for="email" value="Email:" />
+        <h:inputText id="email" value="#{dodavanjeKorisnika.email}" required="true" />
+
+      </h:panelGrid>
+
+      <br/>
+
+      <h:commandButton value="Dodaj korisnika" action="#{dodavanjeKorisnika.dodajKorisnika}" />
+
+      <br/><br/>
+      <h:outputText value="#{dodavanjeKorisnika.poruka}" style="color:green;" rendered="#{not empty dodavanjeKorisnika.poruka}" />
+
+    </h:form>
+  </ui:define>
+	<ui:define name="nav">
+	</ui:define>
+
+</ui:composition>
