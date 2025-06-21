@@ -59,10 +59,15 @@ public class OdabirPartnera implements Serializable {
       } else {
         this.prijavaKorisnika.setPartnerOdabran(false);
       }
+      if (prijavaKorisnika.isImaAktivnuNarudzbu()) {
+        prijavaKorisnika.setPartnerOdabran(false);
+        return "/index.xhtml?faces-redirect=true";
+      }
+
     } else {
       this.prijavaKorisnika.setPartnerOdabran(false);
     }
-    return "index.html?faces-redirect=true";
+    return "/index.xhtml?faces-redirect=true";
   }
 
 }

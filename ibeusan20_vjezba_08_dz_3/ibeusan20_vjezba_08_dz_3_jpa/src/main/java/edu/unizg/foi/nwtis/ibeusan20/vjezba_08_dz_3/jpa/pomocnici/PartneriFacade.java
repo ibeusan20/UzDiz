@@ -15,7 +15,7 @@ import jakarta.persistence.criteria.Root;
 @Stateless
 public class PartneriFacade extends EntityManagerProducer implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 193874598375988685L;
 
   private CriteriaBuilder cb;
 

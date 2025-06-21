@@ -1,7 +1,14 @@
 package edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3.jf;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
+import edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3.jpa.entiteti.Zapisi;
 import edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3.jpa.pomocnici.KorisniciFacade;
+import edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3.jpa.pomocnici.ZapisiFacade;
+import edu.unizg.foi.nwtis.podaci.Jelovnik;
+import edu.unizg.foi.nwtis.podaci.KartaPica;
 import edu.unizg.foi.nwtis.podaci.Korisnik;
 import edu.unizg.foi.nwtis.podaci.Partner;
 import jakarta.annotation.PostConstruct;
@@ -10,6 +17,7 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.security.enterprise.SecurityContext;
+import jakarta.servlet.http.HttpServletRequest;
 
 @SessionScoped
 @Named("prijavaKorisnika")
@@ -28,9 +36,15 @@ public class PrijavaKorisnika implements Serializable {
 
   @Inject
   KorisniciFacade korisniciFacade;
+  
+  @Inject
+  private ZapisiFacade zapisiFacade;
 
   @Inject
   private SecurityContext securityContext;
+  
+  @Inject
+  private HttpServletRequest request;
 
   public String getKorisnickoIme() {
     return korisnickoIme;
@@ -96,12 +110,15 @@ public class PrijavaKorisnika implements Serializable {
         this.prijavljen = true;
         this.korisnickoIme = korIme;
         this.lozinka = this.korisnik.lozinka();
+        init();
       }
     }
   }
 
   public String odjavaKorisnika() {
     if (this.prijavljen) {
+      dodajZapis("odjava");
+      request.getSession().invalidate();
       this.prijavljen = false;
 
       FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -111,4 +128,44 @@ public class PrijavaKorisnika implements Serializable {
     }
     return "";
   }
+ 
+  public void init() {
+    korisnickoIme = request.getRemoteUser();
+    if (korisnickoIme != null) {
+      dodajZapis("prijava");
+    }
+  }
+  
+  private void dodajZapis(String akcija) {
+    Zapisi z = new Zapisi();
+    z.setKorisnickoime(korisnickoIme);
+    z.setVrijeme(Timestamp.valueOf(LocalDateTime.now()));
+    z.setOpisrada(akcija);
+    z.setIpadresaracunala(request.getRemoteAddr());
+    zapisiFacade.create(z);
+  }
+  
+  private boolean imaAktivnuNarudzbu = false;
+
+  public boolean isImaAktivnuNarudzbu() {
+    return imaAktivnuNarudzbu;
+  }
+
+  public void setImaAktivnuNarudzbu(boolean imaAktivnuNarudzbu) {
+    this.imaAktivnuNarudzbu = imaAktivnuNarudzbu;
+  }
+  
+  public List<Jelovnik> getJelovnikOdabranogPartnera() {
+    if (!partnerOdabran || korisnik == null) return List.of();
+    return restConfiguration.dajServisPartner()
+        .dohvatiJelovnik(korisnik.korisnik(), korisnik.lozinka());
+  }
+
+  public List<KartaPica> getKartaPicaOdabranogPartnera() {
+    if (!partnerOdabran || korisnik == null) return List.of();
+    return restConfiguration.dajServisPartner()
+        .dohvatiKartuPica(korisnik.korisnik(), korisnik.lozinka());
+  }
+
+
 }
