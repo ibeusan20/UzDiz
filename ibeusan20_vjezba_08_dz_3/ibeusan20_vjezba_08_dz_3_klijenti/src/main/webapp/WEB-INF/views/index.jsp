@@ -20,7 +20,7 @@
 		<li><a
 			href="${pageContext.servletContext.contextPath}/mvc/tvrtka/status">Status
 				poslužitelja Tvrtka</a></li>
-		<li><a
+		<%-- <li><a
 			href="${pageContext.servletContext.contextPath}/mvc/tvrtka/start/1">Start
 				poslužitelja Tvrtka - registracija</a></li>
 		<li><a
@@ -31,7 +31,7 @@
 				poslužitelja Tvrtka - za partnere</a></li>
 		<li><a
 			href="${pageContext.servletContext.contextPath}/mvc/tvrtka/pauza/2">Pauza
-				poslužitelja Tvrtka - za partnere</a></li>
+				poslužitelja Tvrtka - za partnere</a></li> --%>
 		<li><a
 			href="${pageContext.servletContext.contextPath}/mvc/tvrtka/admin/nadzornaKonzolaTvrtka">Nadzorna
 				konzola Tvrtka</a></li>

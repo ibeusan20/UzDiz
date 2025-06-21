@@ -3,7 +3,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>REST MVC - Dodavanje korisnik</title>
+        <title>Vježba 8 - zadaća 3 - REST MVC - Dodavanje korisnik</title>
         <style type="text/css">
 .poruka {
 	color: red;
@@ -11,7 +11,7 @@
         </style>
     </head>
     <body>
-        <h1>Dodavanje korisnika</h1>
+        <h1>Vježba 8 - zadaća 3 - Dodavanje korisnika</h1>
        <ul>
             <li>
                 <a href="${pageContext.servletContext.contextPath}/mvc/korisnici/pocetak">Početna stranica</a>

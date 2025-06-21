@@ -3,10 +3,10 @@
 	import="java.util.List, java.util.Date, edu.unizg.foi.nwtis.podaci.Obracun"%>
 <html>
 <head>
-<title>Pregled obračuna po partneru</title>
+<title>Vježba 8 - zadaća 3 - Pregled obračuna po partneru</title>
 </head>
 <body>
-	<h2>Obračuni po partneru u razdoblju</h2>
+	<h2>Vježba 8 - zadaća 3 - Obračuni po partneru u razdoblju</h2>
 
 	<form method="get" action="">
 		<label for="od">Datum od:</label> <input type="datetime-local"

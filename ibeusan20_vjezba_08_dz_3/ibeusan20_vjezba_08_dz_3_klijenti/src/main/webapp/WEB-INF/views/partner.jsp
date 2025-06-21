@@ -4,10 +4,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Detalji partnera</title>
+<title>Vježba 8 - zadaća 3 - Detalji partnera</title>
 </head>
 <body>
-	<h1>Detalji partnera</h1>
+	<h1>Vježba 8 - zadaća 3 - Detalji partnera</h1>
 	<ul>
 		<%
 		Integer status = (Integer) request.getAttribute("status");

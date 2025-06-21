@@ -2,10 +2,10 @@
 <%@ page import="java.util.List, edu.unizg.foi.nwtis.podaci.Obracun"%>
 <html>
 <head>
-<title>Obračuni</title>
+<title>Vježba 8 - zadaća 3 - Obračuni</title>
 </head>
 <body>
-	<h2>Pregled obračuna</h2>
+	<h2>Vježba 8 - zadaća 3 - Pregled obračuna</h2>
 
 	<form method="get">
 		<label for="od">Od:</label> <input type="datetime-local" name="od"

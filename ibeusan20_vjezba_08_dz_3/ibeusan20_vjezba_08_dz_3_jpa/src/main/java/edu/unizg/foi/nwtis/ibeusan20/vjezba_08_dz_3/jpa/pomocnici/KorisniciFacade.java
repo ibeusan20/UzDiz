@@ -20,7 +20,7 @@ import jakarta.persistence.criteria.Root;
 
 /**
  *
- * @author Dragutin Kermek
+ * @author Ivan Beusan
  */
 @Stateless
 public class KorisniciFacade extends EntityManagerProducer implements Serializable {

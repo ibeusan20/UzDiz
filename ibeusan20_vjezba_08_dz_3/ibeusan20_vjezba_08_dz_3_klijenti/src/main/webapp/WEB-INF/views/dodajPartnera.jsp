@@ -2,14 +2,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dodavanje partnera</title>
+    <title>Vježba 8 - zadaća 3 - Dodavanje partnera</title>
     <style>
         label { display: inline-block; width: 150px; margin-top: 5px; }
         input, select { margin-top: 5px; }
     </style>
 </head>
 <body>
-    <h1>Dodavanje novog partnera</h1>
+    <h1>Vježba 8 - zadaća 3 - Dodavanje novog partnera</h1>
 
     <form method="post" action="${pageContext.servletContext.contextPath}/mvc/tvrtka/admin/dodajPartnera">
         <label for="id">ID partnera:</label>

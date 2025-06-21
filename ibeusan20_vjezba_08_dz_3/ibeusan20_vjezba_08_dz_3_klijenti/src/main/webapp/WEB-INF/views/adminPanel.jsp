@@ -2,10 +2,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Administracija</title>
+  <title>Vježba 8 - zadaća 3 - Administracija</title>
 </head>
 <body>
-  <h1>Administracijski panel</h1>
+  <h1>Vježba 8 - zadaća 3 - Administracijski panel</h1>
 
   <ul>
     <li>

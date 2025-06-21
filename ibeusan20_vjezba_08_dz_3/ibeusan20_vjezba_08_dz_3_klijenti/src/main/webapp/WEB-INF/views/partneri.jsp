@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>REST MVC - Pregled partnera</title>
+<title>Vježba 8 - zadaća 3 - REST MVC - Pregled partnera</title>
 <style type="text/css">
 table, th, td {
 	border: 1px solid;
@@ -21,7 +21,7 @@ th {
 </style>
 </head>
 <body>
-	<h1>REST MVC - Pregled partnera</h1>
+	<h1>Vježba 8 - zadaća 3 - REST MVC - Pregled partnera</h1>
 	<ul>
 		<li><a
 			href="${pageContext.servletContext.contextPath}/mvc/tvrtka/pocetak">Početna

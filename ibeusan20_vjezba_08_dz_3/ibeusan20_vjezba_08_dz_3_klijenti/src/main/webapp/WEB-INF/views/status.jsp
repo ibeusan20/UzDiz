@@ -3,10 +3,10 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Zadaća 2 - status Tvrtka</title>
+        <title>Vježba 8 - zadaća 3 - status Tvrtka</title>
     </head>
     <body>
-        <h1>Zadaća 2 - status Tvrtka</h1>
+        <h1>Vježba 8 - zadaća 3 - status Tvrtka</h1>
         <ul>
             <li>
                 <a href="${pageContext.servletContext.contextPath}/mvc/tvrtka/pocetak">Početna stranica</a>
