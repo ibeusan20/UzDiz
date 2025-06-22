@@ -15,18 +15,26 @@ import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
 
+/**
+ * Klasa WebSocketPartneri za poruke partnera.
+ */
 @ServerEndpoint("/ws/partneri")
 @ApplicationScoped
 public class WebSocketPartneri {
 
+  /** The queue. */
   static Queue<Session> queue = new ConcurrentLinkedQueue<>();
 
+  /** The globalni podaci. */
   @Inject
   private GlobalniPodaci globalniPodaci;
 
   /**
    * Metoda koja se poziva kad se promijeni stanje za partnera.
    * Slanje poruke: "ID_PARTNERA;brojOtvorenihNarudzbi;brojRacuna"
+   *
+   * @param idPartnera the id partnera
+   * @param globalniPodaci the globalni podaci
    */
   public static void posaljiPoruku(int idPartnera, GlobalniPodaci globalniPodaci) {
     try {
@@ -47,6 +55,12 @@ public class WebSocketPartneri {
     }
   }
 
+  /**
+   * Open connection.
+   *
+   * @param session the session
+   * @param conf the conf
+   */
   @OnOpen
   public void openConnection(Session session, EndpointConfig conf) {
     queue.add(session);
@@ -55,18 +69,36 @@ public class WebSocketPartneri {
     System.out.println("Otvorena WebSocket veza /ws/partneri.");
   }
 
+  /**
+   * Closed connection.
+   *
+   * @param session the session
+   * @param reason the reason
+   */
   @OnClose
   public void closedConnection(Session session, CloseReason reason) {
     queue.remove(session);
     System.out.println("Zatvorena WebSocket veza /ws/partneri.");
   }
 
+  /**
+   * On message.
+   *
+   * @param session the session
+   * @param poruka the poruka
+   */
   @OnMessage
   public void onMessage(Session session, String poruka) {
     System.out.println("Primljena poruka od klijenta (nije obavezna): " + poruka);
   }
   
 
+  /**
+   * Error.
+   *
+   * @param session the session
+   * @param t the t
+   */
   @OnError
   public void error(Session session, Throwable t) {
     queue.remove(session);

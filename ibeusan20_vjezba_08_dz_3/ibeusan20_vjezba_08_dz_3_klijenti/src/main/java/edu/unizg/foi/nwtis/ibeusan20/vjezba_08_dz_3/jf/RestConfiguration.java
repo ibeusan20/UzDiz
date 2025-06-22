@@ -16,24 +16,39 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 /**
+ * Klasa RestConfiguration za istoimenu .xhtml stranicu.
  *
  * @author ibeusan20
  */
 @ApplicationScoped
 public class RestConfiguration {
+  
+  /** The korisnicko ime baza podataka. */
   @Inject
   @ConfigProperty(name = "korisnickoImeBazaPodataka")
   private String korisnickoImeBazaPodataka;
+  
+  /** The lozinka baza podataka. */
   @Inject
   @ConfigProperty(name = "lozinkaBazaPodataka")
   private String lozinkaBazaPodataka;
+  
+  /** The upravljac baza podataka. */
   @Inject
   @ConfigProperty(name = "upravljacBazaPodataka")
   private String upravljacBazaPodataka;
+  
+  /** The url baza podataka. */
   @Inject
   @ConfigProperty(name = "urlBazaPodataka")
   private String urlBazaPodataka;
 
+  /**
+   * Daj vezu.
+   *
+   * @return the connection
+   * @throws Exception the exception
+   */
   public Connection dajVezu() throws Exception {
     Class.forName(this.upravljacBazaPodataka);
     var vezaBazaPodataka = DriverManager.getConnection(this.urlBazaPodataka,
@@ -41,13 +56,12 @@ public class RestConfiguration {
     return vezaBazaPodataka;
   }  
   
-  /*
-   * public ServisPartnerKlijent dajServisPartner() { try { URI uri = new
-   * URI("http://20.24.5.20:8080/nwtis/api/partner"); return RestClientBuilder.newBuilder()
-   * .baseUri(uri) .build(ServisPartnerKlijent.class); } catch (Exception e) { throw new
-   * RuntimeException("Greška pri stvaranju REST klijenta ServisPartnerKlijent", e); } }
-   */
   
+  /**
+   * Daj servis partner.
+   *
+   * @return the servis partner klijent
+   */
   public ServisPartnerKlijent dajServisPartner() {
     try {
       URI uri = new URI("http://20.24.5.20:8080/nwtis/v1");

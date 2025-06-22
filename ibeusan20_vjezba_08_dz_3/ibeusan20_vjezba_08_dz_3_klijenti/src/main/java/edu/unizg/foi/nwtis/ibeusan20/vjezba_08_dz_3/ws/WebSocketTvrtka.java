@@ -16,16 +16,25 @@ import jakarta.websocket.Session;
 import jakarta.websocket.server.ServerEndpoint;
 
 
-
+/**
+ * Klasa WebSocketTvrtka za poruke tvrtke.
+ */
 @ServerEndpoint("/ws/tvrtka")
 @ApplicationScoped
 public class WebSocketTvrtka {
 
+  /** The queue. */
   static Queue<Session> queue = new ConcurrentLinkedQueue<>();
 
+  /** The globalni podaci. */
   @Inject
   private GlobalniPodaci globalniPodaci;
 
+  /**
+   * Send.
+   *
+   * @param poruka the poruka
+   */
   public static void send(String poruka) {
     try {
       for (Session session : queue) {
@@ -39,6 +48,12 @@ public class WebSocketTvrtka {
     }
   }
   
+  /**
+   * Posalji status.
+   *
+   * @param status the status
+   * @param globalniPodaci the globalni podaci
+   */
   public static void posaljiStatus(String status, GlobalniPodaci globalniPodaci) {
     String poruka = status + ";" +
         globalniPodaci.getBrojObracuna() + ";" +
@@ -46,34 +61,36 @@ public class WebSocketTvrtka {
     send(poruka);
   }
 
+  /**
+   * Open connection.
+   *
+   * @param session the session
+   * @param conf the conf
+   */
   @OnOpen
   public void openConnection(Session session, EndpointConfig conf) {
     queue.add(session);
     System.out.println("Otvorena WebSocket veza.");
   }
 
+  /**
+   * Closed connection.
+   *
+   * @param session the session
+   * @param reason the reason
+   */
   @OnClose
   public void closedConnection(Session session, CloseReason reason) {
     queue.remove(session);
     System.out.println("Zatvorena WebSocket veza.");
   }
-
-  /*
-   * @OnMessage public void onMessage(Session session, String poruka) {
-   * System.out.println("Primljena poruka: " + poruka);
-   * 
-   * String[] dijelovi = poruka.split(";", 3); String tip = dijelovi.length > 0 ? dijelovi[0].trim()
-   * : ""; String broj = dijelovi.length > 1 ? dijelovi[1].trim() : ""; String interna =
-   * dijelovi.length > 2 ? dijelovi[2].trim() : "";
-   * 
-   * if ("INTERNA".equalsIgnoreCase(tip) && !interna.isBlank()) {
-   * globalniPodaci.setInternaPoruka(interna); System.out.println("Interna poruka postavljena: " +
-   * interna); }
-   * 
-   * String novaPoruka = tip + ";" + globalniPodaci.getBrojObracuna() + ";" +
-   * globalniPodaci.getInternaPoruka(); send(novaPoruka); }
-   */
   
+  /**
+   * On message.
+   *
+   * @param session the session
+   * @param porukica the porukica
+   */
   @OnMessage
   public void onMessage(Session session, String porukica) {
     System.out.println("Primljena poruka: " + porukica);
@@ -98,6 +115,12 @@ public class WebSocketTvrtka {
   }
    
 
+  /**
+   * Error.
+   *
+   * @param session the session
+   * @param t the t
+   */
   @OnError
   public void error(Session session, Throwable t) {
     queue.remove(session);

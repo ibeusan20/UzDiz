@@ -20,42 +20,81 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
 /**
+ * The Class KorisniciFacade.
  *
  * @author Ivan Beusan
  */
 @Stateless
 public class KorisniciFacade extends EntityManagerProducer implements Serializable {
+  
+  /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 3595041786540495885L;
 
+  /** Criteria API builder. */
   private CriteriaBuilder cb;
 
+  /**
+   * Inicijalizacija.
+   */
   @PostConstruct
   private void init() {
     cb = getEntityManager().getCriteriaBuilder();
   }
 
+  /**
+   * Stvaranje korisnika.
+   *
+   * @param  korisnici
+   */
   public void create(Korisnici korisnici) {
     getEntityManager().persist(korisnici);
   }
 
+  /**
+   * Uređivanje korisnika.
+   *
+   * @param  korisnici
+   */
   public void edit(Korisnici korisnici) {
     getEntityManager().merge(korisnici);
   }
 
+  /**
+   * Micanje korisnika.
+   *
+   * @param  korisnici
+   */
   public void remove(Korisnici korisnici) {
     getEntityManager().remove(getEntityManager().merge(korisnici));
   }
 
+  /**
+   * Traženje korisnika.
+   *
+   * @param  id
+   * @return  korisnici
+   */
   public Korisnici find(Object id) {
     return getEntityManager().find(Korisnici.class, id);
   }
 
+  /**
+   * Traženje svih korisnika.
+   *
+   * @return lista korisnika
+   */
   public List<Korisnici> findAll() {
     CriteriaQuery<Korisnici> cq = cb.createQuery(Korisnici.class);
     cq.select(cq.from(Korisnici.class));
     return getEntityManager().createQuery(cq).getResultList();
   }
 
+  /**
+   * Traži skup korisika.
+   *
+   * @param  range
+   * @return  list
+   */
   public List<Korisnici> findRange(int[] range) {
     CriteriaQuery<Korisnici> cq = cb.createQuery(Korisnici.class);
     cq.select(cq.from(Korisnici.class));
@@ -65,6 +104,13 @@ public class KorisniciFacade extends EntityManagerProducer implements Serializab
     return q.getResultList();
   }
 
+  /**
+   * Traži korisnika.
+   *
+   * @param korisnickoIme korisnicko ime
+   * @param lozinka lozinka
+   * @return korisnici
+   */
   public Korisnici find(String korisnickoIme, String lozinka) {
     CriteriaQuery<Korisnici> cq = cb.createQuery(Korisnici.class);
     Root<Korisnici> korisnici = cq.from(Korisnici.class);
@@ -75,6 +121,13 @@ public class KorisniciFacade extends EntityManagerProducer implements Serializab
     return q.getResultList().getFirst();
   }
 
+  /**
+   * Traži sve korisnike.
+   *
+   * @param prezime prezime
+   * @param ime ime
+   * @return list
+   */
   public List<Korisnici> findAll(String prezime, String ime) {
     CriteriaQuery<Korisnici> cq = cb.createQuery(Korisnici.class);
     Root<Korisnici> korisnici = cq.from(Korisnici.class);
@@ -85,6 +138,13 @@ public class KorisniciFacade extends EntityManagerProducer implements Serializab
     return q.getResultList();
   }
   
+  /**
+   * Pretraži po imenu i prezimenu.
+   *
+   * @param ime ime
+   * @param prezime prezime
+   * @return list
+   */
   public List<Korisnici> pretraziPoImenuIPrezimenu(String ime, String prezime) {
     CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
     CriteriaQuery<Korisnici> cq = cb.createQuery(Korisnici.class);
@@ -105,12 +165,23 @@ public class KorisniciFacade extends EntityManagerProducer implements Serializab
   }
 
 
+  /**
+   * Vraća broj korinsika.
+   *
+   * @return the int
+   */
   public int count() {
     CriteriaQuery<Long> cq = cb.createQuery(Long.class);
     cq.select(cb.count(cq.from(Korisnici.class)));
     return ((Long) getEntityManager().createQuery(cq).getSingleResult()).intValue();
   }
 
+  /**
+   * Pretvorba korisnika (objekt vs entitet)
+   *
+   * @param k the k
+   * @return the korisnik
+   */
   public Korisnik pretvori(Korisnici k) {
     if (k == null) {
       return null;
@@ -121,6 +192,12 @@ public class KorisniciFacade extends EntityManagerProducer implements Serializab
     return kObjekt;
   }
 
+  /**
+   * Pretvorba korisnika (objekt vs entitet)
+   *
+   * @param k the k
+   * @return the korisnici
+   */
   public Korisnici pretvori(Korisnik k) {
     if (k == null) {
       return null;
@@ -135,6 +212,12 @@ public class KorisniciFacade extends EntityManagerProducer implements Serializab
     return kE;
   }
 
+  /**
+   * Pretvorba korisnika (objekt vs entitet)
+   *
+   * @param korisniciE the korisnici E
+   * @return the list
+   */
   public List<Korisnik> pretvori(List<Korisnici> korisniciE) {
     List<Korisnik> korisnici = new ArrayList<>();
     for (Korisnici kEntitet : korisniciE) {

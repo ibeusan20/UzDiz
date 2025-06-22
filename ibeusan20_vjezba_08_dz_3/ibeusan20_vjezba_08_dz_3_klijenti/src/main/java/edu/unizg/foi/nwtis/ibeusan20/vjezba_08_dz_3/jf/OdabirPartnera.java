@@ -12,34 +12,61 @@ import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
+
+/**
+ * Klasa OdabirPartnera za istoimenu .xhtml stranicu.
+ */
 @RequestScoped
 @Named("odabirParnera")
 public class OdabirPartnera implements Serializable {
 
+  /** Constant serialVersionUID. */
   private static final long serialVersionUID = -524581462819739622L;
 
+  /**  prijava korisnika. */
   @Inject
   PrijavaKorisnika prijavaKorisnika;
 
+  /**  rest configuration. */
   @Inject
   RestConfiguration restConfiguration;
 
+  /**  partneri. */
   private List<Partner> partneri = new ArrayList<>();
 
+  /**  partner. */
   private int partner;
 
+  /**
+   * Dohvaća partnera.
+   *
+   * @return the partner
+   */
   public int getPartner() {
     return partner;
   }
 
+  /**
+   * Postavlja partnera.
+   *
+   * @param partner the new partner
+   */
   public void setPartner(int partner) {
     this.partner = partner;
   }
 
+  /**
+   * Dohvaća partnere.
+   *
+   * @return the partneri
+   */
   public List<Partner> getPartneri() {
     return partneri;
   }
 
+  /**
+   * Ucitaj partnere.
+   */
   @PostConstruct
   public void ucitajPartnere() {
     try (var vezaBP = this.restConfiguration.dajVezu()) {
@@ -49,6 +76,11 @@ public class OdabirPartnera implements Serializable {
     }
   }
 
+  /**
+   * Odabir partnera.
+   *
+   * @return the string redirekcija
+   */
   public String odaberiPartnera() {
     if (this.partner > 0) {
       Optional<Partner> partnerO = this.partneri.stream()

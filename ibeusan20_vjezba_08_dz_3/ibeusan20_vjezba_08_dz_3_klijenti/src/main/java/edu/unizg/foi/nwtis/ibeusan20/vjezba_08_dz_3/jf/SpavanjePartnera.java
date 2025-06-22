@@ -9,20 +9,44 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.ws.rs.core.Response;
 
+
+/**
+ * Klasa SpavanjePartnera  za istoimenu .xhtml stranicu.
+ */
 @Named("spavanjePartnera")
 @RequestScoped
 public class SpavanjePartnera implements Serializable {
+  
+  /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 98734895L;
   
+  /** The vrijeme. */
   private int vrijeme;
+  
+  /** The poruka. */
   private String poruka;
 
+  /** The servis partner klijent. */
   @Inject
   private ServisPartnerKlijent servisPartnerKlijent;
 
+  /**
+   * Gets the vrijeme.
+   *
+   * @return the vrijeme
+   */
   public int getVrijeme() { return vrijeme; }
+  
+  /**
+   * Sets the vrijeme.
+   *
+   * @param vrijeme the new vrijeme
+   */
   public void setVrijeme(int vrijeme) { this.vrijeme = vrijeme; }
 
+  /**
+   * Aktiviraj spavanje.
+   */
   public void aktivirajSpavanje() {
     try {
       Response r = servisPartnerKlijent.spava(vrijeme);

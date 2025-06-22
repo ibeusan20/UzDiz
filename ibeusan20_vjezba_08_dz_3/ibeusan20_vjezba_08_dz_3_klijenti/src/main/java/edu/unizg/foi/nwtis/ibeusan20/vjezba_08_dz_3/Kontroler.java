@@ -28,6 +28,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.GenericType;
 
 /**
+ * Klasa Kontroler. Služi kao kontroler za .jsp stranice.
  *
  * @author Ivan Beusan
  */
@@ -36,24 +37,36 @@ import jakarta.ws.rs.core.GenericType;
 @RequestScoped
 public class Kontroler {
 
+  /**  globalni podaci. */
   @Inject
   private GlobalniPodaci globalniPodaci;
 
+  /**  model. */
   @Inject
   private Models model;
 
+  /**  binding result. */
   @Inject
   private BindingResult bindingResult;
 
+  /**  servis tvrtka. */
   @Inject
   @RestClient
   ServisTvrtkaKlijent servisTvrtka;
 
+  /**
+   * Pocetak putanja.
+   */
   @GET
   @Path("pocetak")
   @View("index.jsp")
   public void pocetak() {}
 
+  /**
+   * Kraj putanja.
+   *
+   * @return the string
+   */
   @GET
   @Path("kraj")
   @View("status.jsp")
@@ -75,6 +88,9 @@ public class Kontroler {
     return "redirect:/tvrtka/admin/panel";
   }
 
+  /**
+   * Status putanja.
+   */
   @GET
   @Path("status")
   @View("status.jsp")
@@ -82,6 +98,12 @@ public class Kontroler {
     dohvatiStatuse();
   }
 
+  /**
+   * Start id putanja.
+   *
+   * @param id the id
+   * @return the string
+   */
   @GET
   @Path("start/{id}")
   @View("status.jsp")
@@ -97,6 +119,12 @@ public class Kontroler {
     return "redirect:/tvrtka/admin/panel";
   }
 
+  /**
+   * Pauzat id putanja.
+   *
+   * @param id the id
+   * @return the string
+   */
   @GET
   @Path("pauza/{id}")
   @View("status.jsp")
@@ -110,6 +138,9 @@ public class Kontroler {
     return "redirect:/tvrtka/admin/panel";
   }
 
+  /**
+   * Partneri putanja.
+   */
   @GET
   @Path("partner")
   @View("partneri.jsp")
@@ -123,6 +154,11 @@ public class Kontroler {
     }
   }
 
+  /**
+   * Partner putanja.
+   *
+   * @param id the id
+   */
   @GET
   @Path("partner/{id}")
   @View("partner.jsp")
@@ -139,11 +175,17 @@ public class Kontroler {
   }
 
 
+  /**
+   * Nadzorna konzola tvrtka putanja.
+   */
   @GET
   @Path("admin/nadzornaKonzolaTvrtka")
   @View("nadzornaKonzolaTvrtka.jsp")
   public void nadzornaKonzolaTvrtka() {}
 
+  /**
+   * Dohvati statuse funkcija koja dohvaća statuse.
+   */
   private void dohvatiStatuse() {
     this.model.put("samoOperacija", false);
     var statusT = this.servisTvrtka.headPosluzitelj().getStatus();
@@ -154,6 +196,13 @@ public class Kontroler {
     this.model.put("statusT2", statusT2);
   }
 
+  /**
+   * Obracun putanja.
+   *
+   * @param od the od
+   * @param ddo the ddo
+   * @param tip the tip
+   */
   @GET
   @Path("privatno/obracun")
   @View("obracun.jsp")
@@ -186,6 +235,13 @@ public class Kontroler {
     model.put("obracuni", lista);
   }
 
+  /**
+   * Obracun partner putanja.
+   *
+   * @param id the id
+   * @param od the od
+   * @param ddo the ddo
+   */
   @GET
   @Path("privatno/obracunPartner")
   @View("obracunPartner.jsp")
@@ -212,6 +268,9 @@ public class Kontroler {
     model.put("obracuni", lista);
   }
 
+  /**
+   * Prikazi admin panel putanja.
+   */
   @GET
   @Path("admin/panel")
   @View("adminPanel.jsp")
@@ -219,6 +278,9 @@ public class Kontroler {
     dohvatiStatuse();
   }
 
+  /**
+   * Prikazi formu partnera putanja.
+   */
   @GET
   @Path("admin/dodajPartnera")
   @View("dodajPartnera.jsp")
@@ -226,6 +288,20 @@ public class Kontroler {
     // samo prikaz forme
   }
 
+  /**
+   * Dodaj partnera putanja.
+   *
+   * @param id the id
+   * @param naziv the naziv
+   * @param vrstaKuhinje the vrsta kuhinje
+   * @param adresa the adresa
+   * @param mreznaVrata the mrezna vrata
+   * @param mreznaVrataKraj the mrezna vrata kraj
+   * @param gpsSirina the gps sirina
+   * @param gpsDuzina the gps duzina
+   * @param sigurnosniKod the sigurnosni kod
+   * @param adminKod the admin kod
+   */
   @POST
   @Path("admin/dodajPartnera")
   @View("dodajPartnera.jsp")
@@ -240,6 +316,11 @@ public class Kontroler {
     model.put("statusDodavanja", odgovor.getStatus());
   }
 
+  /**
+   * Aktiviraj spavanje putanja.
+   *
+   * @param vrijeme the vrijeme
+   */
   @POST
   @Path("admin/aktivirajSpavanje")
   @View("adminPanel.jsp")
@@ -248,6 +329,11 @@ public class Kontroler {
     model.put("statusSpavanje", odgovor.getStatus());
   }
 
+  /**
+   * Posalji status poruku putanja.
+   *
+   * @param status the status
+   */
   private void posaljiStatusPoruku(String status) {
     String poruka =
         status + ";" + globalniPodaci.getBrojObracuna() + ";" + globalniPodaci.getInternaPoruka();

@@ -8,20 +8,36 @@ import jakarta.inject.Named;
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.core.Response;
 
+
+/**
+ * Klasa ProvjeraPosluzitelja za istoimenu .xhtml stranicu.
+ */
 @Named("provjeraPosluzitelja")
 @RequestScoped
 public class ProvjeraPosluzitelja implements Serializable {
+  
+  /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 10236859826L;
   
+  /** The rest configuration. */
   @Inject
   RestConfiguration restConfiguration;
 
+  /** The status poruka. */
   private String statusPoruka;
 
+  /**
+   * Gets the status poruka.
+   *
+   * @return the status poruka
+   */
   public String getStatusPoruka() {
     return statusPoruka;
   }
 
+  /**
+   * Provjeri rad posluzitelja.
+   */
   public void provjeriRaduPosluzitelja() {
     try {
       ServisPartnerKlijent klijent = restConfiguration.dajServisPartner();

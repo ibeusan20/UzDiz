@@ -8,17 +8,26 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
+/**
+ * Klasa DetaljiKorisnika za istoimenu .xhtml stranicu.
+ */
 @Named("detaljiKorisnika")
 @RequestScoped
 public class DetaljiKorisnika implements Serializable {
 
+  /** Constant serialVersionUID. */
   private static final long serialVersionUID = 145645645L;
 
+  /** rest configuration. */
   @Inject
   RestConfiguration restConfiguration;
 
+  /** korisnik. */
   private Korisnik korisnik;
 
+  /**
+   * Inicijalizacija.
+   */
   @PostConstruct
   public void init() {
     FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -35,6 +44,11 @@ public class DetaljiKorisnika implements Serializable {
     }
   }
 
+  /**
+   * Dohvaćanje korisnika.
+   *
+   * @return the korisnik
+   */
   public Korisnik getKorisnik() {
     return korisnik;
   }

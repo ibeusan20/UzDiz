@@ -11,6 +11,7 @@ import jakarta.security.enterprise.authentication.mechanism.http.LoginToContinue
 import jakarta.security.enterprise.identitystore.DatabaseIdentityStoreDefinition;
 
 /**
+ * Klasa AplikacijskaSigurnost.
  *
  * @author ibeusan20
  */

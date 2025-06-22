@@ -12,18 +12,35 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
+
+/**
+ * The Class ObracuniFacade.
+ */
 @Stateless
 public class ObracuniFacade extends EntityManagerProducer implements Serializable {
 
+  /** The Constant serialVersionUID. */
   private static final long serialVersionUID = 6348758735L;
 
+  /** The cb. */
   private CriteriaBuilder cb;
 
+  /**
+   * Inits the.
+   */
   @PostConstruct
   private void init() {
     cb = getEntityManager().getCriteriaBuilder();
   }
 
+  /**
+   * Dohvati obracune za partnera i razdoblje.
+   *
+   * @param idPartnera the id partnera
+   * @param od the od
+   * @param do_ the do
+   * @return the list
+   */
   public List<Obracuni> dohvatiObracuneZaPartneraIRazdoblje(int idPartnera, Timestamp od, Timestamp do_) {
     CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
     CriteriaQuery<Obracuni> cq = cb.createQuery(Obracuni.class);
