@@ -41,6 +41,58 @@
 					Tvrtka</a></li>
 			<li><h:link outcome="/index.xhtml" value="Početak Partner" /></li>
 		</ul>
+		
+		<ul>
+			<ui:fragment>
+				<li><h:link outcome="/provjeraPosluzitelja.xhtml"
+						value="Provjera poslužitelja" /></li>
+			</ui:fragment>
+			<ui:fragment>
+				<li><h:link outcome="/partneri.xhtml" value="Pregled partnera" /></li>
+			</ui:fragment>
+			<ui:fragment>
+				<li><h:link outcome="/detaljiPartnera.xhtml"
+						value="Detalji partnera" /></li>
+			</ui:fragment>
+			<ui:fragment>
+				<li><h:link outcome="/dodavanjeKorisnika.xhtml"
+						value="Dodavanje korisnika" /></li>
+			</ui:fragment>
+			<p><b>-------Prijavite se za prikaz privatnih/admin dijelova--------</b></p>
+			<ui:fragment
+				rendered="#{prijavaKorisnika.prijavljen and (!prijavaKorisnika.partnerOdabran)}">
+				<li><h:link outcome="/privatno/odabirPartnera.xhtml"
+						value="Odabir partnera" /></li>
+			</ui:fragment>
+			<ui:fragment>
+				<li><h:link outcome="/admin/nadzornaKonzolaPartnera.xhtml"
+						value="Nadzorna konzola partnera/restorana" /></li>
+			</ui:fragment>
+			<ui:fragment>
+				<li><h:link outcome="/privatno/jelovnikPartnera.xhtml"
+						value="Pogledaj jelovnik"
+						rendered="#{prijavaKorisnika.partnerOdabran}" /></li>
+			</ui:fragment>
+			<ui:fragment>
+				<li><h:link outcome="/privatno/kartaPicaPartnera.xhtml"
+						value="Pogledaj kartu pića"
+						rendered="#{prijavaKorisnika.partnerOdabran}" /></li>
+			</ui:fragment>
+			<p><b>---------------</b></p>
+			<ui:fragment>
+				<li><h:link outcome="/admin/spavanje.xhtml"
+						value="Spavanje partnera" /></li>
+			</ui:fragment>
+			<ui:fragment>
+				<li><h:link outcome="/admin/korisniciPretrazivanje.xhtml"
+						value="Pregled korisnika i pretraga po imenu i prezimenu" /></li>
+			</ui:fragment>
+			<ui:fragment>
+				<li><h:link outcome="/admin/pregledKorisnika.xhtml"
+						value="Pregled i detalji korisnika" /></li>
+			</ui:fragment>
+		</ul>
+		
 		<ui:insert name="nav">Nav content</ui:insert>
 	</div>
 	<div id="content" class="center_content">
