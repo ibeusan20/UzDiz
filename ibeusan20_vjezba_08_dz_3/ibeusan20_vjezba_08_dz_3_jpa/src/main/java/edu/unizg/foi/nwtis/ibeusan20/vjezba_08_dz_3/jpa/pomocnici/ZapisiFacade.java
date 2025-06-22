@@ -1,14 +1,15 @@
 package edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3.jpa.pomocnici;
 
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.List;
 import edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3.jpa.entiteti.Zapisi;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.Stateless;
-import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
-
-import java.io.Serializable;
-import java.util.List;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
 @Stateless
 public class ZapisiFacade extends EntityManagerProducer implements Serializable {
@@ -49,4 +50,18 @@ public class ZapisiFacade extends EntityManagerProducer implements Serializable 
     cq.select(cb.count(cq.from(Zapisi.class)));
     return ((Long) getEntityManager().createQuery(cq).getSingleResult()).intValue();
   }
+  
+  public List<Zapisi> dohvatiZapiseZaKorisnikaIRazdoblje(String korisnickoIme, Timestamp od, Timestamp do_) {
+    CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
+    CriteriaQuery<Zapisi> cq = cb.createQuery(Zapisi.class);
+    Root<Zapisi> root = cq.from(Zapisi.class);
+
+    Predicate pIme = cb.equal(root.get("korisnickoime"), korisnickoIme);
+    Predicate pOd = cb.greaterThanOrEqualTo(root.get("vrijeme"), od);
+    Predicate pDo = cb.lessThanOrEqualTo(root.get("vrijeme"), do_);
+    cq.select(root).where(cb.and(pIme, pOd, pDo));
+
+    return getEntityManager().createQuery(cq).getResultList();
+  }
+
 }

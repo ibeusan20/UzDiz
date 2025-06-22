@@ -1,0 +1,39 @@
+<ui:composition template="/predlozak.xhtml"
+	xmlns:ui="jakarta.faces.facelets" xmlns:h="jakarta.faces.html"
+	xmlns:f="jakarta.faces.core">
+	<ui:define name="title">Pregled rada korisnika</ui:define>
+	<ui:define name="content">
+		<h:form>
+			<h:panelGrid columns="2">
+				<h:outputLabel value="Korisničko ime:" />
+				<h:inputText value="#{pregledZapisa.korisnickoIme}" />
+
+				<h:outputLabel value="Datum od (format: 2025-02-28):" />
+				<h:inputText value="#{pregledZapisa.datumOd}">
+					<f:convertDateTime type="localDate" pattern="yyyy-MM-dd"
+						placeholder="YYYY-MM-DD" />
+				</h:inputText>
+
+				<h:outputLabel value="Datum do (format: 2025-02-28):" />
+				<h:inputText value="#{pregledZapisa.datumDo}">
+					<f:convertDateTime type="localDate" pattern="yyyy-MM-dd" />
+				</h:inputText>
+
+				<h:commandButton value="Pretraži" action="#{pregledZapisa.pretrazi}"
+					placeholder="YYYY-MM-DD" />
+			</h:panelGrid>
+
+			<h:dataTable value="#{pregledZapisa.zapisi}" var="z">
+
+				<h:column>
+					<f:facet name="header">Vrijeme</f:facet>#{z.vrijeme}</h:column>
+				<h:column>
+					<f:facet name="header">Opis rada</f:facet>#{z.opisrada}</h:column>
+				<h:column>
+					<f:facet name="header">IP adresa</f:facet>#{z.ipadresaracunala}</h:column>
+			</h:dataTable>
+		</h:form>
+	</ui:define>
+	<ui:define name="nav">
+	</ui:define>
+</ui:composition>
