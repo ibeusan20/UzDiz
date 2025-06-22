@@ -16,6 +16,7 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
 /**
@@ -83,6 +84,26 @@ public class KorisniciFacade extends EntityManagerProducer implements Serializab
     TypedQuery<Korisnici> q = getEntityManager().createQuery(cq);
     return q.getResultList();
   }
+  
+  public List<Korisnici> pretraziPoImenuIPrezimenu(String ime, String prezime) {
+    CriteriaBuilder cb = getEntityManager().getCriteriaBuilder();
+    CriteriaQuery<Korisnici> cq = cb.createQuery(Korisnici.class);
+    Root<Korisnici> root = cq.from(Korisnici.class);
+
+    List<Predicate> uvjeti = new ArrayList<>();
+    if (ime != null && !ime.isBlank()) {
+      uvjeti.add(cb.like(cb.lower(root.get("ime")), "%" + ime.toLowerCase() + "%"));
+    }
+    if (prezime != null && !prezime.isBlank()) {
+      uvjeti.add(cb.like(cb.lower(root.get("prezime")), "%" + prezime.toLowerCase() + "%"));
+    }
+
+    cq.where(cb.and(uvjeti.toArray(new Predicate[0])));
+    cq.orderBy(cb.asc(root.get("prezime")), cb.asc(root.get("ime")));
+
+    return getEntityManager().createQuery(cq).getResultList();
+  }
+
 
   public int count() {
     CriteriaQuery<Long> cq = cb.createQuery(Long.class);

@@ -11,6 +11,7 @@ import jakarta.ws.rs.HEAD;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
@@ -29,6 +30,18 @@ public interface ServisPartnerKlijent {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   Response dodajKorisnika(Korisnik korisnik);
+  
+  @GET
+  @Path("korisnik/{id}")
+  @Produces(MediaType.APPLICATION_JSON)
+  Korisnik dohvatiKorisnika(@PathParam("id") String korisnickoIme);
+  
+  
+  @GET
+  @Path("korisnik")
+  @Produces(MediaType.APPLICATION_JSON)
+  List<Korisnik> dohvatiSveKorisnike();
+
   
   @GET
   @Path("jelovnik")

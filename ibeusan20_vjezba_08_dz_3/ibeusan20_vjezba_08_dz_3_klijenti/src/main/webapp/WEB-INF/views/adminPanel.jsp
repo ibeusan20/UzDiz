@@ -15,7 +15,7 @@
     </li>
     <li><a
 			href="${pageContext.servletContext.contextPath}/mvc/tvrtka/admin/nadzornaKonzolaTvrtka">Nadzorna
-				konzola Tvrtka</a></li>
+				konzola Tvrtka - Može se otvoriti u drugom prozoru za prikaz poruka u drugom prozoru</a></li>
   </ul>
 
   <fieldset>
