@@ -11,6 +11,36 @@
 				Poruka: <span id="poruka"></span>
 			</p>
 		</div>
+		<p>
+			Otvorene narudžbe: <span id="otvoreneNarudzbe">?</span>
+		</p>
+		<p>
+			Plaćeni računi: <span id="racuni">?</span>
+		</p>
+
+		<p>
+			Status rada:
+			<h:outputText value="#{nadzornaKonzolaPartnera.statusPoruka}" />
+		</p>
+		<h:form>
+			<h:panelGrid columns="2">
+				<h:outputLabel value="ID partnera:" />
+				<h:inputText value="#{nadzornaKonzolaPartnera.id}">
+					<f:validateLongRange minimum="1" />
+				</h:inputText>
+
+			</h:panelGrid>
+			<h:commandButton value="Status"
+				action="#{nadzornaKonzolaPartnera.status}" />
+			<h:commandButton value="Pauza"
+				action="#{nadzornaKonzolaPartnera.pauza}" />
+			<h:commandButton value="Start"
+				action="#{nadzornaKonzolaPartnera.start}" />
+			<h:commandButton value="Kraj"
+				action="#{nadzornaKonzolaPartnera.kraj}" />
+		</h:form>
+
+
 		<script type="text/javascript">
 			var wsocket;
 			function connect() {

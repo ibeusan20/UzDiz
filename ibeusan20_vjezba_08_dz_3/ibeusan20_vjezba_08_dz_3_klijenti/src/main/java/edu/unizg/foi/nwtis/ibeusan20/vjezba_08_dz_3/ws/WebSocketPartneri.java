@@ -61,6 +61,7 @@ public class WebSocketPartneri {
   public void onMessage(Session session, String poruka) {
     System.out.println("Primljena poruka od klijenta (nije obavezna): " + poruka);
   }
+  
 
   @OnError
   public void error(Session session, Throwable t) {

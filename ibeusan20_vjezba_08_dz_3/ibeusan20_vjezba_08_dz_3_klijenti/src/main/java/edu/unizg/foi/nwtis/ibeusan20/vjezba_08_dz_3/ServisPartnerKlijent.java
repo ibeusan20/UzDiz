@@ -56,6 +56,24 @@ public interface ServisPartnerKlijent {
   @GET
   @Path("spava")
   Response spava(@QueryParam("vrijeme") int vrijeme);
+  
+  @HEAD
+  @Path("status/{id}")
+  Response status(@PathParam("id") int id);
+
+  @HEAD
+  @Path("pauza/{id}")
+  Response pauza(@PathParam("id") int id);
+
+  @HEAD
+  @Path("start/{id}")
+  Response start(@PathParam("id") int id);
+
+
+  @HEAD
+  @Path("kraj")
+  Response kraj();
+
 
 
 }
