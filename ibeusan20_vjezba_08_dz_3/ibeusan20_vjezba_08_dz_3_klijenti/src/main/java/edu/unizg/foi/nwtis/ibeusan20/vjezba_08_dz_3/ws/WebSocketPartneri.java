@@ -32,7 +32,9 @@ public class WebSocketPartneri {
     try {
       int otvorene = globalniPodaci.getBrojOtvorenihNarudzbi().getOrDefault(idPartnera, 0);
       int racuni = globalniPodaci.getBrojRacuna().getOrDefault(idPartnera, 0);
-      String poruka = idPartnera + ";" + otvorene + ";" + racuni;
+      boolean pauza = globalniPodaci.jeUPauzi(idPartnera);
+      String status = pauza ? "NE RADI" : "RADI";
+      String poruka = status + ";" + otvorene + ";" + racuni;
 
       for (Session session : queue) {
         if (session.isOpen()) {
@@ -48,6 +50,8 @@ public class WebSocketPartneri {
   @OnOpen
   public void openConnection(Session session, EndpointConfig conf) {
     queue.add(session);
+    int idPartnera = 1;
+    posaljiPoruku(idPartnera, globalniPodaci);
     System.out.println("Otvorena WebSocket veza /ws/partneri.");
   }
 

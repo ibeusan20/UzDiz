@@ -64,4 +64,16 @@ public class GlobalniPodaci {
   public int dajBrojRacuna(int partnerId) {
     return brojRacuna.getOrDefault(partnerId, 0);
   }
+  
+  private final Map<Integer, Boolean> pauzaPartnera = new ConcurrentHashMap<>();
+
+  public boolean jeUPauzi(int partnerId) {
+    return pauzaPartnera.getOrDefault(partnerId, false);
+  }
+
+  public void postaviPauzu(int partnerId, boolean pauza) {
+    pauzaPartnera.put(partnerId, pauza);
+    WebSocketPartneri.posaljiPoruku(partnerId, this);
+  }
+
 }

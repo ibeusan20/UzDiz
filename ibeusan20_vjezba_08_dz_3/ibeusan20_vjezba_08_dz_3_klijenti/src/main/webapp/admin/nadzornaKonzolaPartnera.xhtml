@@ -17,11 +17,18 @@
 		<p>
 			Plaćeni računi: <span id="racuni">?</span>
 		</p>
-
 		<p>
-			Status rada:
+			Status rada odgovor:
 			<h:outputText value="#{nadzornaKonzolaPartnera.statusPoruka}" />
 		</p>
+		<p>
+				Status rada: <span id="porukaBoja"></span>
+		</p>
+		<!-- <p>
+			Status rada: <span id="statusPosluzitelja" style="font-weight: bold;">NEPOZNATO</span>
+		</p>
+		<p>Status rada: <span id="statusBoja">NEPOZNATO</span></p> -->
+
 		<h:form>
 			<h:panelGrid columns="2">
 				<h:outputLabel value="ID partnera:" />
@@ -62,8 +69,20 @@
 
 			function onMessage(evt) {
 				var poruka = evt.data;
-				var porukaElem = document.getElementById("poruka");
-				porukaElem.innerHTML = poruka;
+				var dijelovi = poruka.split(";");
+				document.getElementById("poruka").innerText = poruka;
+				document.getElementById("otvoreneNarudzbe").innerText = dijelovi[1];
+				document.getElementById("racuni").innerText = dijelovi[2];
+				
+				let status = dijelovi[0].trim();
+				
+				document.getElementById("porukaBoja").innerText = dijelovi[0].trim();
+				const porukaElemBoja = document.getElementById("porukaBoja");
+				porukaElemBoja.style.color = (status === "RADI") ? "green" : "red";
+				
+				
+				const porukaElem = document.getElementById("poruka");
+				porukaElem.style.color = (status === "RADI") ? "green" : "red";
 			}
 
 			window.addEventListener("load", connect, false);

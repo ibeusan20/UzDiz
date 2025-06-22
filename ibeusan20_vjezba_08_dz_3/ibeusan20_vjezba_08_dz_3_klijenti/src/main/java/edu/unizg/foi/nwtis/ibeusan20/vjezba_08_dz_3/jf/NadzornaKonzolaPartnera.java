@@ -1,6 +1,7 @@
 package edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3.jf;
 
 import java.io.Serializable;
+import edu.unizg.foi.nwtis.ibeusan20.vjezba_08_dz_3.GlobalniPodaci;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -14,6 +15,9 @@ public class NadzornaKonzolaPartnera implements Serializable {
 
   @Inject
   RestConfiguration restConfiguration;
+  
+  @Inject
+  GlobalniPodaci globalniPodaci;
 
   private String statusPoruka;
   
@@ -39,6 +43,7 @@ public class NadzornaKonzolaPartnera implements Serializable {
 
   public void pauza() {
     try {
+      globalniPodaci.postaviPauzu(id, true);
       var servis = restConfiguration.dajServisPartner();
       Response r = servis.pauza(id);
       statusPoruka = "PAUZA: " + r.getStatus();
@@ -49,6 +54,7 @@ public class NadzornaKonzolaPartnera implements Serializable {
 
   public void start() {
     try {
+      globalniPodaci.postaviPauzu(id, false);
       var servis = restConfiguration.dajServisPartner();
       Response r = servis.start(id);
       statusPoruka = "START: " + r.getStatus();
