@@ -177,7 +177,7 @@
           <hashTree/>
         </hashTree>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Grupa dretvi za partnere">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Grupa dretvi za partnere" enabled="true">
         <intProp name="ThreadGroup.num_threads">1</intProp>
         <intProp name="ThreadGroup.ramp_time">7</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
@@ -504,7 +504,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="ISPRAVNA komanda START partner1" enabled="true">
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="ISPRAVNA komanda START partner1" enabled="false">
           <stringProp name="TCPSampler.server">${adresaPartner1}</stringProp>
           <boolProp name="TCPSampler.reUseConnection">true</boolProp>
           <stringProp name="TCPSampler.port">${mvKrajPartner1}</stringProp>
@@ -530,7 +530,7 @@
           </ResponseAssertion>
           <hashTree/>
         </hashTree>
-        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="ISPRAVNA komanda SPAVA partner1" enabled="false">
+        <TCPSampler guiclass="TCPSamplerGui" testclass="TCPSampler" testname="ISPRAVNA komanda SPAVA partner1">
           <stringProp name="TCPSampler.server">${adresaPartner1}</stringProp>
           <boolProp name="TCPSampler.reUseConnection">true</boolProp>
           <stringProp name="TCPSampler.port">${mvKrajPartner1}</stringProp>

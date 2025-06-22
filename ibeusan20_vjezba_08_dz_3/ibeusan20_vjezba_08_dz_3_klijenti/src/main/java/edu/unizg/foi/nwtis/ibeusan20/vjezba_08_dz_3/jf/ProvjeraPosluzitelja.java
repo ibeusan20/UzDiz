@@ -11,7 +11,7 @@ import jakarta.ws.rs.core.Response;
 @Named("provjeraPosluzitelja")
 @RequestScoped
 public class ProvjeraPosluzitelja implements Serializable {
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 10236859826L;
   
   @Inject
   RestConfiguration restConfiguration;

@@ -546,7 +546,7 @@ public class PartnerResource {
               .entity("Poslužitelj je uspješno spavao " + vrijeme + " ms").build();
       } else {
           return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                         .entity("Neuspješan zahtjev za spavanjem").build();
+                         .entity("Neuspješan zahtjev za spavanjem "+odgovor+" "+komanda).build();
       }
   }
 

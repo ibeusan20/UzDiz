@@ -12,6 +12,7 @@ import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -20,6 +21,7 @@ import jakarta.ws.rs.core.Response;
 public interface ServisPartnerKlijent {
 
   @HEAD
+  @Path("")
   Response provjeraRadaPosluzitelja();
   
   @POST
@@ -37,6 +39,10 @@ public interface ServisPartnerKlijent {
   @Path("kartapica")
   @Produces(MediaType.APPLICATION_JSON)
   List<KartaPica> dohvatiKartuPica(@HeaderParam("korisnik") String korisnik, @HeaderParam("lozinka") String lozinka);
+
+  @GET
+  @Path("spava")
+  Response spava(@QueryParam("vrijeme") int vrijeme);
 
 
 }

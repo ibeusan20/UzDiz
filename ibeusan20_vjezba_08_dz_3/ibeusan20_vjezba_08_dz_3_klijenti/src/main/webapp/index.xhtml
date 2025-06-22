@@ -20,7 +20,7 @@
 				<li><h:link outcome="/dodavanjeKorisnika.xhtml"
 						value="Dodavanje korisnika" /></li>
 			</ui:fragment>
-			<h3>---------------------------------------------------------------------</h3>
+			<p><b>-------Prijavite se za prikaz privatnih/admin dijelova--------</b></p>
 			<ui:fragment
 				rendered="#{prijavaKorisnika.prijavljen and (!prijavaKorisnika.partnerOdabran)}">
 				<li><h:link outcome="/privatno/odabirPartnera.xhtml"
@@ -40,7 +40,16 @@
 						value="Pogledaj kartu pića"
 						rendered="#{prijavaKorisnika.partnerOdabran}" /></li>
 			</ui:fragment>
-
+			<ui:fragment>
+				<li><h:link outcome="/privatno/kartaPicaPartnera.xhtml"
+						value="Pogledaj kartu pića"
+						rendered="#{prijavaKorisnika.partnerOdabran}" /></li>
+			</ui:fragment>
+			<p><b>---------------</b></p>
+			<ui:fragment>
+				<li><h:link outcome="/admin/spavanje.xhtml"
+						value="Spavanje partnera" /></li>
+			</ui:fragment>
 		</ul>
 
 	</ui:define>
