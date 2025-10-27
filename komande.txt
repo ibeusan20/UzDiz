@@ -1,5 +1,112 @@
+-------------------------------------UzDiz----------------------------------------
+
+
+
+
+
+
+-------------------------------------UzDiz_kraj--------------------------------------
+
 10. Otvori se terminal se te postavi na direktorij {vjezba}. U terminalu se upiše komanda koja kompilira Vjezba_01.java datoteka i stvara .class datoteku:
 
 javac -d ./target/classes ./src/main/java/Vjezba_01.java
 
 java -cp ./target/classes Vjezba_01 Pero Ivo Mato Goga Una Vika
+
+--------------------------------------NWTiS---------------------------------------------
+
+#komande
+#------------------------------------------VJ08------------------------------------------------
+#-----------------PAYARA--------------------------------------
+#------------------------------U SVOM TERMINALU----------------------------
+cd /opt/payara_web/glassfish/bin
+./startserv
+---------------------{LDAP_korisnik}_vjezba_08_dz_3_klijenti---------------------------
+mvn cargo:redeploy -P ServerEE-local
+xdg-open http://localhost:8080
+
+
+
+
+
+#------------------------------------------VJ07------------------------------------------------
+#DOCKER
+docker ps
+docker cp target/libs/ {slika}:/user/app/libs
+docker inspect {slika}
+docker image ls
+docker image prune
+
+docker exec -t {slika} /bin/bash
+ps -ef
+ls -al
+
+#-----------------------MREŽA----------------KORIJENSKI DIREKTORIJ--------------
+docker network create --subnet=20.24.5.0/24 mreza_ibeusan20
+docker network rm mreza_ibeusan20
+docker network ls
+docker network inspect mreza_ibeusan20
+
+#-----------------------SVEZAK/VOLUME--------KORIJENSKI DIREKTORIJ--------------
+docker volume create svezak_ibeusan20
+docker volume inspect svezak_ibeusan20
+sudo cp podaci/*.* /var/lib/docker/volumes/svezak_ibeusan20/_data
+
+sudo su
+cd /var/lib/docker/volumes/svezak_ibeusan20/_data
+
+#-----------------------TVRTKA/SLIKA----------------U SVOME DIREKTORIJU--------
+docker build -t tvrtka_ibeusan20 -f Dockerfile .
+docker run -it -d --network=mreza_ibeusan20 --ip 20.24.5.2 \
+ --name=tvrtka_ibeusan20 --hostname=tvrtka_ibeusan20 \
+ --mount source=svezak_ibeusan20,target=/usr/app/podaci \
+ tvrtka_ibeusan20:latest
+docker stop tvrtka_ibeusan20
+docker start tvrtka_ibeusan20
+docker rm tvrtka_ibeusan20
+//docker rmi tvrtka_ibeusan20
+ 
+#-----------------------PARTNER/SLIKA--------------U SVOME DIREKTORIJU--------
+docker build -t partner_ibeusan20 -f Dockerfile .
+docker run -it -d --network=mreza_ibeusan20 --ip 20.24.5.3 \
+ --name=partner_ibeusan20 --hostname=partner_ibeusan20 \
+ --mount source=svezak_ibeusan20,target=/usr/app/podaci \
+ partner_ibeusan20:latest
+docker stop partner_ibeusan20
+docker start partner_ibeusan20
+docker rm partner_ibeusan20
+
+#-----------------------HSQLDB/SLIKA--------------RODITELJSKI DIREKTORIJ--------
+docker build -t bp_ibeusan20_hsql -f Dockerfile.hsql .
+docker run --env-file hsqldb.env -it -d \
+ --network=mreza_ibeusan20 \
+ --ip 20.24.5.30 \
+ --name=bp_ibeusan20_hsql \
+ --hostname=bp_ibeusan20_hsql \
+ --mount type=bind,source=/opt/hsql/hsqldb/data,target=/opt/data \
+ bp_ibeusan20_hsql:latest
+
+#-----------------------H2/SLIKA--------------RODITELJSKI DIREKTORIJ-------
+docker build -t bp_ibeusan20_h2 -f Dockerfile.h2 .
+docker run -it -d \
+ --network=mreza_ibeusan20 \
+ --ip 20.24.5.31 \
+ --name=bp_ibeusan20_h2 \
+ --hostname=bp_ibeusan20_h2 \
+ --mount type=bind,source=/opt/database,target=/opt/database \
+ bp_ibeusan20_h2:latest
+ 
+ #-----------------------SERVISI/SLIKA--------------U SVOME DIREKTORIJU--------
+docker build -t servis_ibeusan20 -f Dockerfile .
+docker run -it -d \
+ --network=mreza_ibeusan20 \
+ --ip 20.24.5.20 \
+ --name=servis_ibeusan20 \
+ --hostname=servis_ibeusan20 \
+ servis_ibeusan20:latest
+ #-------PROVJERA RADA SERVISA ----------
+curl -X GET "http://20.24.5.20:8080/nwtis/v1/api/tvrtka/partner" \
+-H "Accept: application/json"
+curl -X GET "http://20.24.5.20:8080/nwtis/v1/api/tvrtka/partner/1" \
+-H "Accept: application/json"
+ 
