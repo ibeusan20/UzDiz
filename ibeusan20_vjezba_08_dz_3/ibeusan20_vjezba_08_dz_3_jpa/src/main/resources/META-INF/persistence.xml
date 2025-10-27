@@ -4,15 +4,7 @@
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <jta-data-source>java:app/jdbc/nwtis_hsqldb</jta-data-source>
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
-        <properties>
-            <property name="eclipselink.logging.level" value="FINE"/>        
-            <property name="eclipselink.logging.level.sql" value="ALL"/>
-            <property name="eclipselink.logging.level.cache" value="FINE" />            
-            <property name="eclipselink.logging.parameters" value="true"/>     
-            <property name="eclipselink.logging.timestamp" value="false"/>       
-            <property name="jdbc.persistence.logging" value="true" />
-            <property name="jdbc.persistence.logfile" value="/workspace/logs/JDBC.log" />                
-        </properties>
+        
 	
 	</persistence-unit>
 </persistence>
