@@ -1,13 +1,10 @@
 package ispisi;
 
 import model.Rezervacija;
-import model.FormatDatuma;
+import java.time.format.DateTimeFormatter;
 
 /**
- * Adapter između modela Rezervacija i ispisa u tablici.
- * 
- * Ovaj adapter omogućuje da format ispisa (Bridge uzorak)
- * ostane neovisan o strukturi modela Rezervacija.
+ * Adapter između klase Rezervacija i formata ispisa.
  */
 public class IspisRezervacijaAdapter {
 
@@ -17,19 +14,14 @@ public class IspisRezervacijaAdapter {
         this.r = r;
     }
 
-    public String getIme() {
-        return r.getIme();
+    public String getIme() { return r.getIme(); }
+
+    public String getPrezime() { return r.getPrezime(); }
+
+    public String getDatumVrijeme() {
+        if (r.getDatumVrijeme() == null) return "";
+        return r.getDatumVrijeme().format(DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm:ss"));
     }
 
-    public String getPrezime() {
-        return r.getPrezime();
-    }
-
-    public String getOznakaAranzmana() {
-        return r.getOznakaAranzmana();
-    }
-
-    public String getDatumVrijemeRezervacije() {
-        return FormatDatuma.formatiraj(r.getDatumVrijeme());
-    }
+    public String getVrsta() { return r.getVrsta(); }
 }

@@ -21,6 +21,7 @@ public final class KomandaFactory {
         return switch (naredba) {
             case "ITAK" -> new KomandaItak(ua, argumenti);
             case "ITAP" -> new KomandaItap(ua, argumenti);
+            case "IRTA" -> new KomandaIrta(ur, argumenti);
             case "Q" -> new KomandaQ();
             default -> null;
         };

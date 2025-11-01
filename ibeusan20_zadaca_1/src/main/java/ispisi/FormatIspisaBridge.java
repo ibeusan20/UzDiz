@@ -1,5 +1,9 @@
 package ispisi;
 
+/**
+ * Bridge sučelje za format ispisa.
+ * Omogućuje ispis bilo kojeg tipa adaptera.
+ */
 public interface FormatIspisaBridge {
-  void ispisi(IspisAranzmanaAdapter adapter);
+    void ispisi(Object adapter);
 }
