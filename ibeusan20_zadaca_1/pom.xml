@@ -67,7 +67,7 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <!--<mainClass>edu.unizg.foi.uzdiz.ibeusan20.MainClass</mainClass>-->						
+                            <mainClass>aplikacija.Aplikacija</mainClass>edu.unizg.foi.uzdiz.ibeusan20.Aplikacija>						
 						</manifest>
 					</archive>
 				</configuration>
