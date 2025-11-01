@@ -43,4 +43,6 @@ public class UpraviteljAranzmanima {
         }
         return rezultat;
     }
+    
+    
 }

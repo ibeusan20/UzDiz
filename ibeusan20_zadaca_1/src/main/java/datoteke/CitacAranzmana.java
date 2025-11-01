@@ -67,6 +67,12 @@ public class CitacAranzmana implements UcitavacPodataka<Aranzman> {
                     b.postaviCijenu(procitajFloat(uzmi(stupci, 7)));
                     b.postaviMinPutnika(procitajInt(uzmi(stupci, 8)));
                     b.postaviMaxPutnika(procitajInt(uzmi(stupci, 9)));
+                    b.postaviBrojNocenja(procitajInt(uzmi(stupci, 10)));
+                    b.postaviDoplatuJednokrevetna(procitajFloat(uzmi(stupci, 11)));
+                    b.postaviPrijevoz(uzmi(stupci, 12));
+                    b.postaviBrojDorucaka(procitajInt(uzmi(stupci, 13)));
+                    b.postaviBrojRuckova(procitajInt(uzmi(stupci, 14)));
+                    b.postaviBrojVecera(procitajInt(uzmi(stupci, 15)));
 
 
                     Aranzman a = b.izgradi();

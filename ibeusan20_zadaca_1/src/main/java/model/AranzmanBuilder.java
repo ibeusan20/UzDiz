@@ -2,6 +2,9 @@ package model;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Kreacijski uzorak: Builder.
@@ -21,6 +24,12 @@ public class AranzmanBuilder {
   private float cijena;
   private int minPutnika;
   private int maxPutnika;
+  private int brojNocenja;
+  private float doplataJednokrevetna;
+  private List<String> prijevoz = new ArrayList<>();
+  private int brojDorucaka;
+  private int brojRuckova;
+  private int brojVecera;
 
   // ------------------------------------------------------------
   // Postavljači (setter metode)
@@ -102,6 +111,38 @@ public class AranzmanBuilder {
     return this;
   }
 
+  public AranzmanBuilder postaviBrojNocenja(int broj) {
+    this.brojNocenja = broj;
+    return this;
+  }
+
+  public AranzmanBuilder postaviDoplatuJednokrevetna(float doplata) {
+    this.doplataJednokrevetna = doplata;
+    return this;
+  }
+
+  public AranzmanBuilder postaviPrijevoz(String tekst) {
+    if (tekst != null && !tekst.isBlank()) {
+      this.prijevoz = Arrays.asList(tekst.split(";"));
+    }
+    return this;
+  }
+
+  public AranzmanBuilder postaviBrojDorucaka(int broj) {
+    this.brojDorucaka = broj;
+    return this;
+  }
+
+  public AranzmanBuilder postaviBrojRuckova(int broj) {
+    this.brojRuckova = broj;
+    return this;
+  }
+
+  public AranzmanBuilder postaviBrojVecera(int broj) {
+    this.brojVecera = broj;
+    return this;
+  }
+
   // ------------------------------------------------------------
   // Izgradnja objekta
   // ------------------------------------------------------------
@@ -130,8 +171,12 @@ public class AranzmanBuilder {
     }
 
     if (vrijemeKretanja != null && vrijemePovratka != null) {
-      if (vrijemePovratka.isBefore(vrijemeKretanja)) {
-        throw new IllegalArgumentException("Vrijeme povratka ne može biti prije vremena kretanja.");
+      // uspoređujemo samo ako su datumi isti
+      if (pocetniDatum != null && zavrsniDatum != null && pocetniDatum.equals(zavrsniDatum)) {
+        if (vrijemePovratka.isBefore(vrijemeKretanja)) {
+          throw new IllegalArgumentException(
+              "Vrijeme povratka ne može biti prije vremena kretanja (isti dan).");
+        }
       }
     }
 
@@ -180,5 +225,29 @@ public class AranzmanBuilder {
 
   public int getMaxPutnika() {
     return maxPutnika;
+  }
+
+  public int getBrojNocenja() {
+    return brojNocenja;
+  }
+
+  public float getDoplataJednokrevetna() {
+    return doplataJednokrevetna;
+  }
+
+  public List<String> getPrijevoz() {
+    return prijevoz;
+  }
+
+  public int getBrojDorucaka() {
+    return brojDorucaka;
+  }
+
+  public int getBrojRuckova() {
+    return brojRuckova;
+  }
+
+  public int getBrojVecera() {
+    return brojVecera;
   }
 }
