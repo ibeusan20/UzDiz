@@ -7,6 +7,7 @@ package ispisi;
 public class TablicniFormat implements FormatIspisaBridge {
 
     private boolean zaglavljeIspisano = false;
+    private boolean ispisujeOtkazane = false;
 
     @Override
     public void ispisi(Object adapter) {
@@ -43,21 +44,38 @@ public class TablicniFormat implements FormatIspisaBridge {
     }
 
     private void ispisiRezervaciju(IspisRezervacijaAdapter r) {
+        // ako imamo barem jednu otkazanu, dodaj dodatni stupac
         if (!zaglavljeIspisano) {
+            if (r.getVrsta().equals("O")) ispisujeOtkazane = true;
             ispisiZaglavljeRezervacija();
             zaglavljeIspisano = true;
         }
 
-        System.out.printf("%-12s %-12s %-20s %-5s%n",
-                r.getIme(),
-                r.getPrezime(),
-                r.getDatumVrijeme(),
-                r.getVrsta());
+        if (ispisujeOtkazane) {
+            System.out.printf("%-12s %-12s %-20s %-5s %-20s%n",
+                    r.getIme(),
+                    r.getPrezime(),
+                    r.getDatumVrijeme(),
+                    r.getVrsta(),
+                    r.getDatumVrijemeOtkaza());
+        } else {
+            System.out.printf("%-12s %-12s %-20s %-5s%n",
+                    r.getIme(),
+                    r.getPrezime(),
+                    r.getDatumVrijeme(),
+                    r.getVrsta());
+        }
     }
 
     private void ispisiZaglavljeRezervacija() {
         System.out.println("------------------------------------------------------------");
-        System.out.printf("%-12s %-12s %-20s %-5s%n", "IME", "PREZIME", "DATUM I VRIJEME", "VRSTA");
+        if (ispisujeOtkazane) {
+            System.out.printf("%-12s %-12s %-20s %-5s %-20s%n",
+                    "IME", "PREZIME", "DATUM I VRIJEME", "VRSTA", "DATUM OTKAZA");
+        } else {
+            System.out.printf("%-12s %-12s %-20s %-5s%n",
+                    "IME", "PREZIME", "DATUM I VRIJEME", "VRSTA");
+        }
         System.out.println("------------------------------------------------------------");
     }
 

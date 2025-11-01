@@ -1,19 +1,17 @@
 package komande;
 
-import java.util.List;
-import ispisi.FormatIspisaBridge;
-import ispisi.IspisRezervacijaAdapter;
-import ispisi.TablicniFormat;
+import ispisi.*;
 import logika.UpraviteljRezervacijama;
 import model.Rezervacija;
+import java.util.List;
 
 /**
- * Komanda IRTA - Ispis rezervacija za određeni aranžman.
+ * Komanda IRTA - Ispis rezervacija za određeni aranžman (s filtriranjem po statusu).
  */
 public class KomandaIrta implements Komanda {
 
     private final UpraviteljRezervacijama upraviteljRezervacija;
-    private final FormatIspisaBridge formatIspisa = new TablicniFormat();
+    private final TablicniFormat formatIspisa = new TablicniFormat();
     private final String[] argumenti;
 
     public KomandaIrta(UpraviteljRezervacijama upraviteljRezervacija, String... argumenti) {

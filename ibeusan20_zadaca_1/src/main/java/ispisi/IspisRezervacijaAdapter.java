@@ -15,7 +15,6 @@ public class IspisRezervacijaAdapter {
     }
 
     public String getIme() { return r.getIme(); }
-
     public String getPrezime() { return r.getPrezime(); }
 
     public String getDatumVrijeme() {
@@ -24,4 +23,9 @@ public class IspisRezervacijaAdapter {
     }
 
     public String getVrsta() { return r.getVrsta(); }
+
+    public String getDatumVrijemeOtkaza() {
+        if (r.getDatumVrijemeOtkaza() == null) return "";
+        return r.getDatumVrijemeOtkaza().format(DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm:ss"));
+    }
 }
