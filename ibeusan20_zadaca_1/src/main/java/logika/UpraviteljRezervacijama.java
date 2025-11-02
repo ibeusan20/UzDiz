@@ -99,7 +99,7 @@ public class UpraviteljRezervacijama {
   }
 
   public void rekalkulirajZaAranzman(String oznaka, int min, int max) {
-    // 1) skupi sve NEOTKAZANE za ovaj aranžman
+    // 1) Skupi sve NEOTKAZANE rezervacije za ovaj aranžman
     List<Rezervacija> lista = new ArrayList<>();
     for (Rezervacija r : rezervacije) {
       if (r.getOznakaAranzmana().equalsIgnoreCase(oznaka) && !r.getVrsta().equalsIgnoreCase("O")) {
@@ -107,16 +107,16 @@ public class UpraviteljRezervacijama {
       }
     }
 
-    // 2) sortiraj po datumu
+    // 2) Sortiraj po datumu (najranije prve)
     lista.sort(Comparator.comparing(Rezervacija::getDatumVrijeme));
 
-    int broj = lista.size();
-
-    // helper za "osoba vec ima aktivnu"
+    // 3) Pomoćne varijable
+    int ukupno = lista.size();
+    int aktivni = 0;
     Set<String> osobeSAktivnom = new HashSet<>();
 
-    if (broj < min) {
-      // sve su primljene, ali NEMA aktivnih
+    // 4) Ako je manje od minimalnog broja — sve su "primljene" (PA, ali ne aktivne)
+    if (ukupno < min) {
       for (Rezervacija r : lista) {
         r.setVrsta("PA");
         r.setAktivna(false);
@@ -124,34 +124,34 @@ public class UpraviteljRezervacijama {
       return;
     }
 
-    // imamo barem min
-    // gornja granica koja ide u PA
-    int granica = Math.min(broj, max);
-
-    for (int i = 0; i < granica; i++) {
-      Rezervacija r = lista.get(i);
-      String kljucOsobe = (r.getIme() + "|" + r.getPrezime()).toLowerCase();
-
-      if (!osobeSAktivnom.contains(kljucOsobe)) {
-        // prvi put ta osoba → aktivna = true
-        r.setVrsta("PA");
-        r.setAktivna(true);
-        osobeSAktivnom.add(kljucOsobe);
-      } else {
-        // ista osoba drugi put → i dalje primljena, ali NE aktivna → Č
-        r.setVrsta("Č");
-        r.setAktivna(false);
-      }
-    }
-
-
-    // 4) svi iza max idu u cekanje
-    for (int i = granica; i < broj; i++) {
-      Rezervacija r = lista.get(i);
+    // 5) Prvo resetiraj sve na čekanje
+    for (Rezervacija r : lista) {
       r.setVrsta("Č");
       r.setAktivna(false);
     }
+
+    // 6) Popuni aktivne do max, ali pazi da osoba nema više od jedne aktivne
+    for (Rezervacija r : lista) {
+      String kljuc = (r.getIme() + "|" + r.getPrezime()).toLowerCase();
+
+      if (aktivni < max && !osobeSAktivnom.contains(kljuc)) {
+        r.setVrsta("PA");
+        r.setAktivna(true);
+        osobeSAktivnom.add(kljuc);
+        aktivni++;
+      }
+    }
+
+    // 7) Ako nakon toga broj aktivnih padne ispod minimalnog — sve vraćamo u "primljene"
+    if (aktivni < min) {
+      for (Rezervacija r : lista) {
+        if (r.getVrsta().equals("PA")) {
+          r.setAktivna(false);
+        }
+      }
+    }
   }
+
 
   /**
    * Otkaz rezervacije – BEZ rekalkulacije. Rekalkulaciju treba pozvati onaj tko zna min/max
