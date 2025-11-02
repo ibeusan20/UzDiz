@@ -15,6 +15,7 @@ public class UpraviteljRezervacijama {
   public UpraviteljRezervacijama(List<Rezervacija> pocetne) {
     if (pocetne != null) {
       rezervacije.addAll(pocetne);
+      sortirajPoDatumu();
     }
   }
 
@@ -29,6 +30,7 @@ public class UpraviteljRezervacijama {
   public void dodaj(Rezervacija r) {
     if (r != null) {
       rezervacije.add(r);
+      sortirajPoDatumu();
     }
   }
 
@@ -174,11 +176,17 @@ public class UpraviteljRezervacijama {
       najranija.setVrsta("O");
       najranija.setAktivna(false);
       najranija.setDatumVrijemeOtkaza(LocalDateTime.now());
+      sortirajPoDatumu();
       return true;
     }
 
     return false;
   }
+
+  private void sortirajPoDatumu() {
+    rezervacije.sort(Comparator.comparing(Rezervacija::getDatumVrijeme));
+  }
+
 
 
 }
