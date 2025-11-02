@@ -103,4 +103,11 @@ public class PomocnikDatum {
 
         throw new IllegalArgumentException("Neispravan format datuma/vremena: '" + tekst + "'");
     }
+    
+    public static String formatirajDatumVrijeme(LocalDateTime dt) {
+      if (dt == null) return "";
+      DateTimeFormatter f = DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm:ss");
+      return dt.format(f);
+  }
+
 }
