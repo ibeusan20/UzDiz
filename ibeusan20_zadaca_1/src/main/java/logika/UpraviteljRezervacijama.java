@@ -49,4 +49,16 @@ public class UpraviteljRezervacijama {
     }
     return rezultat;
   }
+  
+  public List<Rezervacija> dohvatiZaOsobu(String ime, String prezime) {
+    List<Rezervacija> rezultat = new ArrayList<>();
+    for (Rezervacija r : rezervacije) {
+        if (r.getIme().equalsIgnoreCase(ime)
+                && r.getPrezime().equalsIgnoreCase(prezime)) {
+            rezultat.add(r);
+        }
+    }
+    return rezultat;
+}
+
 }
