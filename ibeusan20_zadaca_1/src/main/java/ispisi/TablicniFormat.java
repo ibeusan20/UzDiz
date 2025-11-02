@@ -8,6 +8,15 @@ public class TablicniFormat implements FormatIspisaBridge {
   private boolean zaglavljeIspisano = false;
   private boolean ispisujeOtkazane = false;
 
+  public void setIspisujeOtkazane(boolean vrijednost) {
+    this.ispisujeOtkazane = vrijednost;
+  }
+
+  public void reset() {
+    this.zaglavljeIspisano = false;
+  }
+
+
   @Override
   public void ispisi(Object adapter) {
     if (adapter instanceof IspisAranzmanaAdapter a) {

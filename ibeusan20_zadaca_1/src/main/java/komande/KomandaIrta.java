@@ -21,7 +21,7 @@ public class KomandaIrta implements Komanda {
 
     @Override
     public boolean izvrsi() {
-        if (argumenti.length < 1) {
+        if (argumenti.length < 2) {
             System.out.println("Sintaksa: IRTA <oznakaAranzmana> [PA|Č|O]");
             return true;
         }
@@ -38,6 +38,10 @@ public class KomandaIrta implements Komanda {
             System.out.println("Nema rezervacija za tražene kriterije.");
             return true;
         }
+        
+        boolean imaOtkazane = vrste.contains("O");
+        formatIspisa.reset(); // resetiraj zaglavlje između više ispisa
+        formatIspisa.setIspisujeOtkazane(imaOtkazane);
 
         for (Rezervacija r : lista) {
             IspisRezervacijaAdapter adapter = new IspisRezervacijaAdapter(r);
