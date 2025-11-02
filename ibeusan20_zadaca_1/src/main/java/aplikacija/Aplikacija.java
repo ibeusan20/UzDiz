@@ -23,6 +23,10 @@ public class Aplikacija {
       UpraviteljAranzmanima uprAranz = new UpraviteljAranzmanima(aranzmani);
       UpraviteljRezervacijama uprRez = new UpraviteljRezervacijama(rezervacije);
 
+      for (Aranzman a : aranzmani) {
+        uprRez.rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
+    }
+      
       System.out.println("Učitano aranžmana: " + uprAranz.brojAranzmana());
       System.out.println("Učitano rezervacija: " + uprRez.brojRezervacija());
       
