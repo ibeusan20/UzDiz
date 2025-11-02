@@ -48,7 +48,7 @@ public class KomandaIrta implements Komanda {
             formatIspisa.ispisi(adapter);
         }
 
-        System.out.println("------------------------------------------------------------");
+        //System.out.println("------------------------------------------------------------");
         return true;
     }
 }

@@ -34,7 +34,7 @@ public class KomandaItap implements Komanda {
 
         System.out.println("\n--- Detalji aranžmana ---");
         new IspisAranzmanDetaljnoAdapter(a).ispisiDetalje();
-        System.out.println("-------------------------------");
+        //System.out.println("-------------------------------");
         return true;
     }
 }

@@ -40,7 +40,7 @@ public class KomandaItak implements Komanda {
 
         System.out.println();
         System.out.println("Pregled turističkih aranzmana:");
-        System.out.println("--------------------------------------------");
+        //System.out.println("--------------------------------------------");
 
         if (lista.isEmpty()) {
             System.out.println("Nema aranzmana u zadanom razdoblju.");
@@ -51,7 +51,7 @@ public class KomandaItak implements Komanda {
             }
         }
 
-        System.out.println("--------------------------------------------");
+        //System.out.println("--------------------------------------------");
         return true;
     }
 }
