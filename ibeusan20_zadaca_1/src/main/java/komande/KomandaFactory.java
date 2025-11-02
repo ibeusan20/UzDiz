@@ -24,6 +24,7 @@ public final class KomandaFactory {
             case "IRTA" -> new KomandaIrta(ur, argumenti);
             case "IRO" -> new KomandaIro(ur, ua, argumenti);
             case "ORTA" -> new KomandaOrta(ur, argumenti);
+            case "DRTA" -> new KomandaDrta(ur, ua, argumenti);
             case "Q" -> new KomandaQ();
             default -> null;
         };

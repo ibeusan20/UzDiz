@@ -72,4 +72,15 @@ public class UpraviteljRezervacijama {
     return false;
   }
 
+  public boolean postojiRezervacija(String ime, String prezime, String oznaka) {
+    for (Rezervacija r : rezervacije) {
+      if (r.getIme().equalsIgnoreCase(ime) && r.getPrezime().equalsIgnoreCase(prezime)
+          && r.getOznakaAranzmana().equalsIgnoreCase(oznaka) && !r.getVrsta().equals("O")) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+
 }
