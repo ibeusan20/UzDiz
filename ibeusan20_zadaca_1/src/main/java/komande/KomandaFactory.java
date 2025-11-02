@@ -23,6 +23,7 @@ public final class KomandaFactory {
             case "ITAP" -> new KomandaItap(ua, argumenti);
             case "IRTA" -> new KomandaIrta(ur, argumenti);
             case "IRO" -> new KomandaIro(ur, ua, argumenti);
+            case "ORTA" -> new KomandaOrta(ur, argumenti);
             case "Q" -> new KomandaQ();
             default -> null;
         };

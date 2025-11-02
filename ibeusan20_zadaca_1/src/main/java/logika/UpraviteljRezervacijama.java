@@ -1,6 +1,7 @@
 package logika;
 
 import model.Rezervacija;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,16 +50,26 @@ public class UpraviteljRezervacijama {
     }
     return rezultat;
   }
-  
+
   public List<Rezervacija> dohvatiZaOsobu(String ime, String prezime) {
     List<Rezervacija> rezultat = new ArrayList<>();
     for (Rezervacija r : rezervacije) {
-        if (r.getIme().equalsIgnoreCase(ime)
-                && r.getPrezime().equalsIgnoreCase(prezime)) {
-            rezultat.add(r);
-        }
+      if (r.getIme().equalsIgnoreCase(ime) && r.getPrezime().equalsIgnoreCase(prezime)) {
+        rezultat.add(r);
+      }
     }
     return rezultat;
-}
+  }
+
+  public boolean otkaziRezervaciju(String ime, String prezime, String oznaka) {
+    for (Rezervacija r : rezervacije) {
+      if (r.getIme().equalsIgnoreCase(ime) && r.getPrezime().equalsIgnoreCase(prezime)
+          && r.getOznakaAranzmana().equalsIgnoreCase(oznaka) && !"O".equals(r.getVrsta())) {
+        r.otkazi(LocalDateTime.now());
+        return true;
+      }
+    }
+    return false;
+  }
 
 }
