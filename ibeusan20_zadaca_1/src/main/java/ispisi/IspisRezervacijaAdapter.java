@@ -22,7 +22,14 @@ public class IspisRezervacijaAdapter {
         return r.getDatumVrijeme().format(DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm:ss"));
     }
 
-    public String getVrsta() { return r.getVrsta(); }
+    public String getVrsta() {
+      switch (r.getVrsta()) {
+          case "PA": return "Primljena";
+          case "Č": return "Na čekanju";
+          case "O": return "Otkazana";
+          default: return r.getVrsta();
+      }
+  }
 
     public String getDatumVrijemeOtkaza() {
         if (r.getDatumVrijemeOtkaza() == null) return "";

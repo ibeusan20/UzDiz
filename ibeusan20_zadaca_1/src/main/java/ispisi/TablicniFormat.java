@@ -41,12 +41,10 @@ public class TablicniFormat implements FormatIspisaBridge {
   }
 
   private void ispisiZaglavljeAranzmana() {
-    System.out.println(
-        "---------------------------------------------------------------------------------------------------------------");
+    ispisiLiniju(111);
     System.out.printf("%-4s %-35s %-12s %-12s %-8s %-8s %10s %8s %8s%n", "OZN", "NAZIV", "POČETAK",
         "KRAJ", "KRET.", "POVR.", "CIJENA", "MIN", "MAKS");
-    System.out.println(
-        "---------------------------------------------------------------------------------------------------------------");
+    ispisiLiniju(111);
   }
 
   private void ispisiRezervaciju(IspisRezervacijaAdapter r) {
@@ -59,23 +57,23 @@ public class TablicniFormat implements FormatIspisaBridge {
     }
 
     if (ispisujeOtkazane) {
-      System.out.printf("%-12s %-12s %-20s %-5s %-20s%n", r.getIme(), r.getPrezime(),
+      System.out.printf("%-12s %-12s %-20s %-15s %-20s%n", r.getIme(), r.getPrezime(),
           r.getDatumVrijeme(), r.getVrsta(), r.getDatumVrijemeOtkaza());
     } else {
-      System.out.printf("%-12s %-12s %-20s %-5s%n", r.getIme(), r.getPrezime(), r.getDatumVrijeme(),
+      System.out.printf("%-12s %-12s %-20s %-15s%n", r.getIme(), r.getPrezime(), r.getDatumVrijeme(),
           r.getVrsta());
     }
   }
 
   private void ispisiZaglavljeRezervacija() {
-    System.out.println("------------------------------------------------------------");
+    ispisiLiniju(75);
     if (ispisujeOtkazane) {
-      System.out.printf("%-12s %-12s %-20s %-5s %-20s%n", "IME", "PREZIME", "DATUM I VRIJEME",
+      System.out.printf("%-12s %-12s %-20s %-15s %-20s%n", "IME", "PREZIME", "DATUM I VRIJEME",
           "VRSTA", "DATUM OTKAZA");
     } else {
-      System.out.printf("%-12s %-12s %-20s %-5s%n", "IME", "PREZIME", "DATUM I VRIJEME", "VRSTA");
+      System.out.printf("%-12s %-12s %-20s %-15s%n", "IME", "PREZIME", "DATUM I VRIJEME", "VRSTA");
     }
-    System.out.println("------------------------------------------------------------");
+    ispisiLiniju(75);
   }
 
   private void ispisiRezervacijuOsobe(IspisRezervacijaOsobeAdapter ro) {
@@ -89,12 +87,11 @@ public class TablicniFormat implements FormatIspisaBridge {
   }
 
   private void ispisiZaglavljeRezervacijaOsobe() {
-    System.out.println(
-        "------------------------------------------------------------------------------------------");
+    ispisiLiniju(80);
     System.out.printf("%-20s %-8s %-35s %-5s%n", "DATUM I VRIJEME", "OZN", "NAZIV ARANŽMANA",
         "VRSTA");
-    System.out.println(
-        "------------------------------------------------------------------------------------------");
+    ispisiLiniju(80);
+    
   }
 
 
@@ -105,4 +102,9 @@ public class TablicniFormat implements FormatIspisaBridge {
       return tekst;
     return tekst.substring(0, max - 3) + "...";
   }
+
+  private void ispisiLiniju(int duzina) {
+    System.out.println("-".repeat(Math.max(0, duzina)));
+  }
+
 }
