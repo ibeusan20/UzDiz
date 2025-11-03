@@ -1,9 +1,13 @@
 package komande;
 
-import ispisi.*;
-import logika.*;
-import model.*;
 import java.util.List;
+import ispisi.FormatIspisaBridge;
+import ispisi.IspisRezervacijaOsobeAdapter;
+import ispisi.TablicniFormat;
+import logika.UpraviteljAranzmanima;
+import logika.UpraviteljRezervacijama;
+import model.Aranzman;
+import model.Rezervacija;
 
 /**
  * Komanda IRO - Ispis rezervacija osobe.

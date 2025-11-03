@@ -1,9 +1,10 @@
 package komande;
 
-import ispisi.*;
+import java.util.List;
+import ispisi.IspisRezervacijaAdapter;
+import ispisi.TablicniFormat;
 import logika.UpraviteljRezervacijama;
 import model.Rezervacija;
-import java.util.List;
 
 /**
  * Komanda IRTA - Ispis rezervacija za određeni aranžman (s filtriranjem po statusu).

@@ -1,11 +1,13 @@
 package komande;
 
-import ispisi.*;
+import java.time.LocalDate;
+import java.util.List;
+import ispisi.FormatIspisaBridge;
+import ispisi.IspisAranzmanaAdapter;
+import ispisi.TablicniFormat;
 import logika.UpraviteljAranzmanima;
 import model.Aranzman;
 import model.PomocnikDatum;
-import java.time.LocalDate;
-import java.util.List;
 
 public class KomandaItak implements Komanda {
 

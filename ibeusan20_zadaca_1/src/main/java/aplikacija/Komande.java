@@ -1,8 +1,10 @@
 package aplikacija;
 
 import java.util.Scanner;
-import komande.*;
-import logika.*;
+import komande.Komanda;
+import komande.KomandaFactory;
+import logika.UpraviteljAranzmanima;
+import logika.UpraviteljRezervacijama;
 
 public class Komande {
 

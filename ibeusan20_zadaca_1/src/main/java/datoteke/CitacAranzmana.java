@@ -1,8 +1,8 @@
 package datoteke;
 
-import model.Aranzman; // ako ti je bez kvačice onda stavi Aranzman
-import model.AranzmanBuilder; // isto kao gore
-import model.PomocnikDatum;    // tvoje ime klase za datume
+import model.Aranzman;
+import model.AranzmanBuilder;
+import model.PomocnikDatum;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.time.LocalTime;

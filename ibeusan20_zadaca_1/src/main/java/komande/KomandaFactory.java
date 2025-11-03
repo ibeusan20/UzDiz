@@ -1,6 +1,7 @@
 package komande;
 
-import logika.*;
+import logika.UpraviteljAranzmanima;
+import logika.UpraviteljRezervacijama;
 
 public final class KomandaFactory {
 

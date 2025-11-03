@@ -1,9 +1,12 @@
 package aplikacija;
 
-import datoteke.*;
-import model.*;
-import logika.*;
 import java.util.List;
+import datoteke.UcitavacFactory;
+import datoteke.UcitavacPodataka;
+import logika.UpraviteljAranzmanima;
+import logika.UpraviteljRezervacijama;
+import model.Aranzman;
+import model.Rezervacija;
 
 public class Aplikacija {
 
