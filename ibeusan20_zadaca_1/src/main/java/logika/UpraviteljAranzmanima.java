@@ -46,4 +46,12 @@ public class UpraviteljAranzmanima {
     return rezultat;
   }
 
+  public LocalDate[] dohvatiRasponZaOznaku(String oznaka) {
+    Aranzman a = pronadiPoOznaci(oznaka);
+    if (a == null)
+      return null;
+    return new LocalDate[] {a.getPocetniDatum(), a.getZavrsniDatum()};
+  }
+
+
 }

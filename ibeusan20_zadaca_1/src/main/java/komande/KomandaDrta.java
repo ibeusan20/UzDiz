@@ -55,13 +55,21 @@ public class KomandaDrta implements Komanda {
       return true;
     }
 
+    if (upraviteljRezervacija.imaAktivnuUPeriodu(ime, prezime, oznaka, upraviteljAranzmani)) {
+      System.out.println(
+          "Postoji aktivna rezervacija za korisnika u tom vremenskom periodu. Rezervacija nije unesena.");
+      return true;
+    }
+
+
     // dodaj novu rezervaciju
     Rezervacija r = new Rezervacija(ime, prezime, oznaka, datumVrijeme);
     upraviteljRezervacija.dodaj(r);
     upraviteljRezervacija.rekalkulirajZaAranzman(oznaka, a.getMinPutnika(), a.getMaxPutnika());
 
-    System.out.println("Dodana rezervacija za " + ime + " " + prezime + " za turistički aranžman s oznakom " + oznaka
-        + " u " + PomocnikDatum.formatirajDatumVrijeme(datumVrijeme));
+    System.out.println(
+        "Dodana rezervacija za " + ime + " " + prezime + " za turistički aranžman s oznakom "
+            + oznaka + " u " + PomocnikDatum.formatirajDatumVrijeme(datumVrijeme));
     return true;
   }
 }

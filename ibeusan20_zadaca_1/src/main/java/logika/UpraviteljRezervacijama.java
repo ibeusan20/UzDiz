@@ -1,6 +1,7 @@
 package logika;
 
 import model.Rezervacija;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -87,6 +88,38 @@ public class UpraviteljRezervacijama {
     }
     return false;
   }
+
+  public boolean imaAktivnuUPeriodu(String ime, String prezime, String oznakaNovog,
+      UpraviteljAranzmanima upraviteljAranzmanima) {
+    LocalDate[] rasponNovog = upraviteljAranzmanima.dohvatiRasponZaOznaku(oznakaNovog);
+    if (rasponNovog == null)
+      return false;
+
+    LocalDate pocetakNovog = rasponNovog[0];
+    LocalDate krajNovog = rasponNovog[1];
+
+    for (Rezervacija r : rezervacije) {
+      if (r.getIme().equalsIgnoreCase(ime) && r.getPrezime().equalsIgnoreCase(prezime)
+          && r.isAktivna() && !r.getVrsta().equalsIgnoreCase("O")) {
+
+        LocalDate[] rasponPostojeceg =
+            upraviteljAranzmanima.dohvatiRasponZaOznaku(r.getOznakaAranzmana());
+        if (rasponPostojeceg == null)
+          continue;
+
+        LocalDate pocetak = rasponPostojeceg[0];
+        LocalDate kraj = rasponPostojeceg[1];
+
+        boolean preklapaSe = !(kraj.isBefore(pocetakNovog) || pocetak.isAfter(krajNovog));
+        if (preklapaSe) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+
 
   /** ✅ (opcionalno) dohvat svih rezervacija jedne osobe za aranžman */
   public List<Rezervacija> dohvatiZaOsobuIAranzman(String ime, String prezime, String oznaka) {

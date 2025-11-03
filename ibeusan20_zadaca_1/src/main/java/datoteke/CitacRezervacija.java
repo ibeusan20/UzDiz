@@ -22,7 +22,7 @@ public class CitacRezervacija implements UcitavacPodataka<Rezervacija> {
             while ((redak = br.readLine()) != null) {
                 redniBroj++;
 
-                if (prvi) { // preskoči zaglavlje
+                if (prvi) {
                     prvi = false;
                     continue;
                 }
@@ -33,12 +33,6 @@ public class CitacRezervacija implements UcitavacPodataka<Rezervacija> {
 
                 try {
                     List<String> stupci = CsvParser.procitajZapis(redak, br);
-                    // pretpostavljeni raspored:
-                    // 0: ime
-                    // 1: prezime
-                    // 2: oznaka aranžmana
-                    // 3: datum i vrijeme (dd.MM.yyyy. HH:mm:ss)
-
                     String ime = uzmi(stupci, 0);
                     String prezime = uzmi(stupci, 1);
                     String oznaka = uzmi(stupci, 2);
