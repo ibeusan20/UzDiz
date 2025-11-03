@@ -38,24 +38,6 @@ public class CitacAranzmana implements UcitavacPodataka<Aranzman> {
                 try {
                     List<String> stupci = CsvParser.procitajZapis(redak, br);
 
-                    // OVDJE je stvarni raspored iz tvog CSV-a:
-                    // 0: oznaka
-                    // 1: naziv
-                    // 2: program (ogroman tekst, može biti multiline)
-                    // 3: početni datum (npr. 10.11.2025.)
-                    // 4: završni datum
-                    // 5: vrijeme kretanja (može biti prazno)
-                    // 6: vrijeme povratka (može biti prazno)
-                    // 7: cijena
-                    // 8: min
-                    // 9: max
-                    // 10: broj noćenja
-                    // 11: doplata za jednokrevetnu sobu
-                    // 12: prijevoz (može biti npr. "avion;bus;brod")
-                    // 13: broj doručaka
-                    // 14: broj ručkova
-                    // 15: broj večera
-
                     AranzmanBuilder b = new AranzmanBuilder();
                     b.postaviOznaku(uzmi(stupci, 0));
                     b.postaviNaziv(uzmi(stupci, 1));
