@@ -119,8 +119,6 @@ public class UpraviteljRezervacijama {
     return false;
   }
 
-
-
   /** ✅ (opcionalno) dohvat svih rezervacija jedne osobe za aranžman */
   public List<Rezervacija> dohvatiZaOsobuIAranzman(String ime, String prezime, String oznaka) {
     List<Rezervacija> rezultat = new ArrayList<>();
@@ -187,7 +185,6 @@ public class UpraviteljRezervacijama {
     }
   }
 
-
   /**
    * Otkaz rezervacije – BEZ rekalkulacije. Rekalkulaciju treba pozvati onaj tko zna min/max
    * (komanda).
@@ -212,14 +209,10 @@ public class UpraviteljRezervacijama {
       sortirajPoDatumu();
       return true;
     }
-
     return false;
   }
 
   private void sortirajPoDatumu() {
     rezervacije.sort(Comparator.comparing(Rezervacija::getDatumVrijeme));
   }
-
-
-
 }

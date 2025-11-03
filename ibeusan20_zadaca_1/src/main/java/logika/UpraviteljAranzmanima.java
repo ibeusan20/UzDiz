@@ -52,6 +52,4 @@ public class UpraviteljAranzmanima {
       return null;
     return new LocalDate[] {a.getPocetniDatum(), a.getZavrsniDatum()};
   }
-
-
 }

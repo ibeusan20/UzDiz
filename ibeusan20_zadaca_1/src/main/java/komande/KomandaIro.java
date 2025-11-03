@@ -52,8 +52,6 @@ public class KomandaIro implements Komanda {
             IspisRezervacijaOsobeAdapter adapter = new IspisRezervacijaOsobeAdapter(r, a);
             formatIspisa.ispisi(adapter);
         }
-
-        //System.out.println("------------------------------------------------------------------------------------------");
         return true;
     }
 }

@@ -16,7 +16,6 @@ public class TablicniFormat implements FormatIspisaBridge {
     this.zaglavljeIspisano = false;
   }
 
-
   @Override
   public void ispisi(Object adapter) {
     if (adapter instanceof IspisAranzmanaAdapter a) {
@@ -66,14 +65,14 @@ public class TablicniFormat implements FormatIspisaBridge {
   }
 
   private void ispisiZaglavljeRezervacija() {
-    ispisiLiniju(75);
+    ispisiLiniju(80);
     if (ispisujeOtkazane) {
       System.out.printf("%-12s %-12s %-20s %-15s %-20s%n", "IME", "PREZIME", "DATUM I VRIJEME",
           "VRSTA", "DATUM OTKAZA");
     } else {
       System.out.printf("%-12s %-12s %-20s %-15s%n", "IME", "PREZIME", "DATUM I VRIJEME", "VRSTA");
     }
-    ispisiLiniju(75);
+    ispisiLiniju(80);
   }
 
   private void ispisiRezervacijuOsobe(IspisRezervacijaOsobeAdapter ro) {
@@ -106,5 +105,4 @@ public class TablicniFormat implements FormatIspisaBridge {
   private void ispisiLiniju(int duzina) {
     System.out.println("-".repeat(Math.max(0, duzina)));
   }
-
 }

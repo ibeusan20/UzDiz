@@ -16,7 +16,8 @@ public class Rezervacija {
   private boolean aktivna;
 
   // osnovni konstruktor
-  public Rezervacija(String ime, String prezime, String oznakaAranzmana, LocalDateTime datumVrijeme) {
+  public Rezervacija(String ime, String prezime, String oznakaAranzmana,
+      LocalDateTime datumVrijeme) {
     this(ime, prezime, oznakaAranzmana, datumVrijeme, "PA", null, false);
   }
 
@@ -55,11 +56,22 @@ public class Rezervacija {
   public LocalDateTime getDatumVrijemeOtkaza() {
     return datumVrijemeOtkaza;
   }
-  public boolean isAktivna() { return aktivna; }
-  
-  public void setVrsta(String vrsta) { this.vrsta = vrsta; }
-  public void setDatumVrijemeOtkaza(LocalDateTime dt) { this.datumVrijemeOtkaza = dt; }
-  public void setAktivna(boolean aktivna) { this.aktivna = aktivna; }
+
+  public boolean isAktivna() {
+    return aktivna;
+  }
+
+  public void setVrsta(String vrsta) {
+    this.vrsta = vrsta;
+  }
+
+  public void setDatumVrijemeOtkaza(LocalDateTime dt) {
+    this.datumVrijemeOtkaza = dt;
+  }
+
+  public void setAktivna(boolean aktivna) {
+    this.aktivna = aktivna;
+  }
 
   public void otkazi(LocalDateTime vrijemeOtkaza) {
     this.vrsta = "O";
