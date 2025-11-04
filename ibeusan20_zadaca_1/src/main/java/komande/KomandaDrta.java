@@ -8,20 +8,31 @@ import model.PomocnikDatum;
 import model.Rezervacija;
 
 /**
- * Komanda DRTA - Dodavanje rezervacije za turistički aranžman.
+ * Komanda DRTA - dodavanje rezervacije za turistički aranžman.
  */
 public class KomandaDrta implements Komanda {
-
   private final UpraviteljRezervacijama upraviteljRezervacija;
   private final UpraviteljAranzmanima upraviteljAranzmani;
   private final String[] argumenti;
 
+  /**
+   * Instancira novu komandu drta.
+   *
+   * @param ur the ur
+   * @param ua the ua
+   * @param argumenti the argumenti
+   */
   public KomandaDrta(UpraviteljRezervacijama ur, UpraviteljAranzmanima ua, String... argumenti) {
     this.upraviteljRezervacija = ur;
     this.upraviteljAranzmani = ua;
     this.argumenti = argumenti;
   }
 
+  /**
+   * Izvrsi.
+   *
+   * @return true, if successful
+   */
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 5) {
@@ -49,7 +60,7 @@ public class KomandaDrta implements Komanda {
       return true;
     }
 
-    // provjera postoji li već AKTIVNA rezervacija za tu osobu i aranžman
+    // provjera postoji li već aktivna rezervacija za tu osobu i aranžman
     if (upraviteljRezervacija.imaAktivnuZa(ime, prezime, oznaka)) {
       System.out.println("Osoba već ima AKTIVNU rezervaciju za aranžman " + oznaka + ".");
       return true;
@@ -60,7 +71,6 @@ public class KomandaDrta implements Komanda {
           "Postoji aktivna rezervacija za korisnika u tom vremenskom periodu. Rezervacija nije unesena.");
       return true;
     }
-
 
     // dodaj novu rezervaciju
     Rezervacija r = new Rezervacija(ime, prezime, oznaka, datumVrijeme);

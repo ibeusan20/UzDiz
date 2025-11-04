@@ -4,30 +4,39 @@ import model.Rezervacija;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Adapter između klase Rezervacija i formata ispisa.
+ * Adapter između klase {@link Rezervacija} i formata ispisa.
+ * <p>
+ * Pretvara podatke rezervacije u oblik pogodan za prikaz u tabličnom formatu.
+ * </p>
  */
 public class IspisRezervacijaAdapter {
-
   private final Rezervacija r;
 
+  /**
+   * @param r objekt rezervacije za ispis
+   */
   public IspisRezervacijaAdapter(Rezervacija r) {
     this.r = r;
   }
 
+  /** @return ime korisnika */
   public String getIme() {
     return r.getIme();
   }
 
+  /** @return prezime korisnika */
   public String getPrezime() {
     return r.getPrezime();
   }
 
+  /** @return formatirani datum i vrijeme rezervacije */
   public String getDatumVrijeme() {
     if (r.getDatumVrijeme() == null)
       return "";
     return r.getDatumVrijeme().format(DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm:ss"));
   }
 
+  /** @return tekstualni status rezervacije */
   public String getVrsta() {
     switch (r.getVrsta()) {
       case "PA":
@@ -41,6 +50,7 @@ public class IspisRezervacijaAdapter {
     }
   }
 
+  /** @return formatirani datum otkazivanja (ako postoji) */
   public String getDatumVrijemeOtkaza() {
     if (r.getDatumVrijemeOtkaza() == null)
       return "";

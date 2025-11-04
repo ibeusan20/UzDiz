@@ -5,14 +5,20 @@ import logika.UpraviteljRezervacijama;
 import model.Aranzman;
 
 /**
- * Komanda ORTA - Otkaz rezervacije turističkog aranžmana.
+ * Komanda ORTA - otkaz rezervacije turističkog aranžmana.
  */
 public class KomandaOrta implements Komanda {
-
   private final UpraviteljRezervacijama upraviteljRezervacija;
   private final UpraviteljAranzmanima upraviteljAranzmanima;
   private final String[] argumenti;
 
+  /**
+   * Instancira novu komandu orta.
+   *
+   * @param upraviteljRezervacija the upravitelj rezervacija
+   * @param upraviteljAranzmanima the upravitelj aranzmanima
+   * @param argumenti the argumenti
+   */
   public KomandaOrta(UpraviteljRezervacijama upraviteljRezervacija,
       UpraviteljAranzmanima upraviteljAranzmanima, String... argumenti) {
     this.upraviteljRezervacija = upraviteljRezervacija;
@@ -20,6 +26,11 @@ public class KomandaOrta implements Komanda {
     this.argumenti = argumenti;
   }
 
+  /**
+   * Izvrsi.
+   *
+   * @return true, if successful
+   */
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 3) {

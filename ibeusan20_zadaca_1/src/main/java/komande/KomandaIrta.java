@@ -7,19 +7,29 @@ import logika.UpraviteljRezervacijama;
 import model.Rezervacija;
 
 /**
- * Komanda IRTA - Ispis rezervacija za određeni aranžman (s filtriranjem po statusu).
+ * Komanda IRTA - ispis rezervacija za aranžman (s mogućim filtriranjem po statusu).
  */
 public class KomandaIrta implements Komanda {
-
   private final UpraviteljRezervacijama upraviteljRezervacija;
   private final TablicniFormat formatIspisa = new TablicniFormat();
   private final String[] argumenti;
 
+  /**
+   * Instancira novu koamndu irta.
+   *
+   * @param upraviteljRezervacija the upravitelj rezervacija
+   * @param argumenti the argumenti
+   */
   public KomandaIrta(UpraviteljRezervacijama upraviteljRezervacija, String... argumenti) {
     this.upraviteljRezervacija = upraviteljRezervacija;
     this.argumenti = argumenti;
   }
 
+  /**
+   * Izvrsi.
+   *
+   * @return true, if successful
+   */
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 2) {
@@ -41,7 +51,6 @@ public class KomandaIrta implements Komanda {
     }
 
     boolean imaOtkazane = vrste.contains("O");
-    formatIspisa.reset(); // resetiraj zaglavlje između više ispisa
     formatIspisa.setIspisujeOtkazane(imaOtkazane);
 
     for (Rezervacija r : lista) {

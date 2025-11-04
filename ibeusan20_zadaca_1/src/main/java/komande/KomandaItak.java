@@ -9,18 +9,30 @@ import logika.UpraviteljAranzmanima;
 import model.Aranzman;
 import model.PomocnikDatum;
 
+/**
+ * Komanda ITAK - ispis svih aranžmana (ili filtriranih po datumu).
+ */
 public class KomandaItak implements Komanda {
-
   private final UpraviteljAranzmanima upravitelj;
   private final FormatIspisaBridge formatIspisa = new TablicniFormat();
-
   private final String[] argumenti;
 
+  /**
+   * Instanciranje nove komanda itak.
+   *
+   * @param upravitelj the upravitelj
+   * @param argumenti the argumenti
+   */
   public KomandaItak(UpraviteljAranzmanima upravitelj, String... argumenti) {
     this.upravitelj = upravitelj;
     this.argumenti = argumenti;
   }
 
+  /**
+   * Izvrsi.
+   *
+   * @return true, if successful
+   */
   @Override
   public boolean izvrsi() {
     LocalDate datumOd = null;

@@ -8,8 +8,21 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Čita i parsira podatke o rezervacijama iz CSV datoteke.
+ * <p>
+ * Implementira {@link UcitavacPodataka} za tip {@link Rezervacija}. Svaka greška u retku ispisuje
+ * se na stderr, ali ne prekida čitanje.
+ * </p>
+ */
 public class CitacRezervacija implements UcitavacPodataka<Rezervacija> {
 
+  /**
+   * Učitava sve rezervacije iz datoteke.
+   *
+   * @param nazivDatoteke putanja do datoteke rezervacija
+   * @return lista učitanih rezervacija
+   */
   @Override
   public List<Rezervacija> ucitaj(String nazivDatoteke) {
     List<Rezervacija> rezultat = new ArrayList<>();
@@ -57,6 +70,13 @@ public class CitacRezervacija implements UcitavacPodataka<Rezervacija> {
     return rezultat;
   }
 
+  /**
+   * Uzmi.
+   *
+   * @param polja the polja
+   * @param i the i
+   * @return the string
+   */
   private String uzmi(List<String> polja, int i) {
     if (i >= polja.size()) {
       return "";

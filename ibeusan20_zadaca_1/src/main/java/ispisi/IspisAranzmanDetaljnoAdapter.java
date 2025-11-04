@@ -6,15 +6,24 @@ import java.util.stream.Collectors;
 
 /**
  * Adapter za detaljan ispis jednog turističkog aranžmana.
+ * <p>
+ * Koristi {@link Aranzman} i pretvara sve njegove atribute u čitljiv tekstualni oblik za prikaz na
+ * konzoli.
+ * </p>
  */
 public class IspisAranzmanDetaljnoAdapter {
-
   private final Aranzman a;
 
+  /**
+   * @param a objekt aranžmana koji se ispisuje
+   */
   public IspisAranzmanDetaljnoAdapter(Aranzman a) {
     this.a = a;
   }
 
+  /**
+   * Ispisuje sve detalje o aranžmanu u čitljivom obliku.
+   */
   public void ispisiDetalje() {
     System.out.println("Oznaka: " + a.getOznaka());
     System.out.println("Naziv: " + a.getNaziv());

@@ -5,7 +5,7 @@ public interface Komanda {
   /**
    * Izvršava komandu.
    *
-   * @return true ako program treba nastaviti, false ako se treba prekinuti
+   * @return {@code true} ako se program nastavlja, {@code false} ako treba završiti rad
    */
   boolean izvrsi();
 }

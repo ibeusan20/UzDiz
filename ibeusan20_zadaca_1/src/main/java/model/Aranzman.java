@@ -52,7 +52,6 @@ public class Aranzman {
     this.brojVecera = builder.getBrojVecera();
   }
 
-  // --- GETTERI ---
   public String getOznaka() {
     return oznaka;
   }

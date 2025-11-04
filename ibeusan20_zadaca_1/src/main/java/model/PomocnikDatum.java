@@ -7,22 +7,23 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 /**
- * Klasa za parsiranje datuma i vremena u hrvatskom formatu. Koristi se pri učitavanju podataka iz
- * datoteka.
- *
- * Svaka metoda: - pokušava prepoznati više hrvatskih formata, - standardizira vrijednost, - baca
- * iznimku ako je unos neispravan.
+ * Alatna klasa za parsiranje i formatiranje datuma i vremena u hrvatskom formatu.
+ * <p>
+ * Metode prepoznaju više inačica formata te standardiziraju rezultat. Ako unos nije valjan, baca se
+ * {@link IllegalArgumentException}.
+ * </p>
  */
 public class PomocnikDatum {
-
-  // Standardni hrvatski formati
   private static final String FORMAT_DATUM = "dd.MM.yyyy.";
   private static final String FORMAT_VRIJEME = "HH:mm";
   private static final String FORMAT_DATUM_VRIJEME = "dd.MM.yyyy. HH:mm:ss";
 
-  // --------------------------------------------------------------
-  // 1) SAMO DATUM
-  // --------------------------------------------------------------
+  /**
+   * Procitaj datum.
+   *
+   * @param tekst the tekst
+   * @return the local date
+   */
   public static LocalDate procitajDatum(String tekst) {
     if (tekst == null || tekst.isBlank())
       return null;
@@ -32,20 +33,22 @@ public class PomocnikDatum {
     for (String f : formati) {
       try {
         LocalDate datum = LocalDate.parse(tekst.trim(), DateTimeFormatter.ofPattern(f));
-        // standardiziraj u propisani oblik
         String standard = datum.format(DateTimeFormatter.ofPattern(FORMAT_DATUM));
         return LocalDate.parse(standard, DateTimeFormatter.ofPattern(FORMAT_DATUM));
       } catch (DateTimeParseException e) {
-        // pokušaj sljedeći
+
       }
     }
 
     throw new IllegalArgumentException("Neispravan format datuma: '" + tekst + "'");
   }
 
-  // --------------------------------------------------------------
-  // 2) SAMO VRIJEME
-  // --------------------------------------------------------------
+  /**
+   * Procitaj vrijeme.
+   *
+   * @param tekst the tekst
+   * @return the local time
+   */
   public static LocalTime procitajVrijeme(String tekst) {
     if (tekst == null || tekst.isBlank())
       return null;
@@ -65,9 +68,12 @@ public class PomocnikDatum {
     throw new IllegalArgumentException("Neispravan format vremena: '" + tekst + "'");
   }
 
-  // --------------------------------------------------------------
-  // 3) DATUM + VRIJEME
-  // --------------------------------------------------------------
+  /**
+   * Procitaj datum I vrijeme.
+   *
+   * @param tekst the tekst
+   * @return the local date time
+   */
   public static LocalDateTime procitajDatumIVrijeme(String tekst) {
     if (tekst == null || tekst.isBlank())
       return null;
@@ -77,17 +83,20 @@ public class PomocnikDatum {
     for (String f : formati) {
       try {
         LocalDateTime dt = LocalDateTime.parse(tekst.trim(), DateTimeFormatter.ofPattern(f));
-        // standardiziraj u propisani oblik
         String standard = dt.format(DateTimeFormatter.ofPattern(FORMAT_DATUM_VRIJEME));
         return LocalDateTime.parse(standard, DateTimeFormatter.ofPattern(FORMAT_DATUM_VRIJEME));
       } catch (DateTimeParseException e) {
-        // pokušaj sljedeći format
       }
     }
-
     throw new IllegalArgumentException("Neispravan format datuma/vremena: '" + tekst + "'");
   }
 
+  /**
+   * Formatiraj datum - vrijeme.
+   *
+   * @param dt the dt
+   * @return the string
+   */
   public static String formatirajDatumVrijeme(LocalDateTime dt) {
     if (dt == null)
       return "";

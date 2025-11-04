@@ -9,19 +9,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Jednostavan CSV parser koji podržava: - UTF-8 - odvajanje polja zarezom , - polja unutar "..." u
- * kojima mogu biti zarezi i novi redovi - prazna polja (,,) - retke koji počinju s # i prazne retke
- * – preskače ih se
- *
- * Koristi se tako da se prva linija pročita izvana, a onda se pozove procitajZapis(...) koji po
- * potrebi čita i dodatne linije dok se ne zatvore navodnici.
+ * Jednostavan CSV parser s podrškom za:
+ * <ul>
+ * <li>UTF-8 kodiranje</li>
+ * <li>zareze unutar navodnika</li>
+ * <li>višeredne zapise</li>
+ * <li>preskakanje praznih i komentiranih redaka (#)</li>
+ * </ul>
+ * <p>
+ * Koristi se prilikom čitanja aranžmana i rezervacija.
+ * </p>
  */
 public final class CsvParser {
 
+  /**
+   * Otvara datoteku u UTF-8 i vraća reader.
+   *
+   * @param putanja putanja do CSV datoteke
+   * @return {@link BufferedReader} za čitanje sadržaja
+   * @throws IOException ako datoteka nije dostupna
+   */
   private CsvParser() {}
 
   /**
    * Otvara datoteku u UTF-8 i vraća BufferedReader.
+   *
+   * @param putanja the putanja
+   * @return the buffered reader
+   * @throws IOException Signals that an I/O exception has occurred.
    */
   public static BufferedReader otvoriUtf8(String putanja) throws IOException {
     return new BufferedReader(
@@ -29,10 +44,13 @@ public final class CsvParser {
   }
 
   /**
-   * Prima prvi redak jednog zapisa i reader. Ako redak ima nedozatvoren broj navodnika, čita
-   * dodatne retke i spaja ih dok se navodnici ne zatvore.
+   * Čita jedan CSV zapis. Ako je broj navodnika neparan, čita dodatne redke dok se navodnici ne
+   * zatvore.
    *
-   * Na kraju vraća listu polja.
+   * @param prviRedak prvi redak zapisa
+   * @param br aktivni {@link BufferedReader}
+   * @return lista pročitanih polja
+   * @throws IOException ako dođe do pogreške pri čitanju
    */
   public static List<String> procitajZapis(String prviRedak, BufferedReader br) throws IOException {
     if (prviRedak == null) {
@@ -42,7 +60,6 @@ public final class CsvParser {
     StringBuilder sb = new StringBuilder(prviRedak);
     int brojNavodnika = brojNavodnika(sb);
 
-    // ako je broj navodnika neparan -> polje se nastavlja u sljedećem retku
     while (brojNavodnika % 2 != 0) {
       String nastavak = br.readLine();
       if (nastavak == null) {
@@ -56,7 +73,10 @@ public final class CsvParser {
   }
 
   /**
-   * Razdvaja jedan CSV zapis u polja. Podržava "escaped" navodnike unutar navodnika ("").
+   * Razdvaja jedan CSV zapis na polja("").
+   *
+   * @param zapis the zapis
+   * @return the list
    */
   public static List<String> razdvojiJedanZapis(String zapis) {
     List<String> polja = new ArrayList<>();
@@ -67,28 +87,31 @@ public final class CsvParser {
       char c = zapis.charAt(i);
 
       if (c == '"') {
-        // ako smo u navodnicima i slijedi još jedan navodnik -> to je znak "
         if (uNavodnicima && i + 1 < zapis.length() && zapis.charAt(i + 1) == '"') {
           polje.append('"');
-          i++; // preskoči drugi navodnik
+          i++;
         } else {
           uNavodnicima = !uNavodnicima;
         }
       } else if (c == ',' && !uNavodnicima) {
-        // kraj polja
         polja.add(ocisti(polje.toString()));
         polje.setLength(0);
       } else {
         polje.append(c);
       }
     }
-
     // zadnje polje
     polja.add(ocisti(polje.toString()));
 
     return polja;
   }
 
+  /**
+   * Brojač navodnika.
+   *
+   * @param tekst za analizu
+   * @return int broja navodnika
+   */
   private static int brojNavodnika(CharSequence tekst) {
     int br = 0;
     for (int i = 0; i < tekst.length(); i++) {
@@ -100,7 +123,10 @@ public final class CsvParser {
   }
 
   /**
-   * skida vanjske razmake i eventualne vanjske navodnike
+   * skida vanjske razmake i eventualne vanjske navodnike.
+   *
+   * @param polje the polje
+   * @return the string
    */
   private static String ocisti(String polje) {
     if (polje == null) {

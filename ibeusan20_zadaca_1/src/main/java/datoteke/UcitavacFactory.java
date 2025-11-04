@@ -4,17 +4,18 @@ import model.Aranzman;
 import model.Rezervacija;
 
 /**
- * Factory Method uzorak za stvaranje čitača datoteka. Kreira tip-sigurne instance čitača za
- * različite tipove podataka.
+ * <p>
+ * Stvara konkretne instance čitača podataka ({@link CitacAranzmana}, {@link CitacRezervacija}) bez
+ * izravnog pozivanja njihovih konstruktora.
+ * </p>
  */
 public final class UcitavacFactory {
-
   private UcitavacFactory() {}
 
   /**
    * Kreira čitač za turističke aranžmane.
    *
-   * @return instanca čitača aranžmana
+   * @return nova instanca {@link CitacAranzmana}
    */
   public static UcitavacPodataka<Aranzman> createAranzmanReader() {
     return new CitacAranzmana();
@@ -23,7 +24,7 @@ public final class UcitavacFactory {
   /**
    * Kreira čitač za rezervacije aranžmana.
    *
-   * @return instanca čitača rezervacija
+   * @return nova instanca {@link CitacRezervacija}
    */
   public static UcitavacPodataka<Rezervacija> createRezervacijaReader() {
     return new CitacRezervacija();

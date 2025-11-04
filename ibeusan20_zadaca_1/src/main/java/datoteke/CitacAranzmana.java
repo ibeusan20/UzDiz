@@ -10,8 +10,21 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Čita i parsira podatke o turističkim aranžmanima iz CSV datoteke.
+ * <p>
+ * Implementira sučelje {@link UcitavacPodataka} i koristi
+ * {@link AranzmanBuilder} za stvaranje valjanih objekata.
+ * </p>
+ */
 public class CitacAranzmana implements UcitavacPodataka<Aranzman> {
 
+  /**
+   * Učitava sve aranžmane iz zadane datoteke.
+   *
+   * @param nazivDatoteke putanja do datoteke aranžmana
+   * @return lista učitanih aranžmana
+   */
   @Override
   public List<Aranzman> ucitaj(String nazivDatoteke) {
     List<Aranzman> rezultat = new ArrayList<>();
@@ -72,6 +85,13 @@ public class CitacAranzmana implements UcitavacPodataka<Aranzman> {
     return rezultat;
   }
 
+  /**
+   * Uzmi.
+   *
+   * @param polja the polja
+   * @param i the i
+   * @return the string
+   */
   private String uzmi(List<String> polja, int i) {
     if (i >= polja.size()) {
       return "";
@@ -79,6 +99,12 @@ public class CitacAranzmana implements UcitavacPodataka<Aranzman> {
     return polja.get(i);
   }
 
+  /**
+   * Procitaj float.
+   *
+   * @param tekst the tekst
+   * @return the float
+   */
   private float procitajFloat(String tekst) {
     if (tekst == null || tekst.isBlank()) {
       return 0f;
@@ -90,6 +116,12 @@ public class CitacAranzmana implements UcitavacPodataka<Aranzman> {
     }
   }
 
+  /**
+   * Procitaj int.
+   *
+   * @param tekst the tekst
+   * @return the int
+   */
   private int procitajInt(String tekst) {
     if (tekst == null || tekst.isBlank())
       return 0;
@@ -100,6 +132,12 @@ public class CitacAranzmana implements UcitavacPodataka<Aranzman> {
     }
   }
 
+  /**
+   * Pomoćna metoda za čitanje vremena u formatu H:mm.
+   *
+   * @param tekst the tekst
+   * @return the local time
+   */
   public static LocalTime procitajVrijeme(String tekst) {
     if (tekst == null || tekst.isBlank()) {
       return null;

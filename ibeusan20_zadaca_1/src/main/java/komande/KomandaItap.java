@@ -5,18 +5,28 @@ import logika.UpraviteljAranzmanima;
 import model.Aranzman;
 
 /**
- * Komanda ITAP - Ispis pojedinog turističkog aranžmana.
+ * Komanda ITAP - ispis detalja pojedinog turističkog aranžmana.
  */
 public class KomandaItap implements Komanda {
-
   private final UpraviteljAranzmanima upravitelj;
   private final String[] argumenti;
 
+  /**
+   * Instancira novu komandu itap.
+   *
+   * @param upravitelj the upravitelj
+   * @param argumenti the argumenti
+   */
   public KomandaItap(UpraviteljAranzmanima upravitelj, String... argumenti) {
     this.upravitelj = upravitelj;
     this.argumenti = argumenti;
   }
 
+  /**
+   * Izvrsi.
+   *
+   * @return true, if successful
+   */
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 1) {
