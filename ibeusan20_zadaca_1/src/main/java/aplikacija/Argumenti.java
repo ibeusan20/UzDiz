@@ -3,10 +3,6 @@ package aplikacija;
 import java.util.HashMap;
 import java.util.Map;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class Argumenti.
- */
 public class Argumenti {
 
   /** Mapa argumenata komandne linije (ključevi počinju s "--"). */
