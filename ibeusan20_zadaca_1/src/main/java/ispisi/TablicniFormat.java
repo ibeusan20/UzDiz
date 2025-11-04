@@ -37,7 +37,6 @@ public class TablicniFormat implements FormatIspisaBridge {
     } else if (adapter instanceof IspisRezervacijaOsobeAdapter ro) {
       ispisiRezervacijuOsobe(ro);
     }
-
   }
 
   /**
