@@ -51,7 +51,7 @@ public class TablicniFormat implements FormatIspisaBridge {
       zaglavljeIspisano = true;
     }
 
-    System.out.printf("%-4s %-35s %-12s %-12s %-8s %-8s %10s € %6d %6d%n", a.getOznaka(),
+    System.out.printf("%-4s %-35s %-12s %-12s %-8s %-8s %10s %6d %6d%n", a.getOznaka(),
         skrati(a.getNaziv(), 35), a.getDatumOd(), a.getDatumDo(), a.getVrijemeKretanja(),
         a.getVrijemePovratka(), a.getCijena(), a.getMinPutnika(), a.getMaxPutnika());
   }
