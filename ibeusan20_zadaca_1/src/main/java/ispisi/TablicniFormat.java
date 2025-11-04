@@ -66,6 +66,21 @@ public class TablicniFormat implements FormatIspisaBridge {
     ispisiLiniju(111);
   }
 
+
+  /**
+   * Ispisi zaglavlje rezervacija.
+   */
+  private void ispisiZaglavljeRezervacija() {
+    ispisiLiniju(80);
+    if (ispisujeOtkazane) {
+      System.out.printf("%-12s %-12s %-20s %-15s %-20s%n", "IME", "PREZIME", "DATUM I VRIJEME",
+          "VRSTA", "DATUM OTKAZA");
+    } else {
+      System.out.printf("%-12s %-12s %-20s %-15s%n", "IME", "PREZIME", "DATUM I VRIJEME", "VRSTA");
+    }
+    ispisiLiniju(80);
+  }
+
   /**
    * Ispisi rezervaciju.
    *
@@ -86,20 +101,6 @@ public class TablicniFormat implements FormatIspisaBridge {
       System.out.printf("%-12s %-12s %-20s %-15s%n", r.getIme(), r.getPrezime(),
           r.getDatumVrijeme(), r.getVrsta());
     }
-  }
-
-  /**
-   * Ispisi zaglavlje rezervacija.
-   */
-  private void ispisiZaglavljeRezervacija() {
-    ispisiLiniju(80);
-    if (ispisujeOtkazane) {
-      System.out.printf("%-12s %-12s %-20s %-15s %-20s%n", "IME", "PREZIME", "DATUM I VRIJEME",
-          "VRSTA", "DATUM OTKAZA");
-    } else {
-      System.out.printf("%-12s %-12s %-20s %-15s%n", "IME", "PREZIME", "DATUM I VRIJEME", "VRSTA");
-    }
-    ispisiLiniju(80);
   }
 
   /**
