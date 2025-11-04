@@ -29,6 +29,7 @@ public class CitacAranzmana implements UcitavacPodataka<Aranzman> {
   public List<Aranzman> ucitaj(String nazivDatoteke) {
     List<Aranzman> rezultat = new ArrayList<>();
     int redniBroj = 0;
+    int redniBrojGreske = 0;
 
     try (BufferedReader br = CsvParser.otvoriUtf8(nazivDatoteke)) {
       String redak;
@@ -36,14 +37,10 @@ public class CitacAranzmana implements UcitavacPodataka<Aranzman> {
 
       while ((redak = br.readLine()) != null) {
         redniBroj++;
-
-        // preskoči zaglavlje
         if (prvi) {
           prvi = false;
           continue;
         }
-
-        // preskoči prazne i komentare
         if (redak.isBlank() || redak.trim().startsWith("#")) {
           continue;
         }
@@ -69,12 +66,14 @@ public class CitacAranzmana implements UcitavacPodataka<Aranzman> {
           b.postaviBrojRuckova(procitajInt(uzmi(stupci, 14)));
           b.postaviBrojVecera(procitajInt(uzmi(stupci, 15)));
 
-
           Aranzman a = b.izgradi();
           rezultat.add(a);
 
         } catch (Exception e) {
-          System.err.println("Greška u retku " + redniBroj + ": " + e.getMessage());
+          redniBrojGreske++;
+          System.err.println("[" + redniBrojGreske + ". greška] u " + redniBroj + ". retku rezervacije: "
+              + e.getMessage());
+          System.err.println("Sadržaj retka s greškom: " + redak.trim());
         }
       }
 

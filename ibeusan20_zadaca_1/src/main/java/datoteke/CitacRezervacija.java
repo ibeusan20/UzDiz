@@ -57,7 +57,7 @@ public class CitacRezervacija implements UcitavacPodataka<Rezervacija> {
 
         } catch (Exception e) {
           redniBrojGreske++;
-          System.err.println(redniBrojGreske + ". greška u " + redniBroj + ". retku rezervacije: "
+          System.err.println("[" + redniBrojGreske + ". greška] u " + redniBroj + ". retku rezervacije: "
               + e.getMessage());
           System.err.println("Sadržaj retka s greškom: " + redak.trim());
         }
