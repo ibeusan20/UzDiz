@@ -1,33 +1,39 @@
 package edu.unizg.foi.uzdiz.ibeusan20.aplikacija;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
-import edu.unizg.foi.uzdiz.ibeusan20.datoteke.UcitavacFactory;
-import edu.unizg.foi.uzdiz.ibeusan20.datoteke.UcitavacPodataka;
-import edu.unizg.foi.uzdiz.ibeusan20.komande.Komande;
+import edu.unizg.foi.uzdiz.ibeusan20.datoteke.facade.DatotekeFacade;
+import edu.unizg.foi.uzdiz.ibeusan20.datoteke.facade.DatotekeFacadeImpl;
+import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.AranzmanCsv;
+import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.RezervacijaCsv;
+import edu.unizg.foi.uzdiz.ibeusan20.komande.Komanda;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
+import edu.unizg.foi.uzdiz.ibeusan20.model.AranzmanBuilder;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
 
 /**
  * Glavna klasa aplikacije Turistička agencija.
  * <p>
- * Učitava podatke o aranžmanima i rezervacijama pomoću {@link UcitavacFactory},
- * inicijalizira upravitelje logike te pokreće konzolno sučelje za unos komandi.
+ * Učitava podatke pomoću LIB facada, kreira domenske objekte,
+ * puni Composite strukturu (aranžman -> rezervacije) i pokreće
+ * interaktivno izvršavanje komandi.
  * </p>
  */
 public class Aplikacija {
 
   /**
    * Ulazna točka programa.
-   * <p>
+   *
    * Očekuje argumente:
    * <ul>
-   *   <li><code>--ta &lt;putanja_datoteke_aranzmana&gt;</code></li>
-   *   <li><code>--rta &lt;putanja_datoteke_rezervacija&gt;</code></li>
+   *   <li><code>--ta &lt;datoteka_aranzmana&gt;</code></li>
+   *   <li><code>--rta &lt;datoteka_rezervacija&gt;</code></li>
    * </ul>
-   * </p>
    *
    * @param args argumenti komandne linije
    */
@@ -35,39 +41,84 @@ public class Aplikacija {
     try {
       Argumenti argumenti = new Argumenti(args);
 
-      UcitavacPodataka<Aranzman> ucitacAranzmana =
-          UcitavacFactory.createAranzmanReader();
-      UcitavacPodataka<Rezervacija> ucitacRezervacija =
-          UcitavacFactory.createRezervacijaReader();
+      DatotekeFacade facade = DatotekeFacadeImpl.getInstance();
 
-      List<Aranzman> aranzmani =
-          ucitacAranzmana.ucitaj(argumenti.dohvatiPutanjuAranzmana());
-      List<Rezervacija> rezervacije =
-          ucitacRezervacija.ucitaj(argumenti.dohvatiPutanjuRezervacija());
+      // 1) čitanje CSV podataka preko LIB modula
+      List<AranzmanCsv> aranzmaniCsv =
+          facade.ucitajAranzmane(argumenti.dohvatiPutanjuAranzmana());
+      List<RezervacijaCsv> rezervacijeCsv =
+          facade.ucitajRezervacije(argumenti.dohvatiPutanjuRezervacija());
 
-      // Upravitelji domenskih objekata
-      UpraviteljAranzmanima uprAranz =
-          new UpraviteljAranzmanima(aranzmani);
-      UpraviteljRezervacijama uprRez =
-          new UpraviteljRezervacijama(rezervacije, uprAranz);
+      // 2) kreiranje domenskih objekata (Aranzman) i mapa po oznaci
+      List<Aranzman> aranzmani = new ArrayList<>();
+      Map<String, Aranzman> mapaAranzmana = new LinkedHashMap<>();
 
-      // inicijalna rekalkulacija stanja za sve aranžmane
-      for (Aranzman a : aranzmani) {
-        uprRez.rekalkulirajZaAranzman(
-            a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
+      for (AranzmanCsv aCsv : aranzmaniCsv) {
+        try {
+          AranzmanBuilder b = new AranzmanBuilder()
+              .postaviOznaku(aCsv.oznaka)
+              .postaviNaziv(aCsv.naziv)
+              .postaviProgram(aCsv.program)
+              .postaviPocetniDatum(aCsv.pocetniDatum)
+              .postaviZavrsniDatum(aCsv.zavrsniDatum)
+              .postaviVrijemeKretanja(aCsv.vrijemeKretanja)
+              .postaviVrijemePovratka(aCsv.vrijemePovratka)
+              .postaviCijenu(aCsv.cijena)
+              .postaviMinPutnika(aCsv.minPutnika)
+              .postaviMaxPutnika(aCsv.maxPutnika)
+              .postaviBrojNocenja(aCsv.brojNocenja)
+              .postaviDoplatuJednokrevetna(aCsv.doplataJednokrevetna)
+              .postaviPrijevoz(aCsv.prijevoz == null
+                  ? ""
+                  : String.join(";", aCsv.prijevoz))
+              .postaviBrojDorucaka(aCsv.brojDorucaka)
+              .postaviBrojRuckova(aCsv.brojRuckova)
+              .postaviBrojVecera(aCsv.brojVecera);
+
+          Aranzman a = b.izgradi();
+          aranzmani.add(a);
+          mapaAranzmana.put(a.getOznaka(), a);
+
+        } catch (IllegalArgumentException e) {
+          System.err.println(
+              "Preskačem neispravan aranžman (" + aCsv.oznaka + "): " + e.getMessage());
+        }
       }
+
+      // 3) kreiranje domenskih rezervacija (još nisu u Composite-u)
+      List<Rezervacija> rezervacije = new ArrayList<>();
+      for (RezervacijaCsv rCsv : rezervacijeCsv) {
+        Aranzman a = mapaAranzmana.get(rCsv.oznakaAranzmana);
+        if (a == null) {
+          // semantička provjera: ne postoji aranžman za rezervaciju
+          System.err.println(
+              "Preskačem rezervaciju " + rCsv.ime + " " + rCsv.prezime
+                  + " - ne postoji aranžman s oznakom " + rCsv.oznakaAranzmana);
+          continue;
+        }
+        Rezervacija r =
+            new Rezervacija(rCsv.ime, rCsv.prezime, rCsv.oznakaAranzmana, rCsv.datumVrijeme);
+        rezervacije.add(r);
+      }
+
+      // 4) upravitelji
+      UpraviteljAranzmanima uprAranz = new UpraviteljAranzmanima(aranzmani);
+      UpraviteljRezervacijama uprRez = new UpraviteljRezervacijama(uprAranz);
+
+      // 5) popunjavanje Composite strukture + inicijalna rekalkulacija state-ova
+      uprRez.dodajPocetne(rezervacije);
 
       System.out.println("Učitano aranžmana: " + uprAranz.brojAranzmana());
       System.out.println("Učitano rezervacija: " + uprRez.brojRezervacija());
 
+      // 6) pokretanje obrade komandi
       Komande komande = new Komande(uprAranz, uprRez);
       komande.pokreni();
 
     } catch (IllegalArgumentException e) {
       System.err.println("Greška u argumentima: " + e.getMessage());
     } catch (Exception e) {
-      System.err.println(
-          "Neočekivana greška pri pokretanju aplikacije: " + e.getMessage());
+      System.err.println("Neočekivana greška pri pokretanju aplikacije: " + e.getMessage());
     }
   }
 }
