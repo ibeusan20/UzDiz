@@ -51,8 +51,7 @@
 						<manifest>
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>libs/</classpathPrefix>
-							<mainClass>
-								edu.unizg.foi.uzdiz.ibeusan20.app.main.Aplikacija</mainClass>
+							<mainClass>edu.unizg.foi.uzdiz.ibeusan20.aplikacija.Aplikacija</mainClass>
 						</manifest>
 					</archive>
 				</configuration>

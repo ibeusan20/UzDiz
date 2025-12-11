@@ -1,47 +1,58 @@
 package edu.unizg.foi.uzdiz.ibeusan20.ispisi;
 
-import java.util.stream.Collectors;
+import java.time.format.DateTimeFormatter;
+import java.util.StringJoiner;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
-import edu.unizg.foi.uzdiz.ibeusan20.model.FormatDatuma;
 
 /**
- * Adapter za detaljan ispis jednog turističkog aranžmana.
- * <p>
- * Koristi {@link Aranzman} i pretvara sve njegove atribute u čitljiv tekstualni oblik za prikaz na
- * konzoli.
- * </p>
+ * Detaljni ispis jednog aranžmana (ITAP).
  */
 public class IspisAranzmanDetaljnoAdapter {
-  private final Aranzman a;
 
-  /**
-   * @param a objekt aranžmana koji se ispisuje
-   */
-  public IspisAranzmanDetaljnoAdapter(Aranzman a) {
-    this.a = a;
+  private static final DateTimeFormatter FORMAT_DATUM =
+      DateTimeFormatter.ofPattern("dd.MM.yyyy.");
+  private static final DateTimeFormatter FORMAT_VRIJEME =
+      DateTimeFormatter.ofPattern("HH:mm");
+
+  private final Aranzman aranzman;
+
+  public IspisAranzmanDetaljnoAdapter(Aranzman aranzman) {
+    this.aranzman = aranzman;
   }
 
-  /**
-   * Ispisuje sve detalje o aranžmanu u čitljivom obliku.
-   */
   public void ispisiDetalje() {
-    System.out.println("Oznaka: " + a.getOznaka());
-    System.out.println("Naziv: " + a.getNaziv());
-    System.out.println("Program: " + a.getProgram());
-    System.out.println("Početni datum: " + FormatDatuma.formatiraj(a.getPocetniDatum()));
-    System.out.println("Završni datum: " + FormatDatuma.formatiraj(a.getZavrsniDatum()));
-    System.out.println("Vrijeme kretanja: " + FormatDatuma.formatiraj(a.getVrijemeKretanja()));
-    System.out.println("Vrijeme povratka: " + FormatDatuma.formatiraj(a.getVrijemePovratka()));
-    System.out.println("Cijena: " + String.format("%.2f €", a.getCijena()));
-    System.out.println("Min putnika: " + a.getMinPutnika());
-    System.out.println("Max putnika: " + a.getMaxPutnika());
-    System.out.println("Broj noćenja: " + a.getBrojNocenja());
-    System.out
-        .println("Doplata jednokrevetna: " + String.format("%.2f €", a.getDoplataJednokrevetna()));
-    System.out.println("Prijevoz: " + (a.getPrijevoz() == null ? ""
-        : a.getPrijevoz().stream().collect(Collectors.joining("; "))));
-    System.out.println("Doručci: " + a.getBrojDorucaka());
-    System.out.println("Ručkovi: " + a.getBrojRuckova());
-    System.out.println("Večere: " + a.getBrojVecera());
+    String od = aranzman.getPocetniDatum() == null ? ""
+        : aranzman.getPocetniDatum().format(FORMAT_DATUM);
+    String d0 = aranzman.getZavrsniDatum() == null ? ""
+        : aranzman.getZavrsniDatum().format(FORMAT_DATUM);
+    String vk = aranzman.getVrijemeKretanja() == null ? ""
+        : aranzman.getVrijemeKretanja().format(FORMAT_VRIJEME);
+    String vp = aranzman.getVrijemePovratka() == null ? ""
+        : aranzman.getVrijemePovratka().format(FORMAT_VRIJEME);
+
+    String prijevoz = "";
+    if (aranzman.getPrijevoz() != null && !aranzman.getPrijevoz().isEmpty()) {
+      StringJoiner sj = new StringJoiner(", ");
+      aranzman.getPrijevoz().forEach(sj::add);
+      prijevoz = sj.toString();
+    }
+
+    System.out.println("Oznaka: " + aranzman.getOznaka());
+    System.out.println("Naziv: " + aranzman.getNaziv());
+    System.out.println("Program: " + aranzman.getProgram());
+    System.out.println("Početni datum: " + od);
+    System.out.println("Završni datum: " + d0);
+    System.out.println("Vrijeme kretanja: " + vk);
+    System.out.println("Vrijeme povratka: " + vp);
+    System.out.println("Cijena: " + aranzman.getCijena());
+    System.out.println("Min. putnika: " + aranzman.getMinPutnika());
+    System.out.println("Max. putnika: " + aranzman.getMaxPutnika());
+    System.out.println("Broj noćenja: " + aranzman.getBrojNocenja());
+    System.out.println("Doplata jednokrevetna: " + aranzman.getDoplataJednokrevetna());
+    System.out.println("Prijevoz: " + prijevoz);
+    System.out.println("Doručaka: " + aranzman.getBrojDorucaka());
+    System.out.println("Ručkova: " + aranzman.getBrojRuckova());
+    System.out.println("Večera: " + aranzman.getBrojVecera());
+    System.out.println("Stanje aranžmana: " + aranzman.nazivStanja()); // STATE
   }
 }

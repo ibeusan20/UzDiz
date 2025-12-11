@@ -5,22 +5,17 @@ import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 
 /**
  * Factory Method za stvaranje objekata tipa {@link Komanda}.
- * <p>
- * Na temelju unosa korisnika (naredbe) stvara odgovarajuću konkretnu komandu.
- * </p>
  */
 public final class KomandaFactory {
+
   private KomandaFactory() {}
 
-  /**
-   * Kreira i vraća konkretnu komandu prema korisničkom unosu.
-   *
-   * @param unos korisnički unos s nazivom komande i argumentima
-   * @param ua upravitelj aranžmanima
-   * @param ur upravitelj rezervacijama
-   * @return nova instanca odgovarajuće komande ili {@code null} ako naredba nije prepoznata
-   */
-  public static Komanda kreiraj(String unos, UpraviteljAranzmanima ua, UpraviteljRezervacijama ur) {
+  public static Komanda kreiraj(String unos, UpraviteljAranzmanima ua,
+      UpraviteljRezervacijama ur) {
+
+    if (unos == null || unos.isBlank()) {
+      return null;
+    }
 
     String[] dijelovi = unos.trim().split("\\s+");
     String naredba = dijelovi[0].toUpperCase();
@@ -34,11 +29,16 @@ public final class KomandaFactory {
       case "ITAK" -> new KomandaItak(ua, argumenti);
       case "ITAP" -> new KomandaItap(ua, argumenti);
       case "IRTA" -> new KomandaIrta(ur, argumenti);
-      case "IRO" -> new KomandaIro(ur, ua, argumenti);
+      case "IRO"  -> new KomandaIro(ur, ua, argumenti);
       case "ORTA" -> new KomandaOrta(ur, ua, argumenti);
       case "DRTA" -> new KomandaDrta(ur, ua, argumenti);
-      case "Q" -> new KomandaQ();
-      default -> null;
+      case "OTA"  -> new KomandaOta(ua, ur, argumenti);
+      case "IP"   -> new KomandaIp(argumenti);
+      case "BP"   -> new KomandaBp(ua, ur, argumenti);
+      case "UP"   -> new KomandaUp(ua, ur, argumenti);
+      case "ITAS" -> new KomandaItas(ua, argumenti);
+      case "Q"    -> new KomandaQ();
+      default     -> null;
     };
   }
 }

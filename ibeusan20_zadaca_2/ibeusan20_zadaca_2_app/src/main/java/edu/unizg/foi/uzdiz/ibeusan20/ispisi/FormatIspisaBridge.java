@@ -1,17 +1,12 @@
 package edu.unizg.foi.uzdiz.ibeusan20.ispisi;
 
 /**
- * Sučelje Bridge uzorka koje definira apstrakciju za format ispisa.
- * <p>
- * Omogućuje različite implementacije ispisa (npr. tablični, tekstualni, JSON)
- * bez promjene adaptera koji pružaju podatke.
- * </p>
+ * Bridge sučelje za različite formate ispisa (tablični, csv, ...).
  */
 public interface FormatIspisaBridge {
+
   /**
-   * Ispisuje podatke korištenjem odgovarajućeg adaptera.
-   *
-   * @param adapter objekt adaptera koji sadrži podatke za ispis
+   * Ispisuje jedan red podataka u određenom formatu.
    */
-  void ispisi(Object adapter);
+  void ispisi(IspisniRed red);
 }

@@ -1,36 +1,45 @@
 package edu.unizg.foi.uzdiz.ibeusan20.ispisi;
 
+import java.time.format.DateTimeFormatter;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
-import java.time.format.DateTimeFormatter;
 
-public class IspisRezervacijaOsobeAdapter {
+/**
+ * Adapter za ispis rezervacija određene osobe (IRO).
+ */
+public class IspisRezervacijaOsobeAdapter implements IspisniRed {
 
-  private final Rezervacija r;
-  private final Aranzman a;
+  private static final DateTimeFormatter FORMAT_DATUM =
+      DateTimeFormatter.ofPattern("dd.MM.yyyy.");
 
-  public IspisRezervacijaOsobeAdapter(Rezervacija r, Aranzman a) {
-    this.r = r;
-    this.a = a;
+  private final Rezervacija rezervacija;
+  private final Aranzman aranzman;
+
+  public IspisRezervacijaOsobeAdapter(Rezervacija rezervacija, Aranzman aranzman) {
+    this.rezervacija = rezervacija;
+    this.aranzman = aranzman;
   }
 
-  public String getDatumVrijeme() {
-    if (r.getDatumVrijeme() == null) {
-      return "";
-    }
-    return r.getDatumVrijeme()
-        .format(DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm:ss"));
+  @Override
+  public String[] zaglavlje() {
+    return new String[] {
+        "Oznaka", "Naziv aranžmana", "Polazak", "Povratak", "Stanje"
+    };
   }
 
-  public String getOznaka() {
-    return r.getOznakaAranzmana();
-  }
+  @Override
+  public String[] vrijednosti() {
+    String polazak = aranzman.getPocetniDatum() == null ? ""
+        : aranzman.getPocetniDatum().format(FORMAT_DATUM);
+    String povratak = aranzman.getZavrsniDatum() == null ? ""
+        : aranzman.getZavrsniDatum().format(FORMAT_DATUM);
 
-  public String getNazivAranzmana() {
-    return (a != null) ? a.getNaziv() : "(Nepoznat aranžman)";
-  }
-
-  public String getVrsta() {
-    return r.nazivStanja();
+    return new String[] {
+        aranzman.getOznaka(),
+        aranzman.getNaziv(),
+        polazak,
+        povratak,
+        rezervacija.nazivStanja() // STATE, tekstualno
+    };
   }
 }

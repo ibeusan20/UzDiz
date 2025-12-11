@@ -1,66 +1,40 @@
 package edu.unizg.foi.uzdiz.ibeusan20.ispisi;
 
+import java.time.format.DateTimeFormatter;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
-import edu.unizg.foi.uzdiz.ibeusan20.model.FormatDatuma;
 
 /**
- * Adapter između klase {@link Aranzman} i formata ispisa.
- * <p>
- * Pretvara podatke o aranžmanu u tekstualni oblik pogodan za ispis u tabličnom formatu.
- * </p>
+ * Adapter za osnovni ispis aranžmana (koristi se u ITAK).
  */
-public class IspisAranzmanaAdapter {
-  private final Aranzman a;
+public class IspisAranzmanaAdapter implements IspisniRed {
 
-  /**
-   * @param a objekt aranžmana koji se prilagođava za ispis
-   */
-  public IspisAranzmanaAdapter(Aranzman a) {
-    this.a = a;
+  private static final DateTimeFormatter FORMAT_DATUM =
+      DateTimeFormatter.ofPattern("dd.MM.yyyy.");
+
+  private final Aranzman aranzman;
+
+  public IspisAranzmanaAdapter(Aranzman aranzman) {
+    this.aranzman = aranzman;
   }
 
-  /** @return oznaka aranžmana */
-  public String getOznaka() {
-    return a.getOznaka();
+  @Override
+  public String[] zaglavlje() {
+    return new String[] {"Oznaka", "Naziv", "Od", "Do", "Stanje"};
   }
 
-  /** @return naziv aranžmana */
-  public String getNaziv() {
-    return a.getNaziv();
-  }
+  @Override
+  public String[] vrijednosti() {
+    String od = aranzman.getPocetniDatum() == null ? ""
+        : aranzman.getPocetniDatum().format(FORMAT_DATUM);
+    String d0 = aranzman.getZavrsniDatum() == null ? ""
+        : aranzman.getZavrsniDatum().format(FORMAT_DATUM);
 
-  /** @return formatirani početni datum */
-  public String getDatumOd() {
-    return FormatDatuma.formatiraj(a.getPocetniDatum());
-  }
-
-  /** @return formatirani završni datum */
-  public String getDatumDo() {
-    return FormatDatuma.formatiraj(a.getZavrsniDatum());
-  }
-
-  /** @return vrijeme polaska */
-  public String getVrijemeKretanja() {
-    return FormatDatuma.formatiraj(a.getVrijemeKretanja());
-  }
-
-  /** @return vrijeme povratka */
-  public String getVrijemePovratka() {
-    return FormatDatuma.formatiraj(a.getVrijemePovratka());
-  }
-
-  /** @return cijena aranžmana s oznakom valute */
-  public String getCijena() {
-    return String.format("%.2f €", a.getCijena());
-  }
-
-  /** @return minimalan broj putnika */
-  public int getMinPutnika() {
-    return a.getMinPutnika();
-  }
-
-  /** @return maksimalan broj putnika */
-  public int getMaxPutnika() {
-    return a.getMaxPutnika();
+    return new String[] {
+        aranzman.getOznaka(),
+        aranzman.getNaziv(),
+        od,
+        d0,
+        aranzman.nazivStanja()   // STATE, tekstualno
+    };
   }
 }
