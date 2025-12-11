@@ -5,15 +5,12 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeAktivanAranzman;
+import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeAranzmana;
+import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeOtkazanAranzman;
+import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjePopunjenAranzman;
+import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeUPripremiAranzman;
 
-/**
- * Klasa Aranzman predstavlja turistički aranžman.
- *
- * Kreira se pomoću kreacijskog uzorka Builder (klasa {@link AranzmanBuilder}).
- *
- * Osnovni atributi (oznaka, naziv, datumi, cijena, ...) su nepromjenjivi,
- * ali aranžman kao "kompozit" sadrži svoje rezervacije.
- */
 public class Aranzman {
 
   private final String oznaka;
@@ -33,12 +30,9 @@ public class Aranzman {
   private final int brojRuckova;
   private final int brojVecera;
 
-  /** Rezervacije koje pripadaju ovom aranžmanu (Composite). */
   private final List<Rezervacija> rezervacije = new ArrayList<>();
+  private StanjeAranzmana stanje = StanjeUPripremiAranzman.instanca();
 
-  /**
-   * Konstruktor dostupan samo Builderu.
-   */
   protected Aranzman(AranzmanBuilder builder) {
     this.oznaka = builder.getOznaka();
     this.naziv = builder.getNaziv();
@@ -57,8 +51,6 @@ public class Aranzman {
     this.brojRuckova = builder.getBrojRuckova();
     this.brojVecera = builder.getBrojVecera();
   }
-
-  // ------------------- osnovni getteri -------------------
 
   public String getOznaka() {
     return oznaka;
@@ -124,43 +116,50 @@ public class Aranzman {
     return brojVecera;
   }
 
-  // ------------------- Composite dio -------------------
-
-  /**
-   * Dodaje rezervaciju u ovaj aranžman.
-   *
-   * @param rezervacija rezervacija koja se dodaje
-   */
-  public void dodajRezervaciju(Rezervacija rezervacija) {
-    if (rezervacija != null) {
-      rezervacije.add(rezervacija);
-    }
-  }
-
-  /**
-   * Uklanja rezervaciju iz ovog aranžmana.
-   *
-   * @param rezervacija rezervacija koja se uklanja
-   */
-  public void ukloniRezervaciju(Rezervacija rezervacija) {
-    if (rezervacija != null) {
-      rezervacije.remove(rezervacija);
-    }
-  }
-
-  /**
-   * Dohvaća sve rezervacije ovog aranžmana.
-   *
-   * @return nova lista rezervacija (kopija interne kolekcije)
-   */
   public List<Rezervacija> getRezervacije() {
-    return Collections.unmodifiableList(new ArrayList<>(rezervacije));
+    return Collections.unmodifiableList(rezervacije);
+  }
+
+  public void dodajRezervaciju(Rezervacija r) {
+    if (r == null) {
+      return;
+    }
+    rezervacije.add(r);
+  }
+
+  public StanjeAranzmana getStanje() {
+    return stanje;
+  }
+
+  public String nazivStanja() {
+    return stanje.naziv();
+  }
+
+  public void postaviOtkazan() {
+    stanje = StanjeOtkazanAranzman.instanca();
+  }
+
+  public void azurirajStanje(int brojAktivnih, int brojPrijava) {
+    if (stanje instanceof StanjeOtkazanAranzman) {
+      return;
+    }
+    if (brojPrijava < minPutnika) {
+      stanje = StanjeUPripremiAranzman.instanca();
+      return;
+    }
+    if (brojAktivnih <= maxPutnika && brojAktivnih >= minPutnika) {
+      stanje = StanjeAktivanAranzman.instanca();
+      return;
+    }
+    if (brojAktivnih > maxPutnika || brojPrijava > maxPutnika) {
+      stanje = StanjePopunjenAranzman.instanca();
+    }
   }
 
   @Override
   public String toString() {
     return "Aranzman{" + "oznaka='" + oznaka + '\'' + ", naziv='" + naziv + '\''
-        + ", pocetniDatum=" + pocetniDatum + ", zavrsniDatum=" + zavrsniDatum + ", cijena="
-        + cijena + ", minPutnika=" + minPutnika + ", maxPutnika=" + maxPutnika + '}';
+        + ", pocetniDatum=" + pocetniDatum + ", zavrsniDatum=" + zavrsniDatum
+        + ", stanje=" + stanje.naziv() + '}';
   }
 }

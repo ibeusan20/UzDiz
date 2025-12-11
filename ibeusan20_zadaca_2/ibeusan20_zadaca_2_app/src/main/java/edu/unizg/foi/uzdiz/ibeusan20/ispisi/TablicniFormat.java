@@ -94,12 +94,15 @@ public class TablicniFormat implements FormatIspisaBridge {
     }
 
     if (ispisujeOtkazane) {
-      System.out.printf("%-12s %-12s %-20s %-15s %-20s%n", r.getIme(), r.getPrezime(),
-          r.getDatumVrijeme(), r.getVrsta(), r.getDatumVrijemeOtkaza());
+      System.out.printf("%-12s %-12s %-20s %-15s %-20s%n",
+          r.getIme(), r.getPrezime(), r.getDatumVrijeme(),
+          r.getVrsta(), r.getDatumVrijemeOtkaza());
     } else {
-      System.out.printf("%-12s %-12s %-20s %-15s%n", r.getIme(), r.getPrezime(),
-          r.getDatumVrijeme(), r.getVrsta());
+      System.out.printf("%-12s %-12s %-20s %-15s%n",
+          r.getIme(), r.getPrezime(), r.getDatumVrijeme(),
+          r.getVrsta());
     }
+
   }
 
   /**

@@ -2,6 +2,12 @@ package edu.unizg.foi.uzdiz.ibeusan20.logika;
 
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
+import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeAktivnaRezervacija;
+import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeNaCekanjuRezervacija;
+import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeNovaRezervacija;
+import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeOtkazanaRezervacija;
+import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjePrimljenaRezervacija;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,102 +19,65 @@ import java.util.Set;
 /**
  * Upravljanje rezervacijama za turističke aranžmane.
  * <p>
- * Rezervacije se nalaze unutar svojih aranžmana (Composite). Ovaj razred
- * nudi metode za dohvat, provjere i rekalkulaciju statusa.
+ * Drži globalnu listu rezervacija, ali svaku rezervaciju dodaje i u pripadni
+ * aranžman (Composite). Stanja rezervacija se održavaju uzorcima State.
  * </p>
  */
 public class UpraviteljRezervacijama {
 
+  private final List<Rezervacija> rezervacije = new ArrayList<>();
   private final UpraviteljAranzmanima upraviteljAranzmana;
 
   /**
-   * Inicijalizira upravitelja referencom na upravitelja aranžmana.
-   *
-   * @param upraviteljAranzmana upravitelj aranžmana
+   * Konstruktor koji prima početne rezervacije i upravitelja aranžmana.
+   * Rezervacije se sortiraju po datumu i povezuju s odgovarajućim aranžmanom.
    */
-  public UpraviteljRezervacijama(UpraviteljAranzmanima upraviteljAranzmana) {
+  public UpraviteljRezervacijama(List<Rezervacija> pocetne,
+      UpraviteljAranzmanima upraviteljAranzmana) {
     this.upraviteljAranzmana = upraviteljAranzmana;
-  }
-
-  // ------------------- pomoćne metode -------------------
-
-  /** @return nova lista svih rezervacija sa svih aranžmana */
-  private List<Rezervacija> sveRezervacije() {
-    List<Rezervacija> rezultat = new ArrayList<>();
-    for (Aranzman a : upraviteljAranzmana.svi()) {
-      rezultat.addAll(a.getRezervacije());
+    if (pocetne != null) {
+      for (Rezervacija r : pocetne) {
+        rezervacije.add(r);
+        poveziSArazmanom(r);
+      }
+      sortirajPoDatumu();
     }
-    return rezultat;
   }
 
-  // ------------------- osnovni dohvat -------------------
-
-  /** @return broj svih rezervacija */
-  public int brojRezervacija() {
-    return sveRezervacije().size();
-  }
-
-  /** @return nova lista svih rezervacija */
-  public List<Rezervacija> sve() {
-    return sveRezervacije();
-  }
-
-  /**
-   * Dodaje novu rezervaciju u odgovarajući aranžman.
-   *
-   * @param r rezervacija koja se dodaje
-   */
-  public void dodaj(Rezervacija r) {
-    if (r == null) {
-      return;
-    }
-    Aranzman a = upraviteljAranzmana.pronadiPoOznaci(r.getOznakaAranzmana());
+  private void poveziSArazmanom(Rezervacija r) {
+    Aranzman a =
+        upraviteljAranzmana.pronadiPoOznaci(r.getOznakaAranzmana());
     if (a != null) {
       a.dodajRezervaciju(r);
     }
   }
 
+  public int brojRezervacija() {
+    return rezervacije.size();
+  }
+
+  public List<Rezervacija> sve() {
+    return new ArrayList<>(rezervacije);
+  }
+
   /**
-   * Dodaje početne (učitane) rezervacije.
-   *
-   * @param pocetne lista postojećih rezervacija
+   * Dodaje novu rezervaciju i odmah je povezuje s odgovarajućim aranžmanom.
+   * Po defaultu je u stanju "nova".
    */
-  public void dodajPocetne(List<Rezervacija> pocetne) {
-    if (pocetne == null) {
+  public void dodaj(Rezervacija r) {
+    if (r == null) {
       return;
     }
-    for (Rezervacija r : pocetne) {
-      dodaj(r);
-    }
+    r.postaviStanje(StanjeNovaRezervacija.instanca());
+    rezervacije.add(r);
+    poveziSArazmanom(r);
+    sortirajPoDatumu();
   }
 
-  /**
-   * Dohvaća sve rezervacije za određeni aranžman.
-   */
   public List<Rezervacija> dohvatiZaAranzman(String oznaka) {
-    Aranzman a = upraviteljAranzmana.pronadiPoOznaci(oznaka);
     List<Rezervacija> rezultat = new ArrayList<>();
-    if (a != null) {
-      rezultat.addAll(a.getRezervacije());
-      rezultat.sort(Comparator.comparing(Rezervacija::getDatumVrijeme));
-    }
-    return rezultat;
-  }
-
-  /**
-   * Dohvaća rezervacije po oznaci aranžmana i tipu statusa.
-   *
-   * @param oznaka oznaka aranžmana
-   * @param vrste skup slova statusa koje treba uključiti
-   */
-  public List<Rezervacija> dohvatiZaAranzmanIVrste(String oznaka, String vrste) {
-    List<Rezervacija> sveZaAranzman = dohvatiZaAranzman(oznaka);
-    if (vrste == null || vrste.isEmpty()) {
-      return sveZaAranzman;
-    }
-    List<Rezervacija> rezultat = new ArrayList<>();
-    for (Rezervacija r : sveZaAranzman) {
-      if (vrste.contains(r.getVrsta())) {
+    for (Rezervacija r : rezervacije) {
+      if (r.getOznakaAranzmana().equalsIgnoreCase(oznaka)) {
         rezultat.add(r);
       }
     }
@@ -116,48 +85,64 @@ public class UpraviteljRezervacijama {
   }
 
   /**
-   * Dohvati sve rezervacije određene osobe.
+   * Filtrira rezervacije za zadani aranžman po "vrstama" stanja
+   * (PA = primljena/aktivna, Č = na čekanju, O = otkazana, OD = odgođena).
    */
+  public List<Rezervacija> dohvatiZaAranzmanIVrste(String oznaka,
+      String vrste) {
+    List<Rezervacija> sveZaAranzman = dohvatiZaAranzman(oznaka);
+    if (vrste == null || vrste.isBlank()) {
+      return sveZaAranzman;
+    }
+
+    String v = vrste.toUpperCase();
+    boolean zeliPA = v.contains("PA");
+    boolean zeliC = v.contains("Č") || v.contains("C");
+    boolean zeliO = v.contains("O");
+    boolean zeliOD = v.contains("OD");
+
+    List<Rezervacija> rezultat = new ArrayList<>();
+    for (Rezervacija r : sveZaAranzman) {
+      String naziv = r.nazivStanja();
+      if (jePA(naziv) && zeliPA) {
+        rezultat.add(r);
+      } else if ("na čekanju".equals(naziv) && zeliC) {
+        rezultat.add(r);
+      } else if ("otkazana".equals(naziv) && zeliO) {
+        rezultat.add(r);
+      } else if ("odgođena".equals(naziv) && zeliOD) {
+        rezultat.add(r);
+      }
+    }
+    return rezultat;
+  }
+
+  private boolean jePA(String naziv) {
+    return "primljena".equals(naziv) || "aktivna".equals(naziv);
+  }
+
   public List<Rezervacija> dohvatiZaOsobu(String ime, String prezime) {
     List<Rezervacija> rezultat = new ArrayList<>();
-    for (Rezervacija r : sveRezervacije()) {
+    for (Rezervacija r : rezervacije) {
       if (r.getIme().equalsIgnoreCase(ime)
           && r.getPrezime().equalsIgnoreCase(prezime)) {
         rezultat.add(r);
       }
     }
-    rezultat.sort(Comparator.comparing(Rezervacija::getDatumVrijeme));
     return rezultat;
   }
 
-  // ------------------- provjere -------------------
-
   /**
-   * Provjerava postoji li aktivna ili primljena rezervacija osobe
-   * za zadani aranžman.
-   */
-  public boolean postojiRezervacija(String ime, String prezime, String oznaka) {
-    for (Rezervacija r : sveRezervacije()) {
-      if (r.getIme().equalsIgnoreCase(ime)
-          && r.getPrezime().equalsIgnoreCase(prezime)
-          && r.getOznakaAranzmana().equalsIgnoreCase(oznaka)
-          && !r.getVrsta().equals("O")) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * Provjerava ima li osoba aktivnu rezervaciju za isti aranžman.
+   * Provjerava ima li osoba već aktivnu rezervaciju za isti aranžman.
+   * Koristi State (jeAktivna + nije otkazana).
    */
   public boolean imaAktivnuZa(String ime, String prezime, String oznaka) {
-    for (Rezervacija r : sveRezervacije()) {
+    for (Rezervacija r : rezervacije) {
       if (r.getIme().equalsIgnoreCase(ime)
           && r.getPrezime().equalsIgnoreCase(prezime)
           && r.getOznakaAranzmana().equalsIgnoreCase(oznaka)
-          && r.isAktivna()
-          && !r.getVrsta().equalsIgnoreCase("O")) {
+          && r.jeAktivna()
+          && !(r.getStanje() instanceof StanjeOtkazanaRezervacija)) {
         return true;
       }
     }
@@ -165,14 +150,14 @@ public class UpraviteljRezervacijama {
   }
 
   /**
-   * Provjerava postoji li aktivna rezervacija osobe unutar zadanog
-   * vremenskog raspona nekog drugog aranžmana.
+   * Provjerava postoji li aktivna rezervacija osobe u vremenskom periodu
+   * nekog drugog aranžmana.
    */
   public boolean imaAktivnuUPeriodu(String ime, String prezime,
-      String oznakaNovog, UpraviteljAranzmanima upraviteljAranzmana) {
+      String oznakaNovog, UpraviteljAranzmanima upraviteljAranzmanima) {
 
     LocalDate[] rasponNovog =
-        upraviteljAranzmana.dohvatiRasponZaOznaku(oznakaNovog);
+        upraviteljAranzmanima.dohvatiRasponZaOznaku(oznakaNovog);
     if (rasponNovog == null) {
       return false;
     }
@@ -180,16 +165,19 @@ public class UpraviteljRezervacijama {
     LocalDate pocetakNovog = rasponNovog[0];
     LocalDate krajNovog = rasponNovog[1];
 
-    for (Rezervacija r : sveRezervacije()) {
+    for (Rezervacija r : rezervacije) {
       if (!r.getIme().equalsIgnoreCase(ime)
-          || !r.getPrezime().equalsIgnoreCase(prezime)
-          || !r.isAktivna()
-          || r.getVrsta().equalsIgnoreCase("O")) {
+          || !r.getPrezime().equalsIgnoreCase(prezime)) {
+        continue;
+      }
+      if (!r.jeAktivna()
+          || (r.getStanje() instanceof StanjeOtkazanaRezervacija)) {
         continue;
       }
 
       LocalDate[] rasponPostojeceg =
-          upraviteljAranzmana.dohvatiRasponZaOznaku(r.getOznakaAranzmana());
+          upraviteljAranzmanima.dohvatiRasponZaOznaku(
+              r.getOznakaAranzmana());
       if (rasponPostojeceg == null) {
         continue;
       }
@@ -207,100 +195,137 @@ public class UpraviteljRezervacijama {
   }
 
   /**
-   * (Opcionalno) dohvat svih rezervacija jedne osobe za aranžman.
+   * Otkazuje najraniju (po datumu unosa) neotkazanu rezervaciju osobe za
+   * zadani aranžman. Rekalkulacija se radi izvana.
    */
-  public List<Rezervacija> dohvatiZaOsobuIAranzman(
-      String ime, String prezime, String oznaka) {
+  public boolean otkaziRezervaciju(String ime, String prezime,
+      String oznaka) {
+    Rezervacija najranija = null;
 
-    List<Rezervacija> rezultat = new ArrayList<>();
-    for (Rezervacija r : dohvatiZaAranzman(oznaka)) {
-      if (r.getIme().equalsIgnoreCase(ime)
-          && r.getPrezime().equalsIgnoreCase(prezime)) {
-        rezultat.add(r);
+    for (Rezervacija r : rezervacije) {
+      if (r.getOznakaAranzmana().equalsIgnoreCase(oznaka)
+          && r.getIme().equalsIgnoreCase(ime)
+          && r.getPrezime().equalsIgnoreCase(prezime)
+          && !(r.getStanje()
+              instanceof StanjeOtkazanaRezervacija)) {
+
+        if (najranija == null
+            || r.getDatumVrijeme().isBefore(
+                najranija.getDatumVrijeme())) {
+          najranija = r;
+        }
       }
     }
-    return rezultat;
+
+    if (najranija != null) {
+      najranija.otkazi(LocalDateTime.now());
+      sortirajPoDatumu();
+      return true;
+    }
+    return false;
   }
 
-  // ------------------- rekalkulacija -------------------
-
   /**
-   * Rekalkulira sve rezervacije aranžmana prema minimalnom i
-   * maksimalnom broju putnika.
+   * Rekalkulira stanja rezervacija za jedan aranžman i osvježava
+   * stanje samog aranžmana (State + Composite).
    */
   public void rekalkulirajZaAranzman(String oznaka, int min, int max) {
     List<Rezervacija> lista = new ArrayList<>();
-    for (Rezervacija r : dohvatiZaAranzman(oznaka)) {
-      if (!r.getVrsta().equalsIgnoreCase("O")) {
+    for (Rezervacija r : rezervacije) {
+      if (r.getOznakaAranzmana().equalsIgnoreCase(oznaka)
+          && !(r.getStanje()
+              instanceof StanjeOtkazanaRezervacija)) {
         lista.add(r);
       }
     }
 
     lista.sort(Comparator.comparing(Rezervacija::getDatumVrijeme));
-    int ukupno = lista.size();
+
+    int brojPrijava = oznaciPrimljene(lista, min);
+    int brojAktivnih = oznaciAktivneINaCekanju(lista, min, max);
+
+    Aranzman a = upraviteljAranzmana.pronadiPoOznaci(oznaka);
+    if (a != null) {
+      a.azurirajStanje(brojAktivnih, brojPrijava);
+    }
+  }
+
+  /**
+   * Sve "nove" rezervacije prelaze u "primljena".
+   * Broji se koliko ih ulazi u kvotu prijava.
+   */
+  private int oznaciPrimljene(List<Rezervacija> lista, int min) {
+    int prijave = 0;
+    for (Rezervacija r : lista) {
+      if (r.getStanje() instanceof StanjeNovaRezervacija) {
+        r.postaviStanje(StanjePrimljenaRezervacija.instanca());
+      }
+      if (r.brojiSeUKvotu()) {
+        prijave++;
+      }
+    }
+    // ako nema dovoljno prijava, sve ostaju samo "primljene"
+    if (prijave < min) {
+      for (Rezervacija r : lista) {
+        if (r.getStanje()
+            instanceof StanjePrimljenaRezervacija) {
+          r.postaviStanje(StanjePrimljenaRezervacija.instanca());
+        }
+      }
+    }
+    return prijave;
+  }
+
+  /**
+   * Dijeli primljene rezervacije na aktivne (do max) i na čekanju.
+   * Ako nakon toga nema barem min aktivnih, sve se vraća na "primljena".
+   */
+  private int oznaciAktivneINaCekanju(List<Rezervacija> lista, int min,
+      int max) {
     int aktivni = 0;
     Set<String> osobeSAktivnom = new HashSet<>();
 
-    if (ukupno < min) {
-      for (Rezervacija r : lista) {
-        r.setVrsta("PA");
-        r.setAktivna(false);
+    for (Rezervacija r : lista) {
+      if (!r.brojiSeUKvotu()) {
+        continue;
       }
-      return;
-    }
 
-    for (Rezervacija r : lista) {
-      r.setVrsta("Č");
-      r.setAktivna(false);
-    }
-
-    for (Rezervacija r : lista) {
       String kljuc =
           (r.getIme() + "|" + r.getPrezime()).toLowerCase();
 
       if (aktivni < max && !osobeSAktivnom.contains(kljuc)) {
-        r.setVrsta("PA");
-        r.setAktivna(true);
-        osobeSAktivnom.add(kljuc);
-        aktivni++;
+        if (r.getStanje()
+            instanceof StanjePrimljenaRezervacija) {
+          r.postaviStanje(StanjeAktivnaRezervacija.instanca());
+        }
+        if (r.jeAktivna()) {
+          aktivni++;
+          osobeSAktivnom.add(kljuc);
+        }
+      } else {
+        if (!(r.getStanje()
+            instanceof StanjeOtkazanaRezervacija)) {
+          r.postaviStanje(
+              StanjeNaCekanjuRezervacija.instanca());
+        }
       }
     }
 
     if (aktivni < min) {
       for (Rezervacija r : lista) {
-        if (r.getVrsta().equals("PA")) {
-          r.setAktivna(false);
+        if (r.getStanje()
+            instanceof StanjeAktivnaRezervacija) {
+          r.postaviStanje(
+              StanjePrimljenaRezervacija.instanca());
         }
       }
+      aktivni = 0;
     }
+    return aktivni;
   }
 
-  /**
-   * Otkazuje rezervaciju korisnika bez rekalkulacije.
-   * Rekalkulaciju treba naknadno pozvati vanjski sloj (komanda).
-   */
-  public boolean otkaziRezervaciju(String ime, String prezime, String oznaka) {
-    List<Rezervacija> zaAranzman = dohvatiZaAranzman(oznaka);
-    Rezervacija najranija = null;
-
-    for (Rezervacija r : zaAranzman) {
-      if (!r.getIme().equalsIgnoreCase(ime)
-          || !r.getPrezime().equalsIgnoreCase(prezime)
-          || r.getVrsta().equalsIgnoreCase("O")) {
-        continue;
-      }
-      if (najranija == null
-          || r.getDatumVrijeme().isBefore(najranija.getDatumVrijeme())) {
-        najranija = r;
-      }
-    }
-
-    if (najranija != null) {
-      najranija.setVrsta("O");
-      najranija.setAktivna(false);
-      najranija.setDatumVrijemeOtkaza(LocalDateTime.now());
-      return true;
-    }
-    return false;
+  private void sortirajPoDatumu() {
+    rezervacije.sort(
+        Comparator.comparing(Rezervacija::getDatumVrijeme));
   }
 }
