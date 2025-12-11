@@ -40,8 +40,12 @@ public class Aplikacija {
       List<Rezervacija> rezervacije =
           ucitacRezervacija.ucitaj(argumenti.dohvatiPutanjuRezervacija());
 
-      UpraviteljAranzmanima uprAranz = new UpraviteljAranzmanima(aranzmani);
-      UpraviteljRezervacijama uprRez = new UpraviteljRezervacijama(rezervacije);
+      // UpraviteljAranzmanima uprAranz = new UpraviteljAranzmanima(aranzmani);
+      // UpraviteljRezervacijama uprRez = new UpraviteljRezervacijama(rezervacije);
+      
+      UpraviteljAranzmanima ua = new UpraviteljAranzmanima(aranzmani);
+      UpraviteljRezervacijama ur = new UpraviteljRezervacijama(ua);
+      ur.dodajPocetne(rezervacije);
 
       for (Aranzman a : aranzmani) {
         uprRez.rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());

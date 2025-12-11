@@ -40,7 +40,7 @@ public class IspisRezervacijaAdapter {
   public String getVrsta() {
     switch (r.getVrsta()) {
       case "PA":
-        return r.isAktivna() ? "Aktivna" : "Primljena";
+        return r.jeAktivna() ? "Aktivna" : "Primljena";
       case "Č":
         return "Na čekanju";
       case "O":

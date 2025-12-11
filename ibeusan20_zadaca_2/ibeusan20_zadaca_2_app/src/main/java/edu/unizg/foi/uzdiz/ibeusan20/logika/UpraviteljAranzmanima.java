@@ -1,14 +1,15 @@
 package edu.unizg.foi.uzdiz.ibeusan20.logika;
 
+import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 
 /**
  * Upravljanje kolekcijom turističkih aranžmana.
  * <p>
- * Omogućuje dohvat, filtriranje i pretraživanje aranžmana prema oznaci ili vremenskom rasponu.
+ * Omogućuje dohvat, filtriranje i pretraživanje aranžmana prema oznaci ili
+ * vremenskom rasponu.
  * </p>
  */
 public class UpraviteljAranzmanima {
@@ -31,12 +32,26 @@ public class UpraviteljAranzmanima {
   }
 
   /**
+   * Dodaje nove aranžmane u postojeću kolekciju.
+   *
+   * @param novi lista novih aranžmana
+   */
+  public void dodajSve(List<Aranzman> novi) {
+    if (novi != null) {
+      aranzmani.addAll(novi);
+    }
+  }
+
+  /**
    * Pronalazi aranžman prema oznaci (bez obzira na velika/mala slova).
    *
    * @param oznaka oznaka aranžmana
    * @return pronađeni aranžman ili {@code null} ako ne postoji
    */
   public Aranzman pronadiPoOznaci(String oznaka) {
+    if (oznaka == null) {
+      return null;
+    }
     for (Aranzman a : aranzmani) {
       if (a.getOznaka() != null && a.getOznaka().equalsIgnoreCase(oznaka)) {
         return a;
@@ -61,12 +76,14 @@ public class UpraviteljAranzmanima {
     List<Aranzman> rezultat = new ArrayList<>();
     for (Aranzman a : aranzmani) {
       LocalDate poc = a.getPocetniDatum();
-      if (poc == null)
+      if (poc == null) {
         continue;
+      }
       boolean unutar =
           (poc.isEqual(od) || poc.isAfter(od)) && (poc.isEqual(do_) || poc.isBefore(do_));
-      if (unutar)
+      if (unutar) {
         rezultat.add(a);
+      }
     }
     return rezultat;
   }
@@ -79,8 +96,9 @@ public class UpraviteljAranzmanima {
    */
   public LocalDate[] dohvatiRasponZaOznaku(String oznaka) {
     Aranzman a = pronadiPoOznaci(oznaka);
-    if (a == null)
+    if (a == null) {
       return null;
+    }
     return new LocalDate[] {a.getPocetniDatum(), a.getZavrsniDatum()};
   }
 }
