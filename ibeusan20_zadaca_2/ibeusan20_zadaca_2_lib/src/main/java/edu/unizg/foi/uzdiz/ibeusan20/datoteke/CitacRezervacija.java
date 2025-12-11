@@ -2,84 +2,57 @@ package edu.unizg.foi.uzdiz.ibeusan20.datoteke;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import model.Rezervacija;
+import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.RezervacijaCsv;
 
-/**
- * Čita i parsira podatke o rezervacijama iz CSV datoteke.
- * <p>
- * Implementira {@link UcitavacPodataka} za tip {@link Rezervacija}. Svaka greška u retku ispisuje
- * se na stderr, ali ne prekida čitanje.
- * </p>
- */
-public class CitacRezervacija implements UcitavacPodataka<Rezervacija> {
+public class CitacRezervacija implements UcitavacPodataka<RezervacijaCsv> {
 
-  /**
-   * Učitava sve rezervacije iz datoteke.
-   *
-   * @param nazivDatoteke putanja do datoteke rezervacija
-   * @return lista učitanih rezervacija
-   */
-  @Override
-  public List<Rezervacija> ucitaj(String nazivDatoteke) {
-    List<Rezervacija> rezultat = new ArrayList<>();
-    int redniBroj = 0;
-    int redniBrojGreske = 0;
+    @Override
+    public List<RezervacijaCsv> ucitaj(String nazivDatoteke) {
+        List<RezervacijaCsv> rezultat = new ArrayList<>();
+        int redniBroj = 0;
 
-    try (BufferedReader br = CsvParser.otvoriUtf8(nazivDatoteke)) {
-      String redak;
-      boolean prvi = true;
+        try (BufferedReader br = CsvParser.otvoriUtf8(nazivDatoteke)) {
+            String redak;
+            boolean prvi = true;
 
-      while ((redak = br.readLine()) != null) {
-        redniBroj++;
+            while ((redak = br.readLine()) != null) {
+                redniBroj++;
 
-        if (prvi) {
-          prvi = false;
-          continue;
+                if (prvi) {
+                    prvi = false;
+                    continue;
+                }
+                if (redak.isBlank() || redak.startsWith("#"))
+                    continue;
+
+                try {
+                    List<String> stupci = CsvParser.procitajZapis(redak, br);
+                    RezervacijaCsv r = new RezervacijaCsv();
+
+                    r.ime = uzmi(stupci, 0);
+                    r.prezime = uzmi(stupci, 1);
+                    r.oznakaAranzmana = uzmi(stupci, 2);
+                    r.datumVrijeme = PomocnikDatum.procitajDatumIVrijeme(uzmi(stupci, 3));
+
+                    rezultat.add(r);
+
+                } catch (Exception e) {
+                    System.err.println("Greška u retku " + redniBroj + ": " + e.getMessage());
+                }
+            }
+
+        } catch (IOException e) {
+            System.err.println("Greška pri čitanju datoteke rezervacija: " + e.getMessage());
         }
 
-        if (redak.isBlank() || redak.trim().startsWith("#")) {
-          continue;
-        }
-
-        try {
-          List<String> stupci = CsvParser.procitajZapis(redak, br);
-          String ime = uzmi(stupci, 0);
-          String prezime = uzmi(stupci, 1);
-          String oznaka = uzmi(stupci, 2);
-          LocalDateTime datumVrijeme = PomocnikDatum.procitajDatumIVrijeme(uzmi(stupci, 3));
-
-          Rezervacija r = new Rezervacija(ime, prezime, oznaka, datumVrijeme);
-          rezultat.add(r);
-
-        } catch (Exception e) {
-          redniBrojGreske++;
-          System.err.println("[" + redniBrojGreske + ". greška] u " + redniBroj + ". retku rezervacije: "
-              + e.getMessage());
-          System.err.println("Sadržaj retka s greškom: " + redak.trim());
-        }
-      }
-
-    } catch (IOException e) {
-      System.err.println("Greška pri čitanju rezervacija: " + e.getMessage());
+        return rezultat;
     }
 
-    return rezultat;
-  }
-
-  /**
-   * Uzmi.
-   *
-   * @param polja the polja
-   * @param i the i
-   * @return the string
-   */
-  private String uzmi(List<String> polja, int i) {
-    if (i >= polja.size()) {
-      return "";
+    private String uzmi(List<String> polja, int i) {
+        if (i >= polja.size())
+            return "";
+        return polja.get(i);
     }
-    return polja.get(i);
-  }
 }
