@@ -1,161 +1,142 @@
 package edu.unizg.foi.uzdiz.ibeusan20.model;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 
 /**
- * Predstavlja rezervaciju turističkog aranžmana.
- * <p>
- * Status može biti:
- * <ul>
- * <li><b>PA</b> – Primljena/aktivna rezervacija</li>
- * <li><b>Č</b> – Na čekanju</li>
- * <li><b>O</b> – Otkazana</li>
- * </ul>
- * </p>
+ * Rezervacija turističkog aranžmana (State + Leaf u Compositeu).
  */
-public class Rezervacija {
+public class Rezervacija implements ElementRezervacijskeStrukture {
+
   private final String ime;
   private final String prezime;
   private final String oznakaAranzmana;
   private final LocalDateTime datumVrijeme;
-  private String vrsta; // "PA", "Č", "O"
+
+  /** Stanje rezervacije (State). */
+  private StanjeRezervacije stanje;
+
   private LocalDateTime datumVrijemeOtkaza;
 
-  private boolean aktivna;
-
   /**
-   * Instantiates a new rezervacija.
+   * Glavni konstruktor.
    *
-   * @param ime the ime
-   * @param prezime the prezime
-   * @param oznakaAranzmana the oznaka aranzmana
-   * @param datumVrijeme the datum vrijeme
+   * @param ime ime osobe
+   * @param prezime prezime osobe
+   * @param oznakaAranzmana oznaka aranžmana
+   * @param datumVrijeme datum i vrijeme rezervacije
    */
   public Rezervacija(String ime, String prezime, String oznakaAranzmana,
       LocalDateTime datumVrijeme) {
-    this(ime, prezime, oznakaAranzmana, datumVrijeme, "PA", null, false);
+    this(ime, prezime, oznakaAranzmana, datumVrijeme, new NovaRezervacija(), null);
   }
 
   /**
-   * Instantiates a new rezervacija.
+   * Puni konstruktor.
    *
-   * @param ime the ime
-   * @param prezime the prezime
-   * @param oznakaAranzmana the oznaka aranzmana
-   * @param datumVrijeme the datum vrijeme
-   * @param vrsta the vrsta
-   * @param datumVrijemeOtkaza the datum vrijeme otkaza
-   * @param aktivna the aktivna
+   * @param ime ime
+   * @param prezime prezime
+   * @param oznakaAranzmana oznaka aranžmana
+   * @param datumVrijeme datum i vrijeme
+   * @param stanje početno stanje
+   * @param datumVrijemeOtkaza datum otkazivanja
    */
-  // puni konstruktor
-  public Rezervacija(String ime, String prezime, String oznakaAranzmana, LocalDateTime datumVrijeme,
-      String vrsta, LocalDateTime datumVrijemeOtkaza, boolean aktivna) {
+  public Rezervacija(String ime, String prezime, String oznakaAranzmana,
+      LocalDateTime datumVrijeme, StanjeRezervacije stanje,
+      LocalDateTime datumVrijemeOtkaza) {
     this.ime = ime;
     this.prezime = prezime;
     this.oznakaAranzmana = oznakaAranzmana;
     this.datumVrijeme = datumVrijeme;
-    this.vrsta = vrsta;
+    this.stanje = stanje;
     this.datumVrijemeOtkaza = datumVrijemeOtkaza;
-    this.aktivna = aktivna;
+  }
+
+  // --- Composite (leaf) ---
+
+  @Override
+  public void dodaj(ElementRezervacijskeStrukture element) {
+    throw new UnsupportedOperationException("Rezervacija ne može imati djecu.");
+  }
+
+  @Override
+  public void ukloni(ElementRezervacijskeStrukture element) {
+    throw new UnsupportedOperationException("Rezervacija ne može imati djecu.");
+  }
+
+  @Override
+  public List<Rezervacija> dohvatiSveRezervacije() {
+    return Collections.singletonList(this);
+  }
+
+  // --- State ---
+
+  public StanjeRezervacije getStanje() {
+    return stanje;
   }
 
   /**
-   * Gets the ime.
+   * Postavlja novo stanje rezervacije.
    *
-   * @return the ime
+   * @param novo novo stanje
    */
+  public void postaviStanje(StanjeRezervacije novo) {
+    if (novo == null) {
+      return;
+    }
+    this.stanje = novo;
+  }
+
+  /**
+   * Otkazuje rezervaciju i postavlja stanje na "otkazana".
+   *
+   * @param vrijemeOtkaza datum i vrijeme otkazivanja
+   */
+  public void otkazi(LocalDateTime vrijemeOtkaza) {
+    this.stanje = new OtkazanaRezervacija();
+    this.datumVrijemeOtkaza = vrijemeOtkaza;
+  }
+
+  public boolean jeAktivna() {
+    return stanje != null && stanje.jeAktivna();
+  }
+
+  public boolean jeOtkazana() {
+    return stanje != null && stanje.jeOtkazana();
+  }
+
+  // --- Getteri za postojeći kod ---
+
   public String getIme() {
     return ime;
   }
 
-  /**
-   * Gets the prezime.
-   *
-   * @return the prezime
-   */
   public String getPrezime() {
     return prezime;
   }
 
-  /**
-   * Gets the oznaka aranzmana.
-   *
-   * @return the oznaka aranzmana
-   */
   public String getOznakaAranzmana() {
     return oznakaAranzmana;
   }
 
-  /**
-   * Gets the datum vrijeme.
-   *
-   * @return the datum vrijeme
-   */
   public LocalDateTime getDatumVrijeme() {
     return datumVrijeme;
   }
 
   /**
-   * Gets the vrsta.
+   * Vraća oznaku stanja (N, P, A, Č, D, O) za potrebe starog koda.
    *
-   * @return the vrsta
+   * @return šifra stanja ili prazno ako nije definirano
    */
   public String getVrsta() {
-    return vrsta;
+    if (stanje == null) {
+      return "";
+    }
+    return stanje.oznaka();
   }
 
-  /**
-   * Gets the datum vrijeme otkaza.
-   *
-   * @return the datum vrijeme otkaza
-   */
   public LocalDateTime getDatumVrijemeOtkaza() {
     return datumVrijemeOtkaza;
-  }
-
-  /**
-   * Checks if is aktivna.
-   *
-   * @return true, if is aktivna
-   */
-  public boolean isAktivna() {
-    return aktivna;
-  }
-
-  /**
-   * Sets the vrsta.
-   *
-   * @param vrsta the new vrsta
-   */
-  public void setVrsta(String vrsta) {
-    this.vrsta = vrsta;
-  }
-
-  /**
-   * Sets the datum vrijeme otkaza.
-   *
-   * @param dt the new datum vrijeme otkaza
-   */
-  public void setDatumVrijemeOtkaza(LocalDateTime dt) {
-    this.datumVrijemeOtkaza = dt;
-  }
-
-  /**
-   * Sets the aktivna.
-   *
-   * @param aktivna the new aktivna
-   */
-  public void setAktivna(boolean aktivna) {
-    this.aktivna = aktivna;
-  }
-
-  /**
-   * Otkazi.
-   *
-   * @param vrijemeOtkaza the vrijeme otkaza
-   */
-  public void otkazi(LocalDateTime vrijemeOtkaza) {
-    this.vrsta = "O";
-    this.datumVrijemeOtkaza = vrijemeOtkaza;
   }
 }

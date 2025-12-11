@@ -130,7 +130,7 @@ public class UpraviteljRezervacijama {
   public boolean imaAktivnuZa(String ime, String prezime, String oznaka) {
     for (Rezervacija r : rezervacije) {
       if (r.getIme().equalsIgnoreCase(ime) && r.getPrezime().equalsIgnoreCase(prezime)
-          && r.getOznakaAranzmana().equalsIgnoreCase(oznaka) && r.isAktivna()
+          && r.getOznakaAranzmana().equalsIgnoreCase(oznaka) && r.jeAktivna()
           && !r.getVrsta().equalsIgnoreCase("O")) {
         return true;
       }
@@ -159,7 +159,7 @@ public class UpraviteljRezervacijama {
 
     for (Rezervacija r : rezervacije) {
       if (r.getIme().equalsIgnoreCase(ime) && r.getPrezime().equalsIgnoreCase(prezime)
-          && r.isAktivna() && !r.getVrsta().equalsIgnoreCase("O")) {
+          && r.jeAktivna() && !r.getVrsta().equalsIgnoreCase("O")) {
 
         LocalDate[] rasponPostojeceg =
             upraviteljAranzmanima.dohvatiRasponZaOznaku(r.getOznakaAranzmana());
@@ -179,7 +179,7 @@ public class UpraviteljRezervacijama {
   }
 
   /**
-   * ✅ (opcionalno) dohvat svih rezervacija jedne osobe za aranžman.
+   * dohvat svih rezervacija jedne osobe za aranžman.
    *
    * @param ime the ime
    * @param prezime the prezime
