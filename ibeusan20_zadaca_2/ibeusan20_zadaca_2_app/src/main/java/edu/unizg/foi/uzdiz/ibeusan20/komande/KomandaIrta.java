@@ -33,7 +33,7 @@ public class KomandaIrta implements Komanda {
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 2) {
-      System.out.println("Sintaksa: IRTA <oznakaAranzmana> [PA|Č|O]");
+      System.out.println("Sintaksa: IRTA <oznakaAranžmana> [PA|Č|O|OD]");
       return true;
     }
 

@@ -243,24 +243,31 @@ public class UpraviteljRezervacijama {
     }
 
     String filter = (vrste == null) ? "" : vrste.toUpperCase();
+
+    // P, A, Č/C, O, D (OD = kombinacija O + D)
     boolean fP = filter.contains("P");
     boolean fA = filter.contains("A");
     boolean fC = filter.contains("Č") || filter.contains("C");
     boolean fO = filter.contains("O");
+    boolean fD = filter.contains("D"); // D za ODGOĐENE
 
-    boolean imaFiltera = fP || fA || fC || fO;
+    // ako je string filtera ne-prazan → imamo filtere,
+    // i kad su svi gore false (npr. "X"), tretiramo to kao "ništa se ne poklapa", a NE "bez filtera"
+    boolean imaFiltera = !filter.isBlank();
 
     List<Rezervacija> rezultat = new ArrayList<>();
     for (Rezervacija r : a.getRezervacije()) {
       String ns = r.nazivStanja();
       String u = ns == null ? "" : ns.toUpperCase();
 
+      // bez filtera → vrati sve
       if (!imaFiltera) {
         rezultat.add(r);
         continue;
       }
 
       boolean pripada = false;
+
       if (fP && u.contains("PRIMLJEN")) {
         pripada = true;
       }
@@ -271,6 +278,10 @@ public class UpraviteljRezervacijama {
         pripada = true;
       }
       if (fO && u.contains("OTKAZ")) {
+        pripada = true;
+      }
+      // ODGOĐENE – prema nazivu stanja
+      if (fD && (u.contains("ODGOĐ") || u.contains("ODGOD"))) {
         pripada = true;
       }
 
@@ -290,6 +301,7 @@ public class UpraviteljRezervacijama {
 
     return rezultat;
   }
+
 
   /**
    * Vraća sve rezervacije za zadanu osobu (IRO), preko svih aranžmana.
