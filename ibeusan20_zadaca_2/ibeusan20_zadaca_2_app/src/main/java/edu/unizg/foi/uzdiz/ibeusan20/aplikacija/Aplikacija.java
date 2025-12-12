@@ -9,7 +9,6 @@ import edu.unizg.foi.uzdiz.ibeusan20.datoteke.facade.DatotekeFacade;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.facade.DatotekeFacadeImpl;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.AranzmanCsv;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.RezervacijaCsv;
-import edu.unizg.foi.uzdiz.ibeusan20.aplikacija.Komande;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
@@ -96,6 +95,13 @@ public class Aplikacija {
                   + " - ne postoji aranžman s oznakom " + rCsv.oznakaAranzmana);
           continue;
         }
+        if (rCsv.datumVrijeme == null) {
+          System.err.println(
+              "Preskačem rezervaciju (" + rCsv.ime + " " + rCsv.prezime
+                  + "): neispravan datum/vrijeme.");
+          continue;
+        }
+
         Rezervacija r =
             new Rezervacija(rCsv.ime, rCsv.prezime, rCsv.oznakaAranzmana, rCsv.datumVrijeme);
         rezervacije.add(r);
@@ -105,8 +111,16 @@ public class Aplikacija {
       UpraviteljAranzmanima uprAranz = new UpraviteljAranzmanima(aranzmani);
       UpraviteljRezervacijama uprRez = new UpraviteljRezervacijama(uprAranz);
 
-      // 5) popunjavanje Composite strukture + inicijalna rekalkulacija state-ova
+      // 5a) popunjavanje Composite strukture (aranžman -> rezervacije)
       uprRez.dodajPocetne(rezervacije);
+
+      // 5b) INICIJALNA REKALKULACIJA STATE-OVA ZA SVE ARANŽMANE
+      for (Aranzman a : uprAranz.svi()) {
+        uprRez.rekalkulirajZaAranzman(
+            a.getOznaka(),
+            a.getMinPutnika(),
+            a.getMaxPutnika());
+      }
 
       System.out.println("Učitano aranžmana: " + uprAranz.brojAranzmana());
       System.out.println("Učitano rezervacija: " + uprRez.brojRezervacija());
