@@ -52,7 +52,8 @@ public class KomandaOrta implements Komanda {
 
     Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(oznaka);
     if (a != null) {
-      upraviteljRezervacija.rekalkulirajZaAranzman(oznaka, a.getMinPutnika(), a.getMaxPutnika());
+      // upraviteljRezervacija.rekalkulirajZaAranzman(oznaka, a.getMinPutnika(), a.getMaxPutnika());
+      upraviteljRezervacija.rekalkulirajSve();
     }
 
     System.out

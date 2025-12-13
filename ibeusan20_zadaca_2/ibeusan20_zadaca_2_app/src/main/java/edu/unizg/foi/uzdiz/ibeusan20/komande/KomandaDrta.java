@@ -75,8 +75,9 @@ public class KomandaDrta implements Komanda {
     // dodaj novu rezervaciju
     Rezervacija r = new Rezervacija(ime, prezime, oznaka, datumVrijeme);
     upraviteljRezervacija.dodaj(r);
-    upraviteljRezervacija.rekalkulirajZaAranzman(oznaka, a.getMinPutnika(), a.getMaxPutnika());
-
+    // upraviteljRezervacija.rekalkulirajZaAranzman(oznaka, a.getMinPutnika(), a.getMaxPutnika());
+    upraviteljRezervacija.rekalkulirajSve();
+    
     System.out.println(
         "Dodana rezervacija za " + ime + " " + prezime + " za turistički aranžman s oznakom "
             + oznaka + " u " + PomocnikDatum.formatirajDatumVrijeme(datumVrijeme));
