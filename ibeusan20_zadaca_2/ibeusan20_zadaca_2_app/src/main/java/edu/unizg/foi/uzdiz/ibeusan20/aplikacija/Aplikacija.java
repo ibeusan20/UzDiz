@@ -113,6 +113,7 @@ public class Aplikacija {
 
       // 5a) popunjavanje Composite strukture (aranžman -> rezervacije)
       uprRez.dodajPocetne(rezervacije);
+      uprRez.rekalkulirajSve();
 
       // 5b) INICIJALNA REKALKULACIJA STATE-OVA ZA SVE ARANŽMANE
       for (Aranzman a : uprAranz.svi()) {

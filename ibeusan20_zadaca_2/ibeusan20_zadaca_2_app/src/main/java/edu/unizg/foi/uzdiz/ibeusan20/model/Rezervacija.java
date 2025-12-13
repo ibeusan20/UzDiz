@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeNovaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeOdgodenaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeOtkazanaRezervacija;
+import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjePrimljenaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeRezervacije;
 
 /**
@@ -23,7 +24,7 @@ public class Rezervacija {
   public Rezervacija(String ime, String prezime, String oznakaAranzmana,
       LocalDateTime datumVrijeme) {
     this(ime, prezime, oznakaAranzmana, datumVrijeme,
-        StanjeNovaRezervacija.instanca(), null);
+        StanjePrimljenaRezervacija.instanca(), null);
   }
 
   public Rezervacija(String ime, String prezime, String oznakaAranzmana,

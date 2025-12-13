@@ -2,15 +2,21 @@ package edu.unizg.foi.uzdiz.ibeusan20.logika;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.KontekstIspisa;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeAktivnaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeNaCekanjuRezervacija;
+import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeOdgodenaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeOtkazanaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjePrimljenaRezervacija;
 
@@ -58,6 +64,50 @@ public class UpraviteljRezervacijama {
       a.dodajRezervaciju(r);
     }
   }
+  
+  /**
+   * Glavna Z2 rekalkulacija:
+   * - po aranžmanu: PRIMLJENA/AKTIVNA/ČEKANJE po min/max
+   * - po osobi: ako ima više AKTIVNIH u preklapanju → najranija ostaje AKTIVNA, ostale postaju ODGOĐENE
+   * - ponavlja dok se stanja ne stabiliziraju
+   */
+  public void rekalkulirajSve() {
+    // sigurnosna ograda da ne upadnemo u beskonačnu petlju
+    for (int iter = 0; iter < 10; iter++) {
+      Map<Rezervacija, String> prije = snapshotStanja();
+
+      // 1) kvote po aranžmanima (ne diramo OTKAZANE i ODGOĐENE)
+      for (Aranzman a : upraviteljAranzmanima.svi()) {
+        rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
+      }
+
+      // 2) pravilo preklapanja po osobi (ODGOĐENE)
+      primijeniPraviloPreklapanja();
+
+      Map<Rezervacija, String> poslije = snapshotStanja();
+      if (jednako(prije, poslije)) {
+        break; // stabilno
+      }
+    }
+  }
+
+  private Map<Rezervacija, String> snapshotStanja() {
+    Map<Rezervacija, String> m = new IdentityHashMap<>();
+    for (Aranzman a : upraviteljAranzmanima.svi()) {
+      for (Rezervacija r : a.getRezervacije()) {
+        m.put(r, r.nazivStanja());
+      }
+    }
+    return m;
+  }
+
+  private boolean jednako(Map<Rezervacija, String> a, Map<Rezervacija, String> b) {
+    if (a.size() != b.size()) return false;
+    for (Map.Entry<Rezervacija, String> e : a.entrySet()) {
+      if (!Objects.equals(e.getValue(), b.get(e.getKey()))) return false;
+    }
+    return true;
+  }
 
   /**
    * Rekalkulira stanja rezervacija i aranžmana za zadanu oznaku.
@@ -85,9 +135,8 @@ public class UpraviteljRezervacijama {
     // kandidati = sve neotkazane
     List<Rezervacija> kandidati = new ArrayList<>();
     for (Rezervacija r : sve) {
-      if (r.getStanje() instanceof StanjeOtkazanaRezervacija) {
-        continue;
-      }
+      if (r.getStanje() instanceof StanjeOtkazanaRezervacija) continue;
+      if (r.getStanje() instanceof StanjeOdgodenaRezervacija) continue;
       kandidati.add(r);
     }
 
@@ -100,22 +149,20 @@ public class UpraviteljRezervacijama {
     }
 
     if (brojPrijava < minPutnika) {
-      // sve neotkazane → PRIMLJENA
       for (Rezervacija r : kandidati) {
         r.postaviStanje(StanjePrimljenaRezervacija.instanca());
       }
       brojAktivnih = 0;
     } else {
       int kvotaAktivnih = Math.min(brojPrijava, maxPutnika);
-      int index = 0;
-      for (Rezervacija r : kandidati) {
-        if (index < kvotaAktivnih) {
+      for (int i = 0; i < kandidati.size(); i++) {
+        Rezervacija r = kandidati.get(i);
+        if (i < kvotaAktivnih) {
           r.postaviStanje(StanjeAktivnaRezervacija.instanca());
           brojAktivnih++;
         } else {
           r.postaviStanje(StanjeNaCekanjuRezervacija.instanca());
         }
-        index++;
       }
     }
 
@@ -142,6 +189,118 @@ public class UpraviteljRezervacijama {
       }
     }
     return false;
+  }
+  
+  /**
+   * Pravilo preklapanja:
+   * Ako osoba ima više AKTIVNIH rezervacija koje se preklapaju po periodu aranžmana:
+   * - najranija (po datumu rezervacije) ostaje aktivna
+   * - ostale u presjeku idu u ODGOĐENE
+   *
+   * Također: ako osoba NEMA više konflikt (nema aktivnu u tom preklapanju),
+   * ODGOĐENE rezervacije koje se više ne preklapaju vraćamo u PRIMLJENU (da ponovno uđu u kvote).
+   */
+  private void primijeniPraviloPreklapanja() {
+    // grupiraj sve rezervacije po osobi
+    Map<String, List<Rezervacija>> poOsobi = new HashMap<>();
+
+    for (Aranzman a : upraviteljAranzmanima.svi()) {
+      for (Rezervacija r : a.getRezervacije()) {
+        String key = (r.getIme() + "|" + r.getPrezime()).toLowerCase();
+        poOsobi.computeIfAbsent(key, k -> new ArrayList<>()).add(r);
+      }
+    }
+
+    for (List<Rezervacija> lista : poOsobi.values()) {
+      // aktivne (neotkazane) rezervacije
+      List<Rezervacija> aktivne = new ArrayList<>();
+      for (Rezervacija r : lista) {
+        if (r.getStanje() instanceof StanjeOtkazanaRezervacija) continue;
+        if (r.jeAktivna()) aktivne.add(r);
+      }
+
+      // ako nema aktivnih, sve odgođene oslobodi (postaju primljene) → scenarij 3 nakon otkaza
+      if (aktivne.isEmpty()) {
+        for (Rezervacija r : lista) {
+          if (r.getStanje() instanceof StanjeOdgodenaRezervacija) {
+            r.postaviStanje(StanjePrimljenaRezervacija.instanca());
+          }
+        }
+        continue;
+      }
+
+      // sortiraj aktivne po datumu rezervacije (kronološki najranija ostaje aktivna)
+      aktivne.sort(Comparator.comparing(Rezervacija::getDatumVrijeme,
+          Comparator.nullsLast(Comparator.naturalOrder())));
+
+      // za svaki konflikt preklapanja: samo prva ostaje aktivna u tom konfliktu
+      for (int i = 0; i < aktivne.size(); i++) {
+        Rezervacija rGlavna = aktivne.get(i);
+        Aranzman aGlavna = upraviteljAranzmanima.pronadiPoOznaci(rGlavna.getOznakaAranzmana());
+        if (aGlavna == null) continue;
+
+        LocalDateTime gOd = pocetak(aGlavna);
+        LocalDateTime gDo = kraj(aGlavna);
+
+        for (int j = i + 1; j < aktivne.size(); j++) {
+          Rezervacija rDruga = aktivne.get(j);
+          Aranzman aDruga = upraviteljAranzmanima.pronadiPoOznaci(rDruga.getOznakaAranzmana());
+          if (aDruga == null) continue;
+
+          LocalDateTime dOd = pocetak(aDruga);
+          LocalDateTime dDo = kraj(aDruga);
+          if (preklapaSe(gOd, gDo, dOd, dDo)) {
+            // kasnija aktivna ide u odgođenu
+            rDruga.postaviStanje(StanjeOdgodenaRezervacija.instanca());
+          }
+        }
+      }
+
+      // dodatno: ako neka ODGOĐENA više ne preklapa nijednu aktivnu osobe → vrati u PRIMLJENU
+      for (Rezervacija r : lista) {
+        if (!(r.getStanje() instanceof StanjeOdgodenaRezervacija)) continue;
+
+        Aranzman ar = upraviteljAranzmanima.pronadiPoOznaci(r.getOznakaAranzmana());
+        if (ar == null) continue;
+
+        LocalDateTime od = pocetak(ar);
+        LocalDateTime d0 = kraj(ar);
+
+        boolean preklapaSAktivnom = false;
+        for (Rezervacija akt : aktivne) {
+          Aranzman aa = upraviteljAranzmanima.pronadiPoOznaci(akt.getOznakaAranzmana());
+          if (aa == null) continue;
+          if (preklapaSe(od, d0, pocetak(aa), kraj(aa))) {
+            preklapaSAktivnom = true;
+            break;
+          }
+        }
+
+        if (!preklapaSAktivnom) {
+          r.postaviStanje(StanjePrimljenaRezervacija.instanca());
+        }
+      }
+    }
+  }
+  
+  private LocalDateTime pocetak(Aranzman a) {
+    LocalDate d = a.getPocetniDatum();
+    LocalTime t = a.getVrijemeKretanja();
+    if (d == null) return LocalDateTime.MIN;
+    return LocalDateTime.of(d, t != null ? t : LocalTime.MIN);
+  }
+
+  private LocalDateTime kraj(Aranzman a) {
+    LocalDate d = a.getZavrsniDatum();
+    LocalTime t = a.getVrijemePovratka();
+    if (d == null) return LocalDateTime.MAX;
+    return LocalDateTime.of(d, t != null ? t : LocalTime.MAX);
+  }
+
+  private boolean preklapaSe(LocalDateTime od1, LocalDateTime do1,
+      LocalDateTime od2, LocalDateTime do2) {
+    if (do1.isBefore(od2) || do2.isBefore(od1)) return false;
+    return true;
   }
 
   /**
@@ -249,7 +408,7 @@ public class UpraviteljRezervacijama {
     boolean fA = filter.contains("A");
     boolean fC = filter.contains("Č") || filter.contains("C");
     boolean fO = filter.contains("O");
-    boolean fD = filter.contains("D"); // D za ODGOĐENE
+    boolean fD = filter.contains("OD") || filter.contains("D"); // OD||D za ODGOĐENE
 
     // ako je string filtera ne-prazan → imamo filtere,
     // i kad su svi gore false (npr. "X"), tretiramo to kao "ništa se ne poklapa", a NE "bez filtera"
