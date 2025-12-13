@@ -50,11 +50,14 @@ public class KomandaDrta implements Komanda {
     String oznaka = argumenti[2].trim();
     String datum = argumenti[3].trim();
     String vrijeme = argumenti[4].trim();
+    
+    ispis.ispisi(new IspisTekstAdapter("DRTA " + ime + " " + prezime + " " + oznaka + " " + datum + " " + vrijeme));
 
     // provjera postojanja aranžmana
     Aranzman a = upraviteljAranzmani.pronadiPoOznaci(oznaka);
     if (a == null) {
       ispis.ispisi(new IspisTekstAdapter("Ne postoji aranžman s oznakom: " + oznaka));
+      ispis.ispisi(new IspisTekstAdapter(""));
       return true;
     }
 
@@ -62,18 +65,21 @@ public class KomandaDrta implements Komanda {
     LocalDateTime datumVrijeme = PomocnikDatum.procitajDatumIVrijeme(datum + " " + vrijeme);
     if (datumVrijeme == null) {
       ispis.ispisi(new IspisTekstAdapter("Neispravan format datuma/vremena. Koristi dd.MM.yyyy. HH:mm:ss"));
+      ispis.ispisi(new IspisTekstAdapter(""));
       return true;
     }
 
     // provjera postoji li već aktivna rezervacija za tu osobu i aranžman
     if (upraviteljRezervacija.imaAktivnuZa(ime, prezime, oznaka)) {
       ispis.ispisi(new IspisTekstAdapter("Osoba već ima AKTIVNU rezervaciju za aranžman " + oznaka + "."));
+      ispis.ispisi(new IspisTekstAdapter(""));
       return true;
     }
 
     if (upraviteljRezervacija.imaAktivnuUPeriodu(ime, prezime, oznaka, upraviteljAranzmani)) {
       ispis.ispisi(new IspisTekstAdapter(
           "Postoji aktivna rezervacija za korisnika u tom vremenskom periodu. Rezervacija nije unesena."));
+      ispis.ispisi(new IspisTekstAdapter(""));
       return true;
     }
 
@@ -85,7 +91,7 @@ public class KomandaDrta implements Komanda {
     
     ispis.ispisi(new IspisTekstAdapter(
         "Dodana rezervacija za " + ime + " " + prezime + " za turistički aranžman s oznakom "
-            + oznaka + " u " + PomocnikDatum.formatirajDatumVrijeme(datumVrijeme)));
+            + oznaka + " u " + PomocnikDatum.formatirajDatumVrijeme(datumVrijeme) + "\n"));
     return true;
   }
 }

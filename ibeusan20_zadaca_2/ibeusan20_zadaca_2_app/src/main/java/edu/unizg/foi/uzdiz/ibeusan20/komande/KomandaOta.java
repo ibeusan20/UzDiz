@@ -34,15 +34,17 @@ public class KomandaOta implements Komanda {
     }
 
     String oznaka = argumenti[0].trim();
+    ispis.ispisi(new IspisTekstAdapter("OTA " + oznaka));
+    
     Aranzman a = uprAranz.pronadiPoOznaci(oznaka);
     if (a == null) {
-      ispis.ispisi(new IspisTekstAdapter("Ne postoji turistički aranžman s oznakom: " + oznaka));
+      ispis.ispisi(new IspisTekstAdapter("Ne postoji turistički aranžman s oznakom: " + oznaka + "\n"));
       return true;
     }
 
     // dohvat svih rezervacija tog aranžmana (sve vrste)
     List<Rezervacija> sveRez =
-        uprRez.dohvatiZaAranzmanIVrste(oznaka, "PAČOD");
+        uprRez.dohvatiZaAranzmanIVrste(oznaka, "PAČOOD");
 
     if (sveRez.isEmpty()) {
       // i dalje moramo aranžman staviti na OTKAZAN

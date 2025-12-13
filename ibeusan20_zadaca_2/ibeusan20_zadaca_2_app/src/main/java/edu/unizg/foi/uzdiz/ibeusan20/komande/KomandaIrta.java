@@ -1,9 +1,11 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
+import java.util.ArrayList;
 import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisRezervacijaAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisniRed;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
@@ -41,25 +43,23 @@ public class KomandaIrta implements Komanda {
     }
 
     String oznaka = argumenti[0].trim();
-    String vrste = (argumenti.length >= 2) ? argumenti[1].toUpperCase() : "";
+    String filter = (argumenti.length == 2) ? argumenti[1].trim() : "PAČOOD"; // ako nema -> sve
 
-    List<Rezervacija> lista = upraviteljRezervacija.dohvatiZaAranzmanIVrste(oznaka, vrste);
+    String komandaTekst = (argumenti.length == 2) ? ("IRTA " + oznaka + " " + filter) : ("IRTA " + oznaka);
+    String nazivTablice = "Rezervacije za turistički aranžman " + oznaka;
 
-    ispis.ispisi(new IspisTekstAdapter(""));
-    ispis.ispisi(new IspisTekstAdapter("Pregled rezervacija za aranžman " + oznaka + ":"));
+    List<Rezervacija> lista = upraviteljRezervacija.dohvatiZaAranzmanIVrste(oznaka, filter);
+
+    List<IspisniRed> redovi = new ArrayList<>();
+    for (Rezervacija r : lista) redovi.add(new IspisRezervacijaAdapter(r));
+
+    formatIspisa.ispisiTablicu(komandaTekst, nazivTablice, redovi);
 
     if (lista.isEmpty()) {
       ispis.ispisi(new IspisTekstAdapter("Nema rezervacija za tražene kriterije."));
-      return true;
+      ispis.ispisi(new IspisTekstAdapter(""));
     }
 
-    boolean imaOtkazane = vrste.contains("O");
-    formatIspisa.setIspisujeOtkazane(imaOtkazane);
-
-    for (Rezervacija r : lista) {
-      IspisRezervacijaAdapter adapter = new IspisRezervacijaAdapter(r);
-      formatIspisa.ispisi(adapter);
-    }
     return true;
   }
 }

@@ -3,19 +3,12 @@ package edu.unizg.foi.uzdiz.ibeusan20.komande;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 
-/**
- * Factory Method za stvaranje objekata tipa {@link Komanda}.
- */
 public final class KomandaFactory {
 
   private KomandaFactory() {}
 
-  public static Komanda kreiraj(String unos, UpraviteljAranzmanima ua,
-      UpraviteljRezervacijama ur) {
-
-    if (unos == null || unos.isBlank()) {
-      return null;
-    }
+  public static Komanda kreiraj(String unos, UpraviteljAranzmanima ua, UpraviteljRezervacijama ur) {
+    if (unos == null || unos.isBlank()) return null;
 
     String[] dijelovi = unos.trim().split("\\s+");
     String naredba = dijelovi[0].toUpperCase();
@@ -33,10 +26,14 @@ public final class KomandaFactory {
       case "ORTA" -> new KomandaOrta(ur, ua, argumenti);
       case "DRTA" -> new KomandaDrta(ur, ua, argumenti);
       case "OTA"  -> new KomandaOta(ua, ur, argumenti);
+
+      case "IS"   -> new KomandaIp(argumenti); //opis zadaće potencijalno kriv?....
       case "IP"   -> new KomandaIp(argumenti);
+
       case "BP"   -> new KomandaBp(ua, ur, argumenti);
       case "UP"   -> new KomandaUp(ua, ur, argumenti);
       case "ITAS" -> new KomandaItas(ua, argumenti);
+
       case "Q"    -> new KomandaQ();
       default     -> null;
     };

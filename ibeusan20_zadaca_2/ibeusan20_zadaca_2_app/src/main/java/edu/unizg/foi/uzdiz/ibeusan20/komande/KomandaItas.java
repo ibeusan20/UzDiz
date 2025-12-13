@@ -1,15 +1,16 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.PomocnikDatum;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
-import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisItasAdapter;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisStatistikaAranzmanaAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisniRed;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
-import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
 
 public class KomandaItas implements Komanda {
 
@@ -39,32 +40,21 @@ public class KomandaItas implements Komanda {
       return true;
     }
 
-    List<Aranzman> kandidati = (od == null)
-        ? uprAranz.svi()
-        : uprAranz.filtrirajPoRasponu(od, d0);
+    List<Aranzman> lista = (od == null) ? uprAranz.svi() : uprAranz.filtrirajPoRasponu(od, d0);
 
-    if (kandidati.isEmpty()) {
-      ispis.ispisi(new IspisTekstAdapter("Nema aranžmana za zadano razdoblje."));
-      return true;
+    String komandaTekst = (od == null) ? "ITAS" : ("ITAS " + argumenti[0] + " " + argumenti[1]);
+    String nazivTablice = "Statistika turističkih aranžmana";
+
+    List<IspisniRed> redovi = new ArrayList<>();
+    for (Aranzman a : lista) {
+      redovi.add(new IspisStatistikaAranzmanaAdapter(a));
     }
 
-    ispis.ispisi(new IspisTekstAdapter("ITAS" + (od == null ? "" : " " + argumenti[0] + " " + argumenti[1])));
+    TablicniFormat tab = new TablicniFormat();
+    tab.ispisiTablicu(komandaTekst, nazivTablice, redovi);
 
-    for (Aranzman a : kandidati) {
-      int ukupno = 0, aktivne = 0, cekanje = 0, odgodene = 0, otkazane = 0;
-
-      for (Rezervacija r : a.getRezervacije()) {
-        ukupno++;
-        String s = (r.nazivStanja() == null) ? "" : r.nazivStanja().toUpperCase();
-
-        if (s.contains("AKTIV")) aktivne++;
-        else if (s.contains("ČEKAN") || s.contains("CEKAN")) cekanje++;
-        else if (s.contains("ODGOĐ") || s.contains("ODGOD")) odgodene++;
-        else if (s.contains("OTKAZ")) otkazane++;
-      }
-
-      double prihod = aktivne * a.getCijena();
-      ispis.ispisi(new IspisItasAdapter(a.getOznaka(), ukupno, aktivne, cekanje, odgodene, otkazane, prihod));
+    if (lista.isEmpty()) {
+      ispis.ispisi(new IspisTekstAdapter("Nema aranžmana za zadano razdoblje. \n"));
     }
 
     return true;

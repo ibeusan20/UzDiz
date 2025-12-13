@@ -44,13 +44,15 @@ public class KomandaUp implements Komanda {
 
     String mod = argumenti[0].trim().toUpperCase();
     String datoteka = argumenti[1].trim();
+    
+    ispis.ispisi(new IspisTekstAdapter("UP " + mod + " " + datoteka));
 
     DatotekeFacade facade = DatotekeFacadeImpl.getInstance();
 
     switch (mod) {
       case "A" -> ucitajAranzmane(facade, datoteka);
       case "R" -> ucitajRezervacije(facade, datoteka);
-      default -> ispis.ispisi(new IspisTekstAdapter("Neispravan argument za UP. Dozvoljeno je A ili R."));
+      default -> ispis.ispisi(new IspisTekstAdapter("Neispravan argument za UP. Dozvoljeno je A ili R. \n"));
     }
 
     return true;
@@ -59,7 +61,7 @@ public class KomandaUp implements Komanda {
   private void ucitajAranzmane(DatotekeFacade facade, String datoteka) {
     List<AranzmanCsv> dto = facade.ucitajAranzmane(datoteka);
     if (dto.isEmpty()) {
-      ispis.ispisi(new IspisTekstAdapter("Nije učitan nijedan aranžman iz datoteke " + datoteka + "."));
+      ispis.ispisi(new IspisTekstAdapter("Nije učitan nijedan aranžman iz datoteke " + datoteka + ". \n"));
       return;
     }
 
@@ -103,7 +105,7 @@ public class KomandaUp implements Komanda {
   private void ucitajRezervacije(DatotekeFacade facade, String datoteka) {
     List<RezervacijaCsv> dto = facade.ucitajRezervacije(datoteka);
     if (dto.isEmpty()) {
-      ispis.ispisi(new IspisTekstAdapter("Nije učitana nijedna rezervacija iz datoteke " + datoteka + "."));
+      ispis.ispisi(new IspisTekstAdapter("Nije učitana nijedna rezervacija iz datoteke " + datoteka + ". \n"));
       return;
     }
 
@@ -130,10 +132,11 @@ public class KomandaUp implements Komanda {
 
       // State + Composite: kroz upravitelja
       uprRez.dodaj(r);
+      // uprRez.rekalkulirajSve();
       uprRez.rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
       brojac++;
     }
 
-    System.out.println("Učitano novih rezervacija iz datoteke " + datoteka + ": " + brojac);
+    System.out.println("Učitano novih rezervacija iz datoteke " + datoteka + ": " + brojac + "\n");
   }
 }

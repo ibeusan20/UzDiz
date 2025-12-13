@@ -1,11 +1,13 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.PomocnikDatum;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisAranzmanaAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisniRed;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
@@ -15,7 +17,6 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
  */
 public class KomandaItak implements Komanda {
   private final UpraviteljAranzmanima upravitelj;
-  private final FormatIspisaBridge formatIspisa = new TablicniFormat();
   private final String[] argumenti;
   private final FormatIspisaBridge ispis = new TablicniFormat();
 
@@ -45,26 +46,27 @@ public class KomandaItak implements Komanda {
       if (argumenti.length >= 2) {
         datumOd = PomocnikDatum.procitajDatum(argumenti[0]);
         datumDo = PomocnikDatum.procitajDatum(argumenti[1]);
+        if (datumOd == null || datumDo == null) {
+          System.out.println("Neispravan format datuma. Koristi dd.MM.yyyy.");
+          return true;
+        }
       }
     } catch (Exception e) {
       ispis.ispisi(new IspisTekstAdapter("Neispravan format datuma. Koristi dd.MM.yyyy."));
       return true;
     }
 
-    List<Aranzman> lista =
-        (datumOd == null) ? upravitelj.svi() : upravitelj.filtrirajPoRasponu(datumOd, datumDo);
+    List<Aranzman> lista = (datumOd == null) ? upravitelj.svi() : upravitelj.filtrirajPoRasponu(datumOd, datumDo);
 
-    ispis.ispisi(new IspisTekstAdapter(""));
-    ispis.ispisi(new IspisTekstAdapter("Pregled turističkih aranzmana:"));
+    String komandaTekst = (datumOd == null) ? "ITAK" : ("ITAK " + argumenti[0] + " " + argumenti[1]);
+    String nazivTablice = "Turistički aranžmani";
 
-    if (lista.isEmpty()) {
-      ispis.ispisi(new IspisTekstAdapter("Nema aranzmana u zadanom razdoblju."));
-    } else {
-      for (Aranzman a : lista) {
-        IspisAranzmanaAdapter adapter = new IspisAranzmanaAdapter(a);
-        formatIspisa.ispisi(adapter);
-      }
-    }
+    List<IspisniRed> redovi = new ArrayList<>();
+    for (Aranzman a : lista) redovi.add(new IspisAranzmanaAdapter(a));
+
+    TablicniFormat tab = new TablicniFormat();
+    tab.ispisiTablicu(komandaTekst, nazivTablice, redovi);
+
     return true;
   }
 }

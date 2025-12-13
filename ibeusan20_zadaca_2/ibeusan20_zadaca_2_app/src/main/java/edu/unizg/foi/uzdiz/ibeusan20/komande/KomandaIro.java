@@ -1,9 +1,11 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
+import java.util.ArrayList;
 import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisRezervacijaOsobeAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisniRed;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
@@ -16,7 +18,6 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
 public class KomandaIro implements Komanda {
   private final UpraviteljRezervacijama upraviteljRezervacija;
   private final UpraviteljAranzmanima upraviteljAranzmani;
-  private final FormatIspisaBridge formatIspisa = new TablicniFormat();
   private final String[] argumenti;
   private final FormatIspisaBridge ispis = new TablicniFormat();
 
@@ -50,21 +51,25 @@ public class KomandaIro implements Komanda {
     String ime = argumenti[0].trim();
     String prezime = argumenti[1].trim();
 
+    String komandaTekst = "IRO " + ime + " " + prezime;
+    String nazivTablice = "Rezervacije za osobu " + ime + " " + prezime;
+
     List<Rezervacija> lista = upraviteljRezervacija.dohvatiZaOsobu(ime, prezime);
 
-    ispis.ispisi(new IspisTekstAdapter(""));
-    ispis.ispisi(new IspisTekstAdapter("Pregled rezervacija za osobu " + ime + " " + prezime + ":"));
+    List<IspisniRed> redovi = new ArrayList<>();
+    for (Rezervacija r : lista) {
+      Aranzman a = upraviteljAranzmani.pronadiPoOznaci(r.getOznakaAranzmana());
+      redovi.add(new IspisRezervacijaOsobeAdapter(r, a));
+    }
+
+    TablicniFormat tab = new TablicniFormat();
+    tab.ispisiTablicu(komandaTekst, nazivTablice, redovi);
 
     if (lista.isEmpty()) {
       ispis.ispisi(new IspisTekstAdapter("Nema rezervacija za navedenu osobu."));
-      return true;
+      ispis.ispisi(new IspisTekstAdapter(""));
     }
 
-    for (Rezervacija r : lista) {
-      Aranzman a = upraviteljAranzmani.pronadiPoOznaci(r.getOznakaAranzmana());
-      IspisRezervacijaOsobeAdapter adapter = new IspisRezervacijaOsobeAdapter(r, a);
-      formatIspisa.ispisi(adapter);
-    }
     return true;
   }
 }

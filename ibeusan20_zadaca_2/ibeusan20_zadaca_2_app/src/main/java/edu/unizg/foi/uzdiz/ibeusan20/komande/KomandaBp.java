@@ -34,6 +34,7 @@ public class KomandaBp implements Komanda {
     }
 
     String mod = argumenti[0].trim().toUpperCase();
+    ispis.ispisi(new IspisTekstAdapter("BP" + mod));
 
     switch (mod) {
       case "A" -> obrisiSveAranzmaneLogicki();

@@ -18,7 +18,7 @@ public class KomandaQ implements Komanda {
    */
   @Override
   public boolean izvrsi() {
-    ispis.ispisi(new IspisTekstAdapter("Program završava. Doviđenja!"));
+    ispis.ispisi(new IspisTekstAdapter("Q \n Program završava. Doviđenja!"));
     return false;
   }
 }

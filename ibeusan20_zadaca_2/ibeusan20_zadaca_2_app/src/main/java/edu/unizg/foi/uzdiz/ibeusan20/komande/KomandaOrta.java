@@ -46,12 +46,13 @@ public class KomandaOrta implements Komanda {
     String ime = argumenti[0].trim();
     String prezime = argumenti[1].trim();
     String oznaka = argumenti[2].trim();
+    
+    ispis.ispisi(new IspisTekstAdapter("ORTA " + ime + " " + prezime + " " + oznaka));
 
     boolean uspjeh = upraviteljRezervacija.otkaziRezervaciju(ime, prezime, oznaka);
 
     if (!uspjeh) {
-      System.out
-          .println("Nije pronađena rezervacija za " + ime + " " + prezime + " (" + oznaka + ").");
+      ispis.ispisi(new IspisTekstAdapter("Nije pronađena rezervacija za " + ime + " " + prezime + " (" + oznaka + ").\n"));
       return true;
     }
 
@@ -61,8 +62,7 @@ public class KomandaOrta implements Komanda {
       upraviteljRezervacija.rekalkulirajSve();
     }
 
-    System.out
-        .println("Uspješno otkazana rezervacija za " + ime + " " + prezime + " (" + oznaka + ").");
+    ispis.ispisi(new IspisTekstAdapter("Uspješno otkazana rezervacija za " + ime + " " + prezime + " (" + oznaka + ").\n"));
     return true;
   }
 }
