@@ -1,9 +1,15 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
+
 /**
  * Komanda Q - završetak rada programa.
  */
 public class KomandaQ implements Komanda {
+  
+  private final FormatIspisaBridge ispis = new TablicniFormat();
 
   /**
    * Izvrsi.
@@ -12,7 +18,7 @@ public class KomandaQ implements Komanda {
    */
   @Override
   public boolean izvrsi() {
-    System.out.println("Program završava. Doviđenja!");
+    ispis.ispisi(new IspisTekstAdapter("Program završava. Doviđenja!"));
     return false;
   }
 }

@@ -1,6 +1,9 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
 import java.util.List;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
@@ -14,6 +17,7 @@ public class KomandaOta implements Komanda {
   private final UpraviteljAranzmanima uprAranz;
   private final UpraviteljRezervacijama uprRez;
   private final String[] argumenti;
+  private final FormatIspisaBridge ispis = new TablicniFormat();
 
   public KomandaOta(UpraviteljAranzmanima uprAranz,
       UpraviteljRezervacijama uprRez, String... argumenti) {
@@ -25,14 +29,14 @@ public class KomandaOta implements Komanda {
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 1) {
-      System.out.println("Sintaksa: OTA <oznaka>");
+      ispis.ispisi(new IspisTekstAdapter("Sintaksa: OTA <oznaka>"));
       return true;
     }
 
     String oznaka = argumenti[0].trim();
     Aranzman a = uprAranz.pronadiPoOznaci(oznaka);
     if (a == null) {
-      System.out.println("Ne postoji turistički aranžman s oznakom: " + oznaka);
+      ispis.ispisi(new IspisTekstAdapter("Ne postoji turistički aranžman s oznakom: " + oznaka));
       return true;
     }
 
@@ -43,8 +47,8 @@ public class KomandaOta implements Komanda {
     if (sveRez.isEmpty()) {
       // i dalje moramo aranžman staviti na OTKAZAN
       a.postaviOtkazan();
-      System.out.println(
-          "Turistički aranžman " + oznaka + " je otkazan (nije bilo rezervacija).");
+      ispis.ispisi(new IspisTekstAdapter(
+          "Turistički aranžman " + oznaka + " je otkazan (nije bilo rezervacija)."));
       return true;
     }
 
@@ -63,13 +67,13 @@ public class KomandaOta implements Komanda {
     uprRez.rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
 
     if (biloOtkaza) {
-      System.out.println(
+      ispis.ispisi(new IspisTekstAdapter(
           "Uspješno otkazan turistički aranžman " + oznaka
-              + " i otkazane pripadajuće rezervacije.");
+              + " i otkazane pripadajuće rezervacije."));
     } else {
-      System.out.println(
+      ispis.ispisi(new IspisTekstAdapter(
           "Nije pronađena nijedna rezervacija za aranžman " + oznaka
-              + ", ali je aranžman označen kao otkazan.");
+              + ", ali je aranžman označen kao otkazan."));
     }
 
     return true;

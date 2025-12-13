@@ -3,6 +3,7 @@ package edu.unizg.foi.uzdiz.ibeusan20.komande;
 import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisRezervacijaOsobeAdapter;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
@@ -17,6 +18,8 @@ public class KomandaIro implements Komanda {
   private final UpraviteljAranzmanima upraviteljAranzmani;
   private final FormatIspisaBridge formatIspisa = new TablicniFormat();
   private final String[] argumenti;
+  private final FormatIspisaBridge ispis = new TablicniFormat();
+
 
   /**
    * Instancira novu komandu iro.
@@ -40,7 +43,7 @@ public class KomandaIro implements Komanda {
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 2) {
-      System.out.println("Sintaksa: IRO <ime> <prezime>");
+      ispis.ispisi(new IspisTekstAdapter("Sintaksa: IRO <ime> <prezime>"));
       return true;
     }
 
@@ -49,11 +52,11 @@ public class KomandaIro implements Komanda {
 
     List<Rezervacija> lista = upraviteljRezervacija.dohvatiZaOsobu(ime, prezime);
 
-    System.out.println();
-    System.out.println("Pregled rezervacija za osobu " + ime + " " + prezime + ":");
+    ispis.ispisi(new IspisTekstAdapter(""));
+    ispis.ispisi(new IspisTekstAdapter("Pregled rezervacija za osobu " + ime + " " + prezime + ":"));
 
     if (lista.isEmpty()) {
-      System.out.println("Nema rezervacija za navedenu osobu.");
+      ispis.ispisi(new IspisTekstAdapter("Nema rezervacija za navedenu osobu."));
       return true;
     }
 

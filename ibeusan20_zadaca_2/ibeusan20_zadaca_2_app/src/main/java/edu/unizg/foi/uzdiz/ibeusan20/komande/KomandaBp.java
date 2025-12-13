@@ -2,6 +2,7 @@ package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
 import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
@@ -28,7 +29,7 @@ public class KomandaBp implements Komanda {
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 1) {
-      System.out.println("Sintaksa: BP [A|R]");
+      ispis.ispisi(new IspisTekstAdapter("Sintaksa: BP [A|R]"));
       return true;
     }
 
@@ -37,7 +38,7 @@ public class KomandaBp implements Komanda {
     switch (mod) {
       case "A" -> obrisiSveAranzmaneLogicki();
       case "R" -> obrisiSveRezervacijeLogicki();
-      default -> System.out.println("Neispravan argument za BP. Dozvoljeno je A ili R.");
+      default -> ispis.ispisi(new IspisTekstAdapter("Neispravan argument za BP. Dozvoljeno je A ili R."));
     }
 
     return true;
@@ -46,7 +47,7 @@ public class KomandaBp implements Komanda {
   private void obrisiSveAranzmaneLogicki() {
     List<Aranzman> svi = uprAranz.svi();
     if (svi.isEmpty()) {
-      System.out.println("Nema aranžmana za brisanje.");
+      ispis.ispisi(new IspisTekstAdapter("Nema aranžmana za brisanje."));
       return;
     }
 
@@ -63,7 +64,7 @@ public class KomandaBp implements Komanda {
       uprRez.rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
     }
 
-    System.out.println("Logički obrisani (otkazani) svi aranžmani i sve njihove rezervacije.");
+    ispis.ispisi(new IspisTekstAdapter("Logički obrisani (otkazani) svi aranžmani i sve njihove rezervacije."));
   }
 
   private void obrisiSveRezervacijeLogicki() {
@@ -85,9 +86,9 @@ public class KomandaBp implements Komanda {
     }
 
     if (bilo) {
-      System.out.println("Logički obrisane (otkazane) sve rezervacije.");
+      ispis.ispisi(new IspisTekstAdapter("Logički obrisane (otkazane) sve rezervacije."));
     } else {
-      System.out.println("Nema rezervacija za brisanje.");
+      ispis.ispisi(new IspisTekstAdapter("Nema rezervacija za brisanje."));
     }
   }
 }

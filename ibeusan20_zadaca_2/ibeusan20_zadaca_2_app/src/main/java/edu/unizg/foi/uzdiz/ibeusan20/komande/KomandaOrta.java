@@ -1,5 +1,8 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
@@ -11,6 +14,8 @@ public class KomandaOrta implements Komanda {
   private final UpraviteljRezervacijama upraviteljRezervacija;
   private final UpraviteljAranzmanima upraviteljAranzmanima;
   private final String[] argumenti;
+  private final FormatIspisaBridge ispis = new TablicniFormat();
+
 
   /**
    * Instancira novu komandu orta.
@@ -34,7 +39,7 @@ public class KomandaOrta implements Komanda {
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 3) {
-      System.out.println("Sintaksa: ORTA <ime> <prezime> <oznakaAranzmana>");
+      ispis.ispisi(new IspisTekstAdapter("Sintaksa: ORTA <ime> <prezime> <oznakaAranzmana>"));
       return true;
     }
 

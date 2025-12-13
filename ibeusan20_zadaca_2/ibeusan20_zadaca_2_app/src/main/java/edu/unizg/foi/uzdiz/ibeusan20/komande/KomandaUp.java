@@ -1,11 +1,13 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
 import java.util.List;
-
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.facade.DatotekeFacade;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.facade.DatotekeFacadeImpl;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.AranzmanCsv;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.RezervacijaCsv;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
@@ -24,6 +26,7 @@ public class KomandaUp implements Komanda {
   private final UpraviteljAranzmanima uprAranz;
   private final UpraviteljRezervacijama uprRez;
   private final String[] argumenti;
+  private final FormatIspisaBridge ispis = new TablicniFormat();
 
   public KomandaUp(UpraviteljAranzmanima uprAranz,
       UpraviteljRezervacijama uprRez, String... argumenti) {
@@ -35,7 +38,7 @@ public class KomandaUp implements Komanda {
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 2) {
-      System.out.println("Sintaksa: UP [A|R] nazivDatoteke");
+      ispis.ispisi(new IspisTekstAdapter("Sintaksa: UP [A|R] nazivDatoteke"));
       return true;
     }
 
@@ -47,7 +50,7 @@ public class KomandaUp implements Komanda {
     switch (mod) {
       case "A" -> ucitajAranzmane(facade, datoteka);
       case "R" -> ucitajRezervacije(facade, datoteka);
-      default -> System.out.println("Neispravan argument za UP. Dozvoljeno je A ili R.");
+      default -> ispis.ispisi(new IspisTekstAdapter("Neispravan argument za UP. Dozvoljeno je A ili R."));
     }
 
     return true;
@@ -56,7 +59,7 @@ public class KomandaUp implements Komanda {
   private void ucitajAranzmane(DatotekeFacade facade, String datoteka) {
     List<AranzmanCsv> dto = facade.ucitajAranzmane(datoteka);
     if (dto.isEmpty()) {
-      System.out.println("Nije učitan nijedan aranžman iz datoteke " + datoteka + ".");
+      ispis.ispisi(new IspisTekstAdapter("Nije učitan nijedan aranžman iz datoteke " + datoteka + "."));
       return;
     }
 
@@ -94,13 +97,13 @@ public class KomandaUp implements Komanda {
       }
     }
 
-    System.out.println("Učitano novih aranžmana iz datoteke " + datoteka + ": " + brojac);
+    ispis.ispisi(new IspisTekstAdapter("Učitano novih aranžmana iz datoteke " + datoteka + ": " + brojac));
   }
 
   private void ucitajRezervacije(DatotekeFacade facade, String datoteka) {
     List<RezervacijaCsv> dto = facade.ucitajRezervacije(datoteka);
     if (dto.isEmpty()) {
-      System.out.println("Nije učitana nijedna rezervacija iz datoteke " + datoteka + ".");
+      ispis.ispisi(new IspisTekstAdapter("Nije učitana nijedna rezervacija iz datoteke " + datoteka + "."));
       return;
     }
 

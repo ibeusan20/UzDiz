@@ -1,7 +1,9 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
 import java.util.List;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisRezervacijaAdapter;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
@@ -13,6 +15,7 @@ public class KomandaIrta implements Komanda {
   private final UpraviteljRezervacijama upraviteljRezervacija;
   private final TablicniFormat formatIspisa = new TablicniFormat();
   private final String[] argumenti;
+  private final FormatIspisaBridge ispis = new TablicniFormat();
 
   /**
    * Instancira novu koamndu irta.
@@ -33,7 +36,7 @@ public class KomandaIrta implements Komanda {
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 2) {
-      System.out.println("Sintaksa: IRTA <oznakaAranžmana> [PA|Č|O|OD]");
+      ispis.ispisi(new IspisTekstAdapter("Sintaksa: IRTA <oznakaAranžmana> [PA|Č|O|OD]"));
       return true;
     }
 
@@ -42,11 +45,11 @@ public class KomandaIrta implements Komanda {
 
     List<Rezervacija> lista = upraviteljRezervacija.dohvatiZaAranzmanIVrste(oznaka, vrste);
 
-    System.out.println();
-    System.out.println("Pregled rezervacija za aranžman " + oznaka + ":");
+    ispis.ispisi(new IspisTekstAdapter(""));
+    ispis.ispisi(new IspisTekstAdapter("Pregled rezervacija za aranžman " + oznaka + ":"));
 
     if (lista.isEmpty()) {
-      System.out.println("Nema rezervacija za tražene kriterije.");
+      ispis.ispisi(new IspisTekstAdapter("Nema rezervacija za tražene kriterije."));
       return true;
     }
 
