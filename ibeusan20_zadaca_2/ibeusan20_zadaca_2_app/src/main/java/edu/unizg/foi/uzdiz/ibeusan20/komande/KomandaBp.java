@@ -1,6 +1,8 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
 import java.util.List;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
@@ -14,6 +16,7 @@ public class KomandaBp implements Komanda {
   private final UpraviteljAranzmanima uprAranz;
   private final UpraviteljRezervacijama uprRez;
   private final String[] argumenti;
+  private final FormatIspisaBridge ispis = new TablicniFormat();
 
   public KomandaBp(UpraviteljAranzmanima uprAranz,
       UpraviteljRezervacijama uprRez, String... argumenti) {
