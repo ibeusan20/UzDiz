@@ -19,7 +19,7 @@ public class IspisAranzmanaAdapter implements IspisniRed {
 
   @Override
   public String[] zaglavlje() {
-    return new String[] {"Oznaka", "Naziv", "Od", "Do", "Stanje"};
+    return new String[] {"Oznaka", "Naziv", "Datum od", "Datum do", "Kretanje", "Povratak", "Cijena", "Min", "Max", "Status"};
   }
 
   @Override
@@ -29,7 +29,7 @@ public class IspisAranzmanaAdapter implements IspisniRed {
     String d0 = aranzman.getZavrsniDatum() == null ? ""
         : aranzman.getZavrsniDatum().format(FORMAT_DATUM);
 
-    return new String[] {
+    return new String[] { // nedostaju vrijeednosti definirane u zaglavlju
         aranzman.getOznaka(),
         aranzman.getNaziv(),
         od,

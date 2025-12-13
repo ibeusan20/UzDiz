@@ -16,14 +16,14 @@ public class IspisRezervacijaAdapter implements IspisniRed {
 
   @Override
   public String[] zaglavlje() {
-    return new String[] {"Ime", "Prezime", "Oznaka", "Datum/vrijeme", "Stanje"};
+    return new String[] {"Ime", "Prezime", "Datum i vrijeme", "Stanje", "Dat. i Vri. otkaza"};
   }
 
   @Override
   public String[] vrijednosti() {
     String dv = PomocnikDatum.formatirajDatumVrijeme(rezervacija.getDatumVrijeme());
 
-    return new String[] {
+    return new String[] { // nedostaju sve stvari koje su definirane u zaglavlju
         rezervacija.getIme(),
         rezervacija.getPrezime(),
         rezervacija.getOznakaAranzmana(),

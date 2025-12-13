@@ -23,7 +23,7 @@ public class IspisRezervacijaOsobeAdapter implements IspisniRed {
   @Override
   public String[] zaglavlje() {
     return new String[] {
-        "Oznaka", "Naziv aranžmana", "Polazak", "Povratak", "Stanje"
+        "Datum i vrijeme", "Oznaka", "Naziv aranžmana", "Stanje"
     };
   }
 
@@ -37,8 +37,6 @@ public class IspisRezervacijaOsobeAdapter implements IspisniRed {
     return new String[] {
         aranzman.getOznaka(),
         aranzman.getNaziv(),
-        polazak,
-        povratak,
         rezervacija.nazivStanja() // STATE, tekstualno
     };
   }

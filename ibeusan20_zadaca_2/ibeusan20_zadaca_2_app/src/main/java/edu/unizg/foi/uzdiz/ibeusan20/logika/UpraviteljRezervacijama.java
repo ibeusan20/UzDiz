@@ -367,22 +367,100 @@ public class UpraviteljRezervacijama {
     if (ime == null || prezime == null || oznakaAranzmana == null) {
       return false;
     }
+
     Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(oznakaAranzmana);
     if (a == null) {
       return false;
     }
 
+    // sve rezervacije te osobe za taj aranžman (ne-otkazane)
+    List<Rezervacija> kandidati = new ArrayList<>();
     for (Rezervacija r : a.getRezervacije()) {
       if (ime.equalsIgnoreCase(r.getIme())
           && prezime.equalsIgnoreCase(r.getPrezime())
-          && oznakaAranzmana.equalsIgnoreCase(r.getOznakaAranzmana())) {
-
-        r.otkazi(LocalDateTime.now());
-        return true;
+          && oznakaAranzmana.equalsIgnoreCase(r.getOznakaAranzmana())
+          && !(r.getStanje() instanceof StanjeOtkazanaRezervacija)) {
+        kandidati.add(r);
       }
     }
+
+    if (kandidati.isEmpty()) {
+      return false;
+    }
+
+    // kronološki – najstarije prve
+    kandidati.sort(Comparator.comparing(
+        Rezervacija::getDatumVrijeme,
+        Comparator.nullsLast(Comparator.naturalOrder()))
+    );
+
+    Rezervacija aktivna = null;
+    Rezervacija primljena = null;
+    Rezervacija odgodena = null;
+
+    for (Rezervacija r : kandidati) {
+      if (r.getStanje() instanceof StanjeAktivnaRezervacija) {
+        if (aktivna == null) {
+          aktivna = r;
+        }
+      } else if (r.getStanje() instanceof StanjePrimljenaRezervacija) {
+        if (primljena == null) {
+          primljena = r;
+        }
+      } else if (jeOdgodena(r)) {
+        if (odgodena == null) {
+          odgodena = r;
+        }
+      }
+    }
+
+    LocalDateTime sada = LocalDateTime.now();
+
+    // 3) AKTIVNA + ODGOĐENA za istu osobu i aranžman:
+    //    - otkazuje se AKTIVNA
+    //    - ODGOĐENA prelazi u AKTIVNU
+    if (aktivna != null && odgodena != null) {
+      aktivna.otkazi(sada); // stanje -> otkazana, upiše se datum otkaza
+      odgodena.postaviStanje(StanjeAktivnaRezervacija.instanca());
+      return true;
+    }
+
+    // 2) samo AKTIVNA (bez odgođenih za tu osobu):
+    //    - otkazuje se aktivna
+    //    - radi se rekalkulacija, netko s čekanja može “uskočiti”
+    if (aktivna != null) {
+      aktivna.otkazi(sada);
+      rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
+      return true;
+    }
+
+    // 1) nema aktivne, ali ima PRIMLJENA:
+    //    - otkazuje se primljena (tzv. lista prijava)
+    //    - rekalkulacija (obično neće puno promijeniti aktivne, ali ostaje konzistentno)
+    if (primljena != null) {
+      primljena.otkazi(sada);
+      rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
+      return true;
+    }
+
+    // sve ostalo (npr. postoji samo odgođena/otkazana) – nema što otkazati
     return false;
   }
+  
+  private boolean jeOdgodena(Rezervacija r) {
+    if (r == null) {
+      return false;
+    }
+    String ns = r.nazivStanja();
+    if (ns == null) {
+      return false;
+    }
+    String u = ns.toUpperCase();
+    // pokriva "odgođena", "odgođena rezervacija", bez obzira na dijakritike
+    return u.contains("ODGOĐ") || u.contains("ODGOD");
+  }
+
+
 
   /**
    * Vraća rezervacije za aranžman uz filtriranje po "vrstama" (PAČO).
