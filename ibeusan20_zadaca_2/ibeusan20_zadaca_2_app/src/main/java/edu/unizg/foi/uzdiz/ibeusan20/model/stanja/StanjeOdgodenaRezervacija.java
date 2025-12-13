@@ -25,4 +25,10 @@ public class StanjeOdgodenaRezervacija implements StanjeRezervacije {
   public boolean jeAktivna() {
     return false;
   }
+  
+  @Override
+  public boolean mozeOtkazati() {
+    // korisnik može otkazati i odgođenu rezervaciju
+    return true;
+  }
 }

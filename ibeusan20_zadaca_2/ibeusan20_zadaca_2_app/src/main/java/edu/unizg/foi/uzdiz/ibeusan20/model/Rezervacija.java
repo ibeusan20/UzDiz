@@ -2,6 +2,7 @@ package edu.unizg.foi.uzdiz.ibeusan20.model;
 
 import java.time.LocalDateTime;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeNovaRezervacija;
+import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeOdgodenaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeOtkazanaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeRezervacije;
 
@@ -85,5 +86,12 @@ public class Rezervacija {
     }
     this.datumVrijemeOtkaza = vrijemeOtkaza;
     this.stanje = StanjeOtkazanaRezervacija.instanca();
+  }
+  
+  public void odgodi(LocalDateTime vrijemeOdgode) {
+    // koristimo isto polje datumVrijemeOtkaza i za odgodu,
+    // jer se u ispisima IRTA/ITAS ionako traži "Datum i vrijeme otkaza/odgode"
+    this.datumVrijemeOtkaza = vrijemeOdgode;
+    this.stanje = StanjeOdgodenaRezervacija.instanca();
   }
 }

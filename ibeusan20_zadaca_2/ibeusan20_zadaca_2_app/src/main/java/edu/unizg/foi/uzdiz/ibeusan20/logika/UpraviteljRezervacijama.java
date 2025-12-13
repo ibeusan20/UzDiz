@@ -342,4 +342,60 @@ public class UpraviteljRezervacijama {
     }
     return br;
   }
+  
+  /**
+   * Odgađa sve NEotkazane rezervacije za zadani aranžman.
+   * Korisno za scenarije gdje se aranžman odgađa/otkazuje,
+   * a rezervacije prelaze u stanje ODGOĐENA.
+   */
+  public int odgodiSveRezervacijeZaAranzman(String oznaka, LocalDateTime vrijeme) {
+    Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(oznaka);
+    if (a == null) {
+      return 0;
+    }
+    int br = 0;
+    for (Rezervacija r : a.getRezervacije()) {
+      // ne diramo već otkazane/odgođene
+      String s = r.nazivStanja();
+      String u = s == null ? "" : s.toUpperCase();
+      if (u.contains("OTKAZ") || u.contains("ODGOĐ") || u.contains("ODGOD")) {
+        continue;
+      }
+      r.odgodi(vrijeme);
+      br++;
+    }
+    // nakon toga kvote nema smisla (sve su odgođene/neaktivne),
+    // ali možeš ako želiš pozvati rekalkulaciju s 0/0
+    a.azurirajStanje(0, 0);
+    return br;
+  }
+  
+  /**
+   * Odgađa jednu rezervaciju osobe za zadani aranžman.
+   *
+   * @return true ako je pronađena i odgođena
+   */
+  public boolean odgodiRezervaciju(String ime, String prezime, String oznakaAranzmana,
+      LocalDateTime vrijemeOdgode) {
+    if (ime == null || prezime == null || oznakaAranzmana == null) {
+      return false;
+    }
+    Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(oznakaAranzmana);
+    if (a == null) {
+      return false;
+    }
+
+    for (Rezervacija r : a.getRezervacije()) {
+      if (ime.equalsIgnoreCase(r.getIme())
+          && prezime.equalsIgnoreCase(r.getPrezime())
+          && oznakaAranzmana.equalsIgnoreCase(r.getOznakaAranzmana())) {
+
+        r.odgodi(vrijemeOdgode);
+        return true;
+      }
+    }
+    return false;
+  }
+
+
 }
