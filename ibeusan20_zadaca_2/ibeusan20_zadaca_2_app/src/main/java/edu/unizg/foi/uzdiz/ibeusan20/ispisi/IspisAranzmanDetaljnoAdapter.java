@@ -44,15 +44,15 @@ public class IspisAranzmanDetaljnoAdapter {
     System.out.println("Završni datum: " + d0);
     System.out.println("Vrijeme kretanja: " + vk);
     System.out.println("Vrijeme povratka: " + vp);
-    System.out.println("Cijena: " + aranzman.getCijena());
-    System.out.println("Min. putnika: " + aranzman.getMinPutnika());
-    System.out.println("Max. putnika: " + aranzman.getMaxPutnika());
-    System.out.println("Broj noćenja: " + aranzman.getBrojNocenja());
-    System.out.println("Doplata jednokrevetna: " + aranzman.getDoplataJednokrevetna());
-    System.out.println("Prijevoz: " + prijevoz);
-    System.out.println("Doručaka: " + aranzman.getBrojDorucaka());
-    System.out.println("Ručkova: " + aranzman.getBrojRuckova());
-    System.out.println("Večera: " + aranzman.getBrojVecera());
+    System.out.println("Cijena: " + FormatBrojeva.eur(aranzman.getCijena()));
+    System.out.println("Min. putnika: " + FormatBrojeva.cijeli(aranzman.getMinPutnika()));
+    System.out.println("Max. putnika: " + FormatBrojeva.cijeli(aranzman.getMaxPutnika()));
+    System.out.println("Broj noćenja: " + FormatBrojeva.cijeli(aranzman.getBrojNocenja()));
+    System.out.println("Doplata jednokrevetna: " + FormatBrojeva.eur(aranzman.getDoplataJednokrevetna()));
+    System.out.println("Doručaka: " + FormatBrojeva.cijeli(aranzman.getBrojDorucaka()));
+    System.out.println("Ručkova: " + FormatBrojeva.cijeli(aranzman.getBrojRuckova()));
+    System.out.println("Večera: " + FormatBrojeva.cijeli(aranzman.getBrojVecera()));
+
     System.out.println("Stanje aranžmana: " + aranzman.nazivStanja()); // STATE
   }
 }

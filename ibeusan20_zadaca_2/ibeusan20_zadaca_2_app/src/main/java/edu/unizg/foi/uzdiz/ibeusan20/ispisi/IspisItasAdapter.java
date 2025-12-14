@@ -38,7 +38,7 @@ public class IspisItasAdapter implements IspisniRed {
         String.valueOf(cekanje),
         String.valueOf(odgodene),
         String.valueOf(otkazane),
-        String.format("%.2f", prihod)
+        FormatBrojeva.eur(prihod)
     };
   }
 }

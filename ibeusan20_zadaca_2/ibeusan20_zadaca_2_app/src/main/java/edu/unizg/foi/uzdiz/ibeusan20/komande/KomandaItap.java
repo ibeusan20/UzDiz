@@ -41,7 +41,6 @@ public class KomandaItap implements Komanda {
     }
 
     ispis.ispisi(new IspisTekstAdapter("Pregled turističkog aranžmana"));
-    ispis.ispisi(IspisTekstAdapter(""));
     new IspisAranzmanDetaljnoAdapter(a).ispisiDetalje();
     ispis.ispisi(IspisTekstAdapter(""));
 
