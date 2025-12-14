@@ -37,6 +37,8 @@ public class Aplikacija {
    * @param args argumenti komandne linije
    */
   public static void main(String[] args) {
+    int redniBrojGreske = 0;
+    int redniBroj = 0;
     try {
       Argumenti argumenti = new Argumenti(args);
 
@@ -56,9 +58,11 @@ public class Aplikacija {
 
       // 2) kreiranje domenskih objekata (Aranzman) i mapa po oznaci
       List<Aranzman> aranzmani = new ArrayList<>();
+      redniBroj = 0;
       Map<String, Aranzman> mapaAranzmana = new LinkedHashMap<>();
 
       for (AranzmanCsv aCsv : aranzmaniCsv) {
+        redniBroj++;
         try {
           AranzmanBuilder b = new AranzmanBuilder()
               .postaviOznaku(aCsv.oznaka)
@@ -85,26 +89,33 @@ public class Aplikacija {
           mapaAranzmana.put(a.getOznaka(), a);
 
         } catch (IllegalArgumentException e) {
-          System.err.println(
-              "Preskačem neispravan aranžman (" + aCsv.oznaka + "): " + e.getMessage());
+          redniBrojGreske++;
+          System.err.println("[" + redniBrojGreske + ". greška (aranžmani)] u " + redniBroj
+              + ". retku rezervacije: " + "Preskačem neispravan aranžman (" + aCsv.oznaka + "): " + e.getMessage());
         }
       }
 
       // 3) kreiranje domenskih rezervacija (još nisu u Composite-u)
       List<Rezervacija> rezervacije = new ArrayList<>();
+      redniBroj = 0;
       for (RezervacijaCsv rCsv : rezervacijeCsv) {
+        redniBroj++;
         Aranzman a = mapaAranzmana.get(rCsv.oznakaAranzmana);
         if (a == null) {
           // semantička provjera: ne postoji aranžman za rezervaciju
-          System.err.println(
-              "Preskačem rezervaciju " + rCsv.ime + " " + rCsv.prezime
-                  + " - ne postoji aranžman s oznakom " + rCsv.oznakaAranzmana);
+          redniBrojGreske++;
+          System.err.println("[" + redniBrojGreske + ". greška (rezervacije)] u " + redniBroj
+              + ". retku rezervacije: " + "Preskačem rezervaciju " + rCsv.ime + " " + rCsv.prezime
+              + " - ne postoji aranžman s oznakom " + rCsv.oznakaAranzmana);
           continue;
         }
         if (rCsv.datumVrijeme == null) {
           System.err.println(
-              "Preskačem rezervaciju (" + rCsv.ime + " " + rCsv.prezime
-                  + "): neispravan datum/vrijeme.");
+              );
+          redniBrojGreske++;
+          System.err.println("[" + redniBrojGreske + ". greška (rezervacije)] u " + redniBroj
+              + ". retku rezervacije: " + "Preskačem rezervaciju (" + rCsv.ime + " " + rCsv.prezime
+              + "): neispravan datum/vrijeme.");
           continue;
         }
 
