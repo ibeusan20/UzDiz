@@ -43,10 +43,16 @@ public class Aplikacija {
       DatotekeFacade facade = DatotekeFacadeImpl.getInstance();
 
       // 1) čitanje CSV podataka preko LIB modula
-      List<AranzmanCsv> aranzmaniCsv =
-          facade.ucitajAranzmane(argumenti.dohvatiPutanjuAranzmana());
-      List<RezervacijaCsv> rezervacijeCsv =
-          facade.ucitajRezervacije(argumenti.dohvatiPutanjuRezervacija());
+      List<AranzmanCsv> aranzmaniCsv = new ArrayList<>();
+      List<RezervacijaCsv> rezervacijeCsv = new ArrayList<>();
+
+      if (argumenti.imaAranzmane()) {
+        aranzmaniCsv = facade.ucitajAranzmane(argumenti.dohvatiPutanjuAranzmana());
+      }
+      if (argumenti.imaRezervacije()) {
+        rezervacijeCsv = facade.ucitajRezervacije(argumenti.dohvatiPutanjuRezervacija());
+      }
+
 
       // 2) kreiranje domenskih objekata (Aranzman) i mapa po oznaci
       List<Aranzman> aranzmani = new ArrayList<>();
@@ -132,6 +138,7 @@ public class Aplikacija {
 
     } catch (IllegalArgumentException e) {
       System.err.println("Greška u argumentima: " + e.getMessage());
+      //return;
     } catch (Exception e) {
       System.err.println("Neočekivana greška pri pokretanju aplikacije: " + e.getMessage());
     }
