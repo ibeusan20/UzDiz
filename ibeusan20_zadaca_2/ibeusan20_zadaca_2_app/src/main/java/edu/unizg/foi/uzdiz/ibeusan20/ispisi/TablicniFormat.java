@@ -4,13 +4,50 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class TablicniFormat implements FormatIspisaBridge {
 
-  // I dalje implementira Bridge (možeš ga koristiti i za "tekstne" redove),
-  // ali za tablice koristi ispisiTablicu().
+  private boolean ispisujeOtkazane = true;
+  private enum Mode { AUTO, INT, VALUTA }
+  
+//Stupci koji se uvijek ispisuju kao cijeli brojevi
+ private final Set<String> intStupci = new HashSet<>();
+
+ // Stupci koji se ispisuju kao valuta (2 decimale + €)
+ private final Set<String> valutaStupci = new HashSet<>();
+
+ public TablicniFormat() {
+   // Default prema tvom PDF-u / tablicama
+   intStupci.add("Min");
+   intStupci.add("Max");
+   intStupci.add("Broj noćenja");
+   intStupci.add("Doručaka");
+   intStupci.add("Ručkova");
+   intStupci.add("Večera");
+   intStupci.add("Ukupno");
+   intStupci.add("Aktivne");
+   intStupci.add("Čekanje");
+   intStupci.add("Odgođene");
+   intStupci.add("Otkazane");
+
+   valutaStupci.add("Cijena");
+   valutaStupci.add("Ukupan prihod");
+   valutaStupci.add("Doplata jednokrevetna");
+ }
+
+  /**
+   * Ako je false, redovi koji su OTKAZANI se preskaču.
+   * IRTA to koristi kad filter NE uključuje O.
+   */
+  public void setIspisujeOtkazane(boolean vrijednost) {
+    this.ispisujeOtkazane = vrijednost;
+  }
+
+
   @Override
   public void ispisi(IspisniRed red) {
     if (red == null) return;
@@ -20,23 +57,23 @@ public class TablicniFormat implements FormatIspisaBridge {
   }
 
   public void ispisiTablicu(String komandaTekst, String nazivTablice, List<? extends IspisniRed> redovi) {
-    // 1) komanda + parametri (prvi red)
+    // 1) komanda
     if (komandaTekst != null && !komandaTekst.isBlank()) {
       System.out.println(komandaTekst.trim());
     }
 
-    // 2) naziv tablice (drugi red)
+    // 2) naziv tablice
     if (nazivTablice != null && !nazivTablice.isBlank()) {
       System.out.println(nazivTablice.trim());
     }
 
-    // Ako nema redova – svejedno smo ispisali komandu + naziv tablice
+    // prazna lista -> prazan red i gotovo
     if (redovi == null || redovi.isEmpty()) {
       System.out.println();
       return;
     }
 
-    // 3) uzmi zaglavlje iz prvog reda koji ga ima
+    // 3) header iz prvog reda koji ga ima
     String[] header = null;
     for (IspisniRed r : redovi) {
       if (r != null && r.zaglavlje() != null && r.zaglavlje().length > 0) {
@@ -44,8 +81,9 @@ public class TablicniFormat implements FormatIspisaBridge {
         break;
       }
     }
+
+    // Ako nema headera, ispiši vrijednosti kao tekst
     if (header == null) {
-      // nema zaglavlja -> ispiši samo vrijednosti
       System.out.println();
       for (IspisniRed r : redovi) {
         if (r == null || r.vrijednosti() == null) continue;
@@ -57,10 +95,11 @@ public class TablicniFormat implements FormatIspisaBridge {
 
     int cols = header.length;
 
-    // 4) izgradi matricu vrijednosti (padaj/puni da uvijek ima cols)
+    // 4) pripremi redove (padaj/puni na cols) + primijeni “ne ispisuj otkazane”
     List<String[]> values = new ArrayList<>();
     for (IspisniRed r : redovi) {
       if (r == null) continue;
+
       String[] v = r.vrijednosti();
       if (v == null) v = new String[0];
 
@@ -68,10 +107,24 @@ public class TablicniFormat implements FormatIspisaBridge {
       for (int i = 0; i < cols; i++) {
         row[i] = i < v.length ? nullToEmpty(v[i]) : "";
       }
+
+      if (!ispisujeOtkazane && row.length > 0) {
+        String zadnje = row[row.length - 1];
+        if (zadnje != null && zadnje.toUpperCase().contains("OTKAZ")) {
+          continue;
+        }
+      }
+
       values.add(row);
     }
 
-    // 5) odredi koje kolone su numeričke (sve ne-prazne ćelije su broj)
+    // nakon filtriranja – ako je prazno, samo završi tablicu
+    if (values.isEmpty()) {
+      System.out.println();
+      return;
+    }
+
+    // 5) detekcija numeričkih kolona (sve ne-prazne ćelije su broj)
     boolean[] numericCol = new boolean[cols];
     for (int c = 0; c < cols; c++) {
       boolean any = false;
@@ -88,7 +141,7 @@ public class TablicniFormat implements FormatIspisaBridge {
       numericCol[c] = any && allNumeric;
     }
 
-    // 6) formatiraj vrijednosti (brojevi: 1.234.567,89) i izračunaj širine
+    // 6) formatiraj + širine
     int[] widths = new int[cols];
     for (int c = 0; c < cols; c++) {
       widths[c] = header[c] == null ? 0 : header[c].length();
@@ -98,7 +151,20 @@ public class TablicniFormat implements FormatIspisaBridge {
     for (int r = 0; r < values.size(); r++) {
       for (int c = 0; c < cols; c++) {
         String cell = values.get(r)[c];
-        String out = numericCol[c] ? formatNumber(cell) : cell;
+
+        String out = cell;
+        if (numericCol[c]) {
+          String nazivStupca = header[c] == null ? "" : header[c].trim();
+
+          if (valutaStupci.contains(nazivStupca)) {
+            out = formatNumber(cell, Mode.VALUTA);
+          } else if (intStupci.contains(nazivStupca)) {
+            out = formatNumber(cell, Mode.INT);
+          } else {
+            out = formatNumber(cell, Mode.AUTO);
+          }
+        }
+
         formatted[r][c] = out;
 
         if (out != null && out.length() > widths[c]) {
@@ -107,28 +173,59 @@ public class TablicniFormat implements FormatIspisaBridge {
       }
     }
 
-    // 7) širina cijele tablice (za crte)
-    int totalWidth = 1; // početni |
+    // 7) širina tablice
+    int totalWidth = 1;
     for (int c = 0; c < cols; c++) {
-      totalWidth += widths[c] + 2; // razmak + sadržaj + razmak
-      totalWidth += 1; // |
+      totalWidth += widths[c] + 2;
+      totalWidth += 1;
     }
 
-    // 8) crta / prazan red (po specifikaciji: može prazan ili crta) -> mi radimo crtu
+    // 8) crta, zaglavlje, crta
+    System.out.println("-".repeat(totalWidth));
+    System.out.println(renderRow(header, widths, null));
     System.out.println("-".repeat(totalWidth));
 
-    // 9) zaglavlje + crta
-    System.out.println(renderRow(header, widths, /*numeric*/ null));
-    System.out.println("-".repeat(totalWidth));
-
-    // 10) podaci
+    // 9) podaci
     for (int r = 0; r < formatted.length; r++) {
       System.out.println(renderRow(formatted[r], widths, numericCol));
     }
 
-    // završna crta (nije striktno nužna, ali tablicu čini “završenom”)
     System.out.println("-".repeat(totalWidth));
     System.out.println();
+  }
+
+  /**
+   * Prepoznaj otkazani red:
+   * - ako postoji stupac "Stanje" i sadrži "OTKAZ"
+   * - ili ako postoji stupac koji sadrži "otkaza" (datum/vrijeme otkaza) i nije prazan
+   */
+  private boolean jeOtkazanaRow(String[] header, String[] row) {
+    int idxStanje = -1;
+    int idxOtkaz = -1;
+
+    for (int i = 0; i < header.length; i++) {
+      String h = header[i] == null ? "" : header[i].toLowerCase();
+      if (idxStanje == -1 && h.contains("stanje")) idxStanje = i;
+      if (idxOtkaz == -1 && h.contains("otkaz")) idxOtkaz = i;
+    }
+
+    if (idxStanje >= 0) {
+      String s = row[idxStanje] == null ? "" : row[idxStanje].toUpperCase();
+      if (s.contains("OTKAZ")) return true;
+    }
+
+    if (idxOtkaz >= 0) {
+      String t = row[idxOtkaz] == null ? "" : row[idxOtkaz].trim();
+      if (!t.isEmpty()) return true;
+    }
+
+    // fallback: zadnja kolona
+    if (row.length > 0) {
+      String last = row[row.length - 1] == null ? "" : row[row.length - 1].toUpperCase();
+      if (last.contains("OTKAZ")) return true;
+    }
+
+    return false;
   }
 
   private String renderRow(String[] cells, int[] widths, boolean[] numericCol) {
@@ -140,9 +237,9 @@ public class TablicniFormat implements FormatIspisaBridge {
 
       sb.append(" ");
       if (numeric) {
-        sb.append(String.format("%" + widths[c] + "s", v)); // desno
+        sb.append(String.format("%" + widths[c] + "s", v));
       } else {
-        sb.append(String.format("%-" + widths[c] + "s", v)); // lijevo
+        sb.append(String.format("%-" + widths[c] + "s", v));
       }
       sb.append(" |");
     }
@@ -157,40 +254,53 @@ public class TablicniFormat implements FormatIspisaBridge {
     if (s == null) return false;
     String t = s.trim();
     if (t.isEmpty()) return false;
-    if (t.contains(":")) return false;       // vrijeme
-    if (t.endsWith(".")) return false;       // datumi tipa 01.10.2025.
-    // dopusti: 123, 123.45, 123,45, -123, -123,45 ...
+    if (t.contains(":")) return false;   // vrijeme
+    if (t.endsWith(".")) return false;   // datumi tipa 01.10.2025.
     return t.matches("^-?\\d+(?:[\\.,]\\d+)?$");
   }
 
-  private String formatNumber(String s) {
+  /**
+   * Format broja: grupiranje s '.' i decimal ',' + 2 decimale (npr. 12.345,67).
+   */
+  private String formatNumber(String s, Mode mode) {
     if (s == null || s.isBlank()) return "";
 
-    // normalizacija: dopusti ulaz s '.' ili ',' kao decimalni separator
     String t = s.trim();
 
     BigDecimal bd;
     try {
-      // Ako ima i '.' i ',' -> pretpostavi '.' grupiranje, ',' decimal
       if (t.contains(".") && t.contains(",")) {
         t = t.replace(".", "").replace(",", ".");
       } else {
-        // inače zamijeni ',' u '.' radi parsiranja
         t = t.replace(",", ".");
       }
       bd = new BigDecimal(t);
     } catch (Exception e) {
-      return s; // fallback
+      return s;
     }
 
-    // format: grupiranje '.' i decimal ',' (HR stil), 2 decimale kad ima decimalu
     DecimalFormatSymbols sym = new DecimalFormatSymbols(Locale.ROOT);
     sym.setGroupingSeparator('.');
     sym.setDecimalSeparator(',');
 
-    boolean hasDecimal = bd.scale() > 0 && bd.stripTrailingZeros().scale() > 0;
-    DecimalFormat df = new DecimalFormat(hasDecimal ? "#,##0.00" : "#,##0", sym);
+    String pattern;
+    switch (mode) {
+      case INT -> pattern = "#,##0";
+      case VALUTA -> pattern = "#,##0.00";
+      default -> {
+        boolean isWhole = bd.stripTrailingZeros().scale() <= 0;
+        pattern = isWhole ? "#,##0" : "#,##0.00";
+      }
+    }
+
+    DecimalFormat df = new DecimalFormat(pattern, sym);
     df.setGroupingUsed(true);
-    return df.format(bd);
+
+    String out = df.format(bd);
+    if (mode == Mode.VALUTA) {
+      out += " €";
+    }
+    return out;
   }
+
 }

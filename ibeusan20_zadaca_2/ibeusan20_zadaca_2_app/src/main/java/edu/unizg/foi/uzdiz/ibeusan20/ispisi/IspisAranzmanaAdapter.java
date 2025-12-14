@@ -9,7 +9,7 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 public class IspisAranzmanaAdapter implements IspisniRed {
 
   private static final DateTimeFormatter FORMAT_DATUM = DateTimeFormatter.ofPattern("dd.MM.yyyy.");
-  private static final DateTimeFormatter FORMAT_VRIJEME = DateTimeFormatter.ofPattern("HH:mm");
+  private static final DateTimeFormatter FORMAT_VRIJEME = DateTimeFormatter.ofPattern("HH:mm:ss");
 
   private final Aranzman aranzman;
 
@@ -37,7 +37,7 @@ public class IspisAranzmanaAdapter implements IspisniRed {
     String vk = aranzman.getVrijemeKretanja() == null ? "" : aranzman.getVrijemeKretanja().format(FORMAT_VRIJEME);
     String vp = aranzman.getVrijemePovratka() == null ? "" : aranzman.getVrijemePovratka().format(FORMAT_VRIJEME);
 
-    String cijena = String.format("%.2f", aranzman.getCijena());
+    String cijena = String.valueOf(aranzman.getCijena());
 
     return new String[] {
         aranzman.getOznaka(),
