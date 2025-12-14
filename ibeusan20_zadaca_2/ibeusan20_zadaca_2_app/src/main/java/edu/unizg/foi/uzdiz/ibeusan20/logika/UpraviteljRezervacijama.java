@@ -58,6 +58,10 @@ public class UpraviteljRezervacijama {
     if (r == null) {
       return;
     }
+    // spriječi identične duplikate (npr. ponovno učitavanje istog CSV-a)
+    if (postojiIdenticna(r.getIme(), r.getPrezime(), r.getOznakaAranzmana(), r.getDatumVrijeme())) {
+      return;
+    }
     Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(r.getOznakaAranzmana());
     if (a != null) {
       a.dodajRezervaciju(r);
@@ -627,7 +631,7 @@ public class UpraviteljRezervacijama {
     }
     return false;
   }
-  
+
   public int obrisiSveRezervacijeFizicki() {
     int obrisano = 0;
 
@@ -646,6 +650,43 @@ public class UpraviteljRezervacijama {
     }
 
     return obrisano;
+  }
+
+  public boolean postojiIdenticna(String ime, String prezime, String oznakaAranzmana,
+      LocalDateTime datumVrijeme) {
+
+    if (ime == null || prezime == null || oznakaAranzmana == null || datumVrijeme == null) {
+      return false;
+    }
+
+    Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(oznakaAranzmana);
+    if (a == null)
+      return false;
+
+    for (Rezervacija r : a.getRezervacije()) {
+      if (r == null)
+        continue;
+
+      boolean isti = ime.equalsIgnoreCase(r.getIme()) && prezime.equalsIgnoreCase(r.getPrezime())
+          && oznakaAranzmana.equalsIgnoreCase(r.getOznakaAranzmana())
+          && datumVrijeme.equals(r.getDatumVrijeme());
+
+      if (isti)
+        return true;
+    }
+    return false;
+  }
+
+  public boolean dodajAkoNePostoji(Rezervacija r) {
+    if (r == null)
+      return false;
+
+    if (postojiIdenticna(r.getIme(), r.getPrezime(), r.getOznakaAranzmana(), r.getDatumVrijeme())) {
+      return false;
+    }
+
+    dodaj(r); // tvoja postojeća metoda koja dodaje u Aranzman
+    return true;
   }
 
 

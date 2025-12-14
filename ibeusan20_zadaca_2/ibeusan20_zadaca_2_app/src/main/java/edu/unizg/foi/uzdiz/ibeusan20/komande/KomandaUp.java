@@ -91,6 +91,11 @@ public class KomandaUp implements Komanda {
             .postaviBrojRuckova(c.brojRuckova)
             .postaviBrojVecera(c.brojVecera)
             .izgradi();
+        
+        if (uprAranz.pronadiPoOznaci(a.getOznaka()) != null) {
+          System.out.println("Preskačem aranžman (već postoji): " + a.getOznaka());
+          continue;
+        }
 
         uprAranz.dodaj(a);
         brojac++;
@@ -105,38 +110,61 @@ public class KomandaUp implements Komanda {
   private void ucitajRezervacije(DatotekeFacade facade, String datoteka) {
     List<RezervacijaCsv> dto = facade.ucitajRezervacije(datoteka);
     if (dto.isEmpty()) {
-      ispis.ispisi(new IspisTekstAdapter("Nije učitana nijedna rezervacija iz datoteke " + datoteka + ". \n"));
+      System.out.println("Nije učitana nijedna rezervacija iz datoteke " + datoteka + ".");
       return;
     }
 
-    int brojac = 0;
+    int dodano = 0;
+    int preskocenoDuplikata = 0;
+    int preskocenoNepoznatiAranzman = 0;
+    int preskocenoLosDatum = 0;
+
+    // da rekalkuliramo jednom po aranžmanu
+    java.util.Set<String> dirnutiAranzmani = new java.util.HashSet<>();
 
     for (RezervacijaCsv c : dto) {
-      // semantička provjera: postoji li aranžman?
       Aranzman a = uprAranz.pronadiPoOznaci(c.oznakaAranzmana);
       if (a == null) {
-        System.err.println("Preskacem rezervaciju za nepoznati aranžman: "
-            + c.oznakaAranzmana);
+        preskocenoNepoznatiAranzman++;
         continue;
       }
 
       if (c.datumVrijeme == null) {
-        System.err.println(
-            "Preskacem rezervaciju (" + c.ime + " " + c.prezime
-                + "): neispravan datum/vrijeme.");
+        preskocenoLosDatum++;
         continue;
       }
 
-      Rezervacija r = new Rezervacija(c.ime, c.prezime,
-          c.oznakaAranzmana, c.datumVrijeme);
+      // ključna stvar: provjera identične rezervacije
+      if (uprRez.postojiIdenticna(c.ime, c.prezime, c.oznakaAranzmana, c.datumVrijeme)) {
+        preskocenoDuplikata++;
+        continue;
+      }
 
-      // State + Composite: kroz upravitelja
+      Rezervacija r = new Rezervacija(c.ime, c.prezime, c.oznakaAranzmana, c.datumVrijeme);
       uprRez.dodaj(r);
-      // uprRez.rekalkulirajSve();
-      uprRez.rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
-      brojac++;
+
+      dirnutiAranzmani.add(a.getOznaka());
+      dodano++;
     }
 
-    System.out.println("Učitano novih rezervacija iz datoteke " + datoteka + ": " + brojac + "\n");
+    // rekalkulacija jednom po aranžmanu
+    for (String oznaka : dirnutiAranzmani) {
+      Aranzman a = uprAranz.pronadiPoOznaci(oznaka);
+      if (a != null) {
+        uprRez.rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
+      }
+    }
+
+    System.out.println("Učitano novih rezervacija iz datoteke " + datoteka + ": " + dodano);
+    if (preskocenoDuplikata > 0) {
+      ispis.ispisi(new IspisTekstAdapter("Preskočeno duplikata (identične rezervacije): " + preskocenoDuplikata));
+    }
+    if (preskocenoNepoznatiAranzman > 0) {
+      ispis.ispisi(new IspisTekstAdapter("Preskočeno (nepoznat aranžman): " + preskocenoNepoznatiAranzman));
+    }
+    if (preskocenoLosDatum > 0) {
+      ispis.ispisi(new IspisTekstAdapter("Preskočeno (neispravan datum/vrijeme): " + preskocenoLosDatum));
+    }
   }
+
 }
