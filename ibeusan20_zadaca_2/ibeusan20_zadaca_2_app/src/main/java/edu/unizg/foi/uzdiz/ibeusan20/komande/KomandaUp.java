@@ -146,14 +146,8 @@ public class KomandaUp implements Komanda {
       dirnutiAranzmani.add(a.getOznaka());
       dodano++;
     }
-
-    // rekalkulacija jednom po aranžmanu
-    for (String oznaka : dirnutiAranzmani) {
-      Aranzman a = uprAranz.pronadiPoOznaci(oznaka);
-      if (a != null) {
-        uprRez.rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
-      }
-    }
+    // OBAVEZNO: globalna rekalkulacija (kvote + preklapanja + stabilizacija)
+    uprRez.rekalkulirajSve();
 
     System.out.println("Učitano novih rezervacija iz datoteke " + datoteka + ": " + dodano);
     if (preskocenoDuplikata > 0) {
