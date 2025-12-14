@@ -156,10 +156,23 @@ public class Aranzman {
     }
   }
 
+  public int obrisiSveRezervacijeFizicki() {
+    int n = (rezervacije == null) ? 0 : rezervacije.size();
+    if (rezervacije != null) {
+      rezervacije.clear();
+    }
+    return n;
+  }
+  
+  public boolean obrisiRezervacijuFizicki(Rezervacija r) {
+    if (r == null || rezervacije == null) return false;
+    return rezervacije.remove(r);
+  }
+
+
   @Override
   public String toString() {
-    return "Aranzman{" + "oznaka='" + oznaka + '\'' + ", naziv='" + naziv + '\''
-        + ", pocetniDatum=" + pocetniDatum + ", zavrsniDatum=" + zavrsniDatum
-        + ", stanje=" + stanje.naziv() + '}';
+    return "Aranzman{" + "oznaka='" + oznaka + '\'' + ", naziv='" + naziv + '\'' + ", pocetniDatum="
+        + pocetniDatum + ", zavrsniDatum=" + zavrsniDatum + ", stanje=" + stanje.naziv() + '}';
   }
 }

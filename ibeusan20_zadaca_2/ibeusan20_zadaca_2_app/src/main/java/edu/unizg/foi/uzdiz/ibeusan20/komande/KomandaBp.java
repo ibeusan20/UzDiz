@@ -37,13 +37,39 @@ public class KomandaBp implements Komanda {
     ispis.ispisi(new IspisTekstAdapter("BP" + mod));
 
     switch (mod) {
-      case "A" -> obrisiSveAranzmaneLogicki();
-      case "R" -> obrisiSveRezervacijeLogicki();
+      case "A" -> obrisiSveAranzmaneFizicki();
+      case "R" -> obrisiSveRezervacijeFizicki();
       default -> ispis.ispisi(new IspisTekstAdapter("Neispravan argument za BP. Dozvoljeno je A ili R."));
     }
 
     return true;
   }
+  
+  private void obrisiSveAranzmaneFizicki() {
+    int prije = uprAranz.svi().size();
+
+    if (prije == 0) {
+      ispis.ispisi(new IspisTekstAdapter("Nema aranžmana za brisanje."));
+      return;
+    }
+
+    // fizičko brisanje aranžmana (rezervacije nestaju s njima)
+    int obrisano = uprAranz.obrisiSveAranzmaneFizicki();
+
+    ispis.ispisi(new IspisTekstAdapter("Fizički obrisani svi aranžmani: " + obrisano));
+  }
+
+  private void obrisiSveRezervacijeFizicki() {
+    int ukupnoRez = uprRez.brojRezervacija();
+    if (ukupnoRez == 0) {
+      ispis.ispisi(new IspisTekstAdapter("Nema rezervacija za brisanje."));
+      return;
+    }
+
+    int obrisano = uprRez.obrisiSveRezervacijeFizicki();
+    ispis.ispisi(new IspisTekstAdapter("Fizički obrisane sve rezervacije: " + obrisano));
+  }
+
 
   private void obrisiSveAranzmaneLogicki() {
     List<Aranzman> svi = uprAranz.svi();
@@ -92,4 +118,5 @@ public class KomandaBp implements Komanda {
       ispis.ispisi(new IspisTekstAdapter("Nema rezervacija za brisanje."));
     }
   }
+  
 }

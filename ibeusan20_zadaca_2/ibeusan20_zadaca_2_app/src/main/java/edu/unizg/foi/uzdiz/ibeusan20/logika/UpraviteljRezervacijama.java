@@ -627,6 +627,27 @@ public class UpraviteljRezervacijama {
     }
     return false;
   }
+  
+  public int obrisiSveRezervacijeFizicki() {
+    int obrisano = 0;
+
+    for (Aranzman a : upraviteljAranzmanima.svi()) {
+      obrisano += a.obrisiSveRezervacijeFizicki();
+
+      // nakon brisanja rezervacija, aranžman treba biti konzistentan
+      // ako je aranžman otkazan, nemoj ga "oživljavati"
+      String st = a.nazivStanja();
+      boolean otkazan = st != null && st.toUpperCase().contains("OTKAZ");
+
+      if (!otkazan) {
+        // nema prijava -> u pripremi (ovisno o tvojoj implementaciji)
+        a.azurirajStanje(0, 0);
+      }
+    }
+
+    return obrisano;
+  }
+
 
 
 }

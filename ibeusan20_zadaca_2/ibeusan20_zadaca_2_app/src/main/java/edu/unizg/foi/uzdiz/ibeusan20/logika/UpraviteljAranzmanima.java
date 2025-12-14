@@ -10,10 +10,8 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 /**
  * Upravlja kolekcijom turističkih aranžmana.
  * 
- * - čuva sve aranžmane
- * - omogućuje pretragu po oznaci
- * - filtriranje po rasponu datuma
- * - vraćanje liste uz poštivanje IP (N/S) poretka
+ * - čuva sve aranžmane - omogućuje pretragu po oznaci - filtriranje po rasponu datuma - vraćanje
+ * liste uz poštivanje IP (N/S) poretka
  */
 public class UpraviteljAranzmanima {
 
@@ -26,8 +24,7 @@ public class UpraviteljAranzmanima {
   }
 
   /**
-   * Vraća sve aranžmane.
-   * Poštuje IP poredak (N – kronološki, S – obrnuto).
+   * Vraća sve aranžmane. Poštuje IP poredak (N – kronološki, S – obrnuto).
    */
   public List<Aranzman> svi() {
     List<Aranzman> kopija = new ArrayList<>(aranzmani);
@@ -62,8 +59,7 @@ public class UpraviteljAranzmanima {
   }
 
   /**
-   * Filtrira aranžmane po rasponu datuma (uključivo).
-   * Poštuje IP poredak pri vraćanju liste.
+   * Filtrira aranžmane po rasponu datuma (uključivo). Poštuje IP poredak pri vraćanju liste.
    */
   public List<Aranzman> filtrirajPoRasponu(LocalDate od, LocalDate d0) {
     List<Aranzman> rezultat = new ArrayList<>();
@@ -87,19 +83,26 @@ public class UpraviteljAranzmanima {
   }
 
   /**
-   * Interna lista (ako ti negdje treba).
-   * Pazi da ne mijenjaš izvornu kolekciju izvana.
+   * Interna lista (ako ti negdje treba). Pazi da ne mijenjaš izvornu kolekciju izvana.
    */
   public List<Aranzman> getUnutarnjaLista() {
     return aranzmani;
   }
-  
+
   public void dodaj(Aranzman a) {
-    if (a == null) return;
+    if (a == null)
+      return;
     if (pronadiPoOznaci(a.getOznaka()) != null) {
       // već postoji – možeš ili ignorirati ili baciti iznimku
       return;
     }
     this.aranzmani.add(a);
   }
+
+  public int obrisiSveAranzmaneFizicki() {
+    int n = aranzmani.size();
+    aranzmani.clear();
+    return n;
+  }
+
 }
