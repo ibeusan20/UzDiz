@@ -1,8 +1,11 @@
 package edu.unizg.foi.uzdiz.ibeusan20.logika;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.KontekstIspisa;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
@@ -104,5 +107,35 @@ public class UpraviteljAranzmanima {
     aranzmani.clear();
     return n;
   }
+  
+  private static final Comparator<Aranzman> PO_POCETKU = Comparator
+      .comparing(UpraviteljAranzmanima::pocetakAranzmana, Comparator.nullsLast(Comparator.naturalOrder()))
+      .thenComparing(a -> a.getOznaka() == null ? "" : a.getOznaka(), String.CASE_INSENSITIVE_ORDER);
+
+  private static LocalDateTime pocetakAranzmana(Aranzman a) {
+    if (a == null || a.getPocetniDatum() == null) return null;
+    LocalTime t = (a.getVrijemeKretanja() != null) ? a.getVrijemeKretanja() : LocalTime.MIN;
+    return LocalDateTime.of(a.getPocetniDatum(), t);
+  }
+
+  private List<Aranzman> sortirajZaIspis(List<Aranzman> ulaz) {
+    List<Aranzman> lista = new ArrayList<>(ulaz == null ? List.of() : ulaz);
+    lista.sort(PO_POCETKU);
+    if (KontekstIspisa.jeObrnuto()) {
+      Collections.reverse(lista);
+    }
+    return lista;
+  }
+
+  /** Svi aranžmani, sortirani po početku + IP poredak. */
+  public List<Aranzman> sviZaIspis() {
+    return sortirajZaIspis(svi()); // koristi tvoju postojeću metodu
+  }
+
+  /** Filtrirani aranžmani, sortirani po početku + IP poredak. */
+  public List<Aranzman> filtrirajPoRasponuZaIspis(java.time.LocalDate od, java.time.LocalDate d0) {
+    return sortirajZaIspis(filtrirajPoRasponu(od, d0)); // koristi tvoju postojeću metodu
+  }
+
 
 }

@@ -56,8 +56,10 @@ public class KomandaItak implements Komanda {
       return true;
     }
 
-    List<Aranzman> lista = (datumOd == null) ? upravitelj.svi() : upravitelj.filtrirajPoRasponu(datumOd, datumDo);
-
+    List<Aranzman> lista = (datumOd == null)
+        ? upravitelj.sviZaIspis()
+        : upravitelj.filtrirajPoRasponuZaIspis(datumOd, datumDo);
+    
     String komandaTekst = (datumOd == null) ? "ITAK" : ("ITAK " + argumenti[0] + " " + argumenti[1]);
     String nazivTablice = "Turistički aranžmani";
 
