@@ -1,5 +1,6 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
+import edu.unizg.foi.uzdiz.ibeusan20.komande.dekoratori.AuditKomandaDecorator;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 
@@ -18,7 +19,7 @@ public final class KomandaFactory {
       System.arraycopy(dijelovi, 1, argumenti, 0, dijelovi.length - 1);
     }
 
-    return switch (naredba) {
+    Komanda baza = switch (naredba) {
       case "ITAK" -> new KomandaItak(ua, argumenti);
       case "ITAP" -> new KomandaItap(ua, argumenti);
       case "IRTA" -> new KomandaIrta(ur, argumenti);
@@ -26,16 +27,22 @@ public final class KomandaFactory {
       case "ORTA" -> new KomandaOrta(ur, ua, argumenti);
       case "DRTA" -> new KomandaDrta(ur, ua, argumenti);
       case "OTA"  -> new KomandaOta(ua, ur, argumenti);
-
-      case "IS"   -> new KomandaIp(argumenti); //opis zadaće potencijalno kriv?....
+      case "IS"   -> new KomandaIp(argumenti);
       case "IP"   -> new KomandaIp(argumenti);
-
       case "BP"   -> new KomandaBp(ua, ur, argumenti);
       case "UP"   -> new KomandaUp(ua, ur, argumenti);
       case "ITAS" -> new KomandaItas(ua, argumenti);
-
+      case "AUDIT" -> new KomandaAudit(argumenti);
       case "Q"    -> new KomandaQ();
       default     -> null;
     };
+    
+    if (baza == null) return null;
+
+    // Q ne omatamo (nije nužno, ali je čišće)
+    if (baza instanceof KomandaQ) return baza;
+
+    return new AuditKomandaDecorator(baza, unos);
+    
   }
 }

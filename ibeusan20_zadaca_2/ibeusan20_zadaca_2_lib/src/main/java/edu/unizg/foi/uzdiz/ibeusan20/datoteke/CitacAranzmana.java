@@ -2,11 +2,9 @@ package edu.unizg.foi.uzdiz.ibeusan20.datoteke;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.AranzmanCsv;
 
 public class CitacAranzmana implements UcitavacPodataka<AranzmanCsv> {
