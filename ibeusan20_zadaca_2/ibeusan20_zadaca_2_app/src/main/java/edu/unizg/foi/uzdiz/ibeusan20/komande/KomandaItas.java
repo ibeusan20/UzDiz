@@ -6,7 +6,6 @@ import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.PomocnikDatum;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisStatistikaAranzmanaAdapter;
-import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisniRed;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
@@ -32,11 +31,11 @@ public class KomandaItas implements Komanda {
       od = PomocnikDatum.procitajDatum(argumenti[0]);
       d0 = PomocnikDatum.procitajDatum(argumenti[1]);
       if (od == null || d0 == null) {
-        ispis.ispisi(new IspisTekstAdapter("Neispravan format datuma. Koristi dd.MM.yyyy."));
+        ispis.ispisi("Neispravan format datuma. Koristi dd.MM.yyyy.");
         return true;
       }
     } else if (argumenti.length != 0) {
-      ispis.ispisi(new IspisTekstAdapter("Sintaksa: ITAS [od do]"));
+      ispis.ispisi("Sintaksa: ITAS [od do]");
       return true;
     }
 
@@ -56,7 +55,7 @@ public class KomandaItas implements Komanda {
     tab.ispisiTablicu(komandaTekst, nazivTablice, redovi);
 
     if (lista.isEmpty()) {
-      ispis.ispisi(new IspisTekstAdapter("Nema aranžmana za zadano razdoblje. \n"));
+      ispis.ispisi("Nema aranžmana za zadano razdoblje. \n");
     }
 
     return true;

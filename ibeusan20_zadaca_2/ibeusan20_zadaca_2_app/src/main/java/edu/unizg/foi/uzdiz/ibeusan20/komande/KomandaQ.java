@@ -1,7 +1,6 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
-import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 
 /**
@@ -18,7 +17,7 @@ public class KomandaQ implements Komanda {
    */
   @Override
   public boolean izvrsi() {
-    ispis.ispisi(new IspisTekstAdapter("Q \n Program završava. Doviđenja!"));
+    ispis.ispisi("Q \n Program završava. Doviđenja!");
     return false;
   }
 }

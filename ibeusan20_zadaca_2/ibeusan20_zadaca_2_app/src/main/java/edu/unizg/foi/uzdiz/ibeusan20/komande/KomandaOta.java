@@ -2,7 +2,6 @@ package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
 import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
-import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
@@ -29,16 +28,16 @@ public class KomandaOta implements Komanda {
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 1) {
-      ispis.ispisi(new IspisTekstAdapter("Sintaksa: OTA <oznaka>"));
+      ispis.ispisi("Sintaksa: OTA <oznaka>");
       return true;
     }
 
     String oznaka = argumenti[0].trim();
-    ispis.ispisi(new IspisTekstAdapter("OTA " + oznaka));
+    ispis.ispisi("OTA " + oznaka);
     
     Aranzman a = uprAranz.pronadiPoOznaci(oznaka);
     if (a == null) {
-      ispis.ispisi(new IspisTekstAdapter("Ne postoji turistički aranžman s oznakom: " + oznaka + "\n"));
+      ispis.ispisi("Ne postoji turistički aranžman s oznakom: " + oznaka + "\n");
       return true;
     }
 
@@ -49,8 +48,8 @@ public class KomandaOta implements Komanda {
     if (sveRez.isEmpty()) {
       // i dalje moramo aranžman staviti na OTKAZAN
       a.postaviOtkazan();
-      ispis.ispisi(new IspisTekstAdapter(
-          "Turistički aranžman " + oznaka + " je otkazan (nije bilo rezervacija)."));
+      ispis.ispisi(
+          "Turistički aranžman " + oznaka + " je otkazan (nije bilo rezervacija).");
       return true;
     }
 
@@ -69,13 +68,13 @@ public class KomandaOta implements Komanda {
     uprRez.rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
 
     if (biloOtkaza) {
-      ispis.ispisi(new IspisTekstAdapter(
+      ispis.ispisi(
           "Uspješno otkazan turistički aranžman " + oznaka
-              + " i otkazane pripadajuće rezervacije."));
+              + " i otkazane pripadajuće rezervacije.");
     } else {
-      ispis.ispisi(new IspisTekstAdapter(
+      ispis.ispisi(
           "Nije pronađena nijedna rezervacija za aranžman " + oznaka
-              + ", ali je aranžman označen kao otkazan."));
+              + ", ali je aranžman označen kao otkazan.");
     }
 
     return true;

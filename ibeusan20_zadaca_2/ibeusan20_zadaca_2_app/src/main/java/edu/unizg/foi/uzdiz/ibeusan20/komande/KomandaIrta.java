@@ -3,7 +3,6 @@ package edu.unizg.foi.uzdiz.ibeusan20.komande;
 import java.util.ArrayList;
 import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisRezervacijaAdapter;
-import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisniRed;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
@@ -32,7 +31,7 @@ public class KomandaIrta implements Komanda {
   public boolean izvrsi() {
     // IRTA mora imati barem oznaku
     if (argumenti == null || argumenti.length < 1) {
-      tablica.ispisi(new IspisTekstAdapter("Sintaksa: IRTA <oznakaAranžmana> [PA|Č|O|OD]"));
+      tablica.ispisi("Sintaksa: IRTA <oznakaAranžmana> [PA|Č|O|OD]");
       return true;
     }
 
@@ -62,8 +61,8 @@ public class KomandaIrta implements Komanda {
     tablica.ispisiTablicu(komandaTekst, nazivTablice, redovi);
 
     if (lista.isEmpty()) {
-      tablica.ispisi(new IspisTekstAdapter("Nema rezervacija za tražene kriterije."));
-      tablica.ispisi(new IspisTekstAdapter(""));
+      tablica.ispisi("Nema rezervacija za tražene kriterije.");
+      tablica.ispisi("");
     }
 
     return true;

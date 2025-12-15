@@ -3,7 +3,6 @@ package edu.unizg.foi.uzdiz.ibeusan20.komande;
 import java.time.LocalDateTime;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.PomocnikDatum;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
-import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
@@ -41,7 +40,7 @@ public class KomandaDrta implements Komanda {
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 5) {
-      ispis.ispisi(new IspisTekstAdapter("Sintaksa: DRTA <ime> <prezime> <oznaka> <datum> <vrijeme>"));
+      ispis.ispisi("Sintaksa: DRTA <ime> <prezime> <oznaka> <datum> <vrijeme>");
       return true;
     }
 
@@ -51,35 +50,35 @@ public class KomandaDrta implements Komanda {
     String datum = argumenti[3].trim();
     String vrijeme = argumenti[4].trim();
     
-    ispis.ispisi(new IspisTekstAdapter("DRTA " + ime + " " + prezime + " " + oznaka + " " + datum + " " + vrijeme));
+    ispis.ispisi("DRTA " + ime + " " + prezime + " " + oznaka + " " + datum + " " + vrijeme);
 
     // provjera postojanja aranžmana
     Aranzman a = upraviteljAranzmani.pronadiPoOznaci(oznaka);
     if (a == null) {
-      ispis.ispisi(new IspisTekstAdapter("Ne postoji aranžman s oznakom: " + oznaka));
-      ispis.ispisi(new IspisTekstAdapter(""));
+      ispis.ispisi("Ne postoji aranžman s oznakom: " + oznaka);
+      ispis.ispisi("");
       return true;
     }
 
     // provjera ispravnosti datuma i vremena
     LocalDateTime datumVrijeme = PomocnikDatum.procitajDatumIVrijeme(datum + " " + vrijeme);
     if (datumVrijeme == null) {
-      ispis.ispisi(new IspisTekstAdapter("Neispravan format datuma/vremena. Koristi dd.MM.yyyy. HH:mm:ss"));
-      ispis.ispisi(new IspisTekstAdapter(""));
+      ispis.ispisi("Neispravan format datuma/vremena. Koristi dd.MM.yyyy. HH:mm:ss");
+      ispis.ispisi("");
       return true;
     }
 
     // provjera postoji li već aktivna rezervacija za tu osobu i aranžman
     if (upraviteljRezervacija.imaAktivnuZa(ime, prezime, oznaka)) {
-      ispis.ispisi(new IspisTekstAdapter("Osoba već ima AKTIVNU rezervaciju za aranžman " + oznaka + "."));
-      ispis.ispisi(new IspisTekstAdapter(""));
+      ispis.ispisi("Osoba već ima AKTIVNU rezervaciju za aranžman " + oznaka + ".");
+      ispis.ispisi("");
       return true;
     }
 
     if (upraviteljRezervacija.imaAktivnuUPeriodu(ime, prezime, oznaka, upraviteljAranzmani)) {
-      ispis.ispisi(new IspisTekstAdapter(
-          "Postoji aktivna rezervacija za korisnika u tom vremenskom periodu. Rezervacija nije unesena."));
-      ispis.ispisi(new IspisTekstAdapter(""));
+      ispis.ispisi(
+          "Postoji aktivna rezervacija za korisnika u tom vremenskom periodu. Rezervacija nije unesena.");
+      ispis.ispisi("");
       return true;
     }
 
@@ -89,9 +88,9 @@ public class KomandaDrta implements Komanda {
     // upraviteljRezervacija.rekalkulirajZaAranzman(oznaka, a.getMinPutnika(), a.getMaxPutnika());
     upraviteljRezervacija.rekalkulirajSve();
     
-    ispis.ispisi(new IspisTekstAdapter(
+    ispis.ispisi(
         "Dodana rezervacija za " + ime + " " + prezime + " za turistički aranžman s oznakom "
-            + oznaka + " u " + PomocnikDatum.formatirajDatumVrijeme(datumVrijeme) + "\n"));
+            + oznaka + " u " + PomocnikDatum.formatirajDatumVrijeme(datumVrijeme) + "\n");
     return true;
   }
 }

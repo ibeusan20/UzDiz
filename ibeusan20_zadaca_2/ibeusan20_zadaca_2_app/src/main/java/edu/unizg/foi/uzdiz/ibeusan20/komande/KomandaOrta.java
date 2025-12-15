@@ -1,7 +1,6 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
-import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
@@ -39,7 +38,7 @@ public class KomandaOrta implements Komanda {
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 3) {
-      ispis.ispisi(new IspisTekstAdapter("Sintaksa: ORTA <ime> <prezime> <oznakaAranzmana>"));
+      ispis.ispisi("Sintaksa: ORTA <ime> <prezime> <oznakaAranzmana>");
       return true;
     }
 
@@ -47,12 +46,12 @@ public class KomandaOrta implements Komanda {
     String prezime = argumenti[1].trim();
     String oznaka = argumenti[2].trim();
     
-    ispis.ispisi(new IspisTekstAdapter("ORTA " + ime + " " + prezime + " " + oznaka));
+    ispis.ispisi("ORTA " + ime + " " + prezime + " " + oznaka);
 
     boolean uspjeh = upraviteljRezervacija.otkaziRezervaciju(ime, prezime, oznaka);
 
     if (!uspjeh) {
-      ispis.ispisi(new IspisTekstAdapter("Nije pronađena rezervacija za " + ime + " " + prezime + " (" + oznaka + ").\n"));
+      ispis.ispisi("Nije pronađena rezervacija za " + ime + " " + prezime + " (" + oznaka + ").\n");
       return true;
     }
 
@@ -62,7 +61,7 @@ public class KomandaOrta implements Komanda {
       upraviteljRezervacija.rekalkulirajSve();
     }
 
-    ispis.ispisi(new IspisTekstAdapter("Uspješno otkazana rezervacija za " + ime + " " + prezime + " (" + oznaka + ").\n"));
+    ispis.ispisi("Uspješno otkazana rezervacija za " + ime + " " + prezime + " (" + oznaka + ").\n");
     return true;
   }
 }

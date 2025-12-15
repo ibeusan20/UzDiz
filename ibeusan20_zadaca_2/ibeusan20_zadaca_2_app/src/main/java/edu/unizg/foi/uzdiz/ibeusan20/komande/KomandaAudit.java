@@ -7,7 +7,6 @@ import edu.unizg.foi.uzdiz.ibeusan20.audit.AuditDnevnik;
 import edu.unizg.foi.uzdiz.ibeusan20.audit.AuditStavka;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisAuditAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisAuditZbrojAdapter;
-import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisniRed;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 
@@ -29,8 +28,8 @@ public class KomandaAudit implements Komanda {
 
       if (a0.equalsIgnoreCase("CLEAR")) {
         AuditDnevnik.instanca().obrisiSve();
-        tab.ispisi(new IspisTekstAdapter("AUDIT CLEAR"));
-        tab.ispisi(new IspisTekstAdapter("Audit dnevnik je obrisan.\n"));
+        tab.ispisi("AUDIT CLEAR");
+        tab.ispisi("Audit dnevnik je obrisan.\n");
         return true;
       }
 
@@ -43,7 +42,7 @@ public class KomandaAudit implements Komanda {
         ispisiTablicu(tab, komandaTekst, zadnjih);
         return true;
       } catch (NumberFormatException e) {
-        tab.ispisi(new IspisTekstAdapter("Sintaksa: AUDIT [N|CLEAR]\n"));
+        tab.ispisi("Sintaksa: AUDIT [N|CLEAR]\n");
         return true;
       }
     }
@@ -58,9 +57,9 @@ public class KomandaAudit implements Komanda {
     String nazivTablice = "Dnevnik izvršavanja komandi";
 
     if (stavke == null || stavke.isEmpty()) {
-      tab.ispisi(new IspisTekstAdapter(komandaTekst));
-      tab.ispisi(new IspisTekstAdapter(nazivTablice));
-      tab.ispisi(new IspisTekstAdapter("Nema audit zapisa.\n"));
+      tab.ispisi(komandaTekst);
+      tab.ispisi(nazivTablice);
+      tab.ispisi("Nema audit zapisa.\n");
       return;
     }
 
@@ -76,8 +75,8 @@ public class KomandaAudit implements Komanda {
 
   private void ispisiZbroj(TablicniFormat tab, String naslov, List<AuditStavka> stavke) {
     if (stavke == null || stavke.isEmpty()) {
-      tab.ispisi(new IspisTekstAdapter(naslov));
-      tab.ispisi(new IspisTekstAdapter("Nema podataka.\n"));
+      tab.ispisi(naslov);
+      tab.ispisi("Nema podataka.\n");
       return;
     }
 

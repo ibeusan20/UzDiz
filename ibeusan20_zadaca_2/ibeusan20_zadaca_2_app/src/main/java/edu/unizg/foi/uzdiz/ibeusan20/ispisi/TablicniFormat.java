@@ -42,11 +42,9 @@ public class TablicniFormat implements FormatIspisaBridge {
   }
 
   @Override
-  public void ispisi(IspisniRed red) {
-    if (red == null) return;
-    String[] v = red.vrijednosti();
-    if (v == null) return;
-    System.out.println(String.join(" ", v));
+  public void ispisi(String tekst) {
+    if (tekst == null) return;
+    System.out.println(tekst);
   }
 
   public void ispisiTablicu(String komandaTekst, String nazivTablice,

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisRezervacijaOsobeAdapter;
-import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisniRed;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
@@ -44,7 +43,7 @@ public class KomandaIro implements Komanda {
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 2) {
-      ispis.ispisi(new IspisTekstAdapter("Sintaksa: IRO <ime> <prezime>"));
+      ispis.ispisi("Sintaksa: IRO <ime> <prezime>");
       return true;
     }
 
@@ -66,8 +65,8 @@ public class KomandaIro implements Komanda {
     tab.ispisiTablicu(komandaTekst, nazivTablice, redovi);
 
     if (lista.isEmpty()) {
-      ispis.ispisi(new IspisTekstAdapter("Nema rezervacija za navedenu osobu."));
-      ispis.ispisi(new IspisTekstAdapter(""));
+      ispis.ispisi("Nema rezervacija za navedenu osobu.");
+      ispis.ispisi("");
     }
 
     return true;

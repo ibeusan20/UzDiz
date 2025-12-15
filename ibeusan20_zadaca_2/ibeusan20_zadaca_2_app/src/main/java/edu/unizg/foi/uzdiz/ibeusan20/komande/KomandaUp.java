@@ -7,7 +7,6 @@ import edu.unizg.foi.uzdiz.ibeusan20.datoteke.facade.DatotekeFacadeImpl;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.AranzmanCsv;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.RezervacijaCsv;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
-import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
@@ -39,21 +38,21 @@ public class KomandaUp implements Komanda {
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 2) {
-      ispis.ispisi(new IspisTekstAdapter("Sintaksa: UP [A|R] nazivDatoteke"));
+      ispis.ispisi("Sintaksa: UP [A|R] nazivDatoteke");
       return true;
     }
 
     String mod = argumenti[0].trim().toUpperCase();
     String datoteka = argumenti[1].trim();
     
-    ispis.ispisi(new IspisTekstAdapter("UP " + mod + " " + datoteka));
+    ispis.ispisi("UP " + mod + " " + datoteka);
 
     DatotekeFacade facade = DatotekeFacadeImpl.getInstance();
 
     switch (mod) {
       case "A" -> ucitajAranzmane(facade, datoteka);
       case "R" -> ucitajRezervacije(facade, datoteka);
-      default -> ispis.ispisi(new IspisTekstAdapter("Neispravan argument za UP. Dozvoljeno je A ili R. \n"));
+      default -> ispis.ispisi("Neispravan argument za UP. Dozvoljeno je A ili R. \n");
     }
 
     return true;
@@ -62,7 +61,7 @@ public class KomandaUp implements Komanda {
   private void ucitajAranzmane(DatotekeFacade facade, String datoteka) {
     List<AranzmanCsv> dto = facade.ucitajAranzmane(datoteka);
     if (dto.isEmpty()) {
-      ispis.ispisi(new IspisTekstAdapter("Nije učitan nijedan aranžman iz datoteke " + datoteka + ". \n"));
+      ispis.ispisi("Nije učitan nijedan aranžman iz datoteke " + datoteka + ". \n");
       return;
     }
 
@@ -105,7 +104,7 @@ public class KomandaUp implements Komanda {
       }
     }
 
-    ispis.ispisi(new IspisTekstAdapter("Učitano novih aranžmana iz datoteke " + datoteka + ": " + brojac));
+    ispis.ispisi("Učitano novih aranžmana iz datoteke " + datoteka + ": " + brojac);
   }
 
   private void ucitajRezervacije(DatotekeFacade facade, String datoteka) {
@@ -152,15 +151,15 @@ public class KomandaUp implements Komanda {
     // OBAVEZNO: globalna rekalkulacija (kvote + preklapanja + stabilizacija)
     uprRez.rekalkulirajSve();
 
-    ispis.ispisi(new IspisTekstAdapter("Učitano novih rezervacija iz datoteke " + datoteka + ": " + dodano));
+    ispis.ispisi("Učitano novih rezervacija iz datoteke " + datoteka + ": " + dodano);
     //if (preskocenoDuplikata > 0) {
-    //  ispis.ispisi(new IspisTekstAdapter("Preskočeno duplikata (identične rezervacije): " + preskocenoDuplikata));
+    //  ispis.ispisi("Preskočeno duplikata (identične rezervacije): " + preskocenoDuplikata));
     //}
     if (preskocenoNepoznatiAranzman > 0) {
-      ispis.ispisi(new IspisTekstAdapter("Preskočeno (nepoznat aranžman): " + preskocenoNepoznatiAranzman));
+      ispis.ispisi("Preskočeno (nepoznat aranžman): " + preskocenoNepoznatiAranzman);
     }
     if (preskocenoLosDatum > 0) {
-      ispis.ispisi(new IspisTekstAdapter("Preskočeno (neispravan datum/vrijeme): " + preskocenoLosDatum));
+      ispis.ispisi("Preskočeno (neispravan datum/vrijeme): " + preskocenoLosDatum);
     }
   }
 

@@ -8,5 +8,5 @@ public interface FormatIspisaBridge {
   /**
    * Ispisuje jedan red podataka u određenom formatu.
    */
-  void ispisi(IspisniRed red);
+  void ispisi(String tekst);
 }

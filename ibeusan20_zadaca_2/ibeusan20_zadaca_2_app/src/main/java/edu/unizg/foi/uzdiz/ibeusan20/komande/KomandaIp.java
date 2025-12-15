@@ -1,7 +1,6 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
-import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.KontekstIspisa;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 
@@ -25,7 +24,7 @@ public class KomandaIp implements Komanda {
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 1) {
-      ispis.ispisi(new IspisTekstAdapter("Sintaksa: IP [N|S]"));
+      ispis.ispisi("Sintaksa: IP [N|S]");
       return true;
     }
 
@@ -34,15 +33,14 @@ public class KomandaIp implements Komanda {
     switch (mod) {
       case "N" -> {
         KontekstIspisa.postaviObrnuto(false);
-        ispis.ispisi(new IspisTekstAdapter("Postavljen ispis u kronološkom redoslijedu (N)."));
+        ispis.ispisi("Postavljen ispis u kronološkom redoslijedu (N).");
       }
       case "S" -> {
         KontekstIspisa.postaviObrnuto(true);
-        ispis.ispisi(new IspisTekstAdapter("Postavljen ispis u obrnutom kronološkom redu. \n"
-            + "slijedu (S)."));
+        ispis.ispisi("Postavljen ispis u obrnutom kronološkom redoslijedu (S).");
       }
       default -> {
-        ispis.ispisi(new IspisTekstAdapter("Nepoznata opcija za IP. Dozvoljeno: N ili S."));
+        ispis.ispisi("Nepoznata opcija za IP. Dozvoljeno: N ili S.");
       }
     }
 

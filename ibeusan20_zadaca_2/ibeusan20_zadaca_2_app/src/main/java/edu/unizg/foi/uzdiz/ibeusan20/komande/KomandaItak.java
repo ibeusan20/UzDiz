@@ -6,7 +6,6 @@ import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.PomocnikDatum;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisAranzmanaAdapter;
-import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisniRed;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
@@ -52,7 +51,7 @@ public class KomandaItak implements Komanda {
         }
       }
     } catch (Exception e) {
-      ispis.ispisi(new IspisTekstAdapter("Neispravan format datuma. Koristi dd.MM.yyyy."));
+      ispis.ispisi("Neispravan format datuma. Koristi dd.MM.yyyy.");
       return true;
     }
 

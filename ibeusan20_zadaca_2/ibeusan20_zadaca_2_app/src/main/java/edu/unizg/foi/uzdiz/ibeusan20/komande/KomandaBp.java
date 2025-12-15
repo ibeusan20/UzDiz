@@ -29,17 +29,17 @@ public class KomandaBp implements Komanda {
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 1) {
-      ispis.ispisi(new IspisTekstAdapter("Sintaksa: BP [A|R]"));
+      ispis.ispisi("Sintaksa: BP [A|R]");
       return true;
     }
 
     String mod = argumenti[0].trim().toUpperCase();
-    ispis.ispisi(new IspisTekstAdapter("BP" + mod));
+    ispis.ispisi("BP" + mod);
 
     switch (mod) {
       case "A" -> obrisiSveAranzmaneFizicki();
       case "R" -> obrisiSveRezervacijeFizicki();
-      default -> ispis.ispisi(new IspisTekstAdapter("Neispravan argument za BP. Dozvoljeno je A ili R."));
+      default -> ispis.ispisi("Neispravan argument za BP. Dozvoljeno je A ili R.");
     }
 
     return true;
@@ -49,32 +49,32 @@ public class KomandaBp implements Komanda {
     int prije = uprAranz.svi().size();
 
     if (prije == 0) {
-      ispis.ispisi(new IspisTekstAdapter("Nema aranžmana za brisanje."));
+      ispis.ispisi("Nema aranžmana za brisanje.");
       return;
     }
 
     // fizičko brisanje aranžmana (rezervacije nestaju s njima)
     int obrisano = uprAranz.obrisiSveAranzmaneFizicki();
 
-    ispis.ispisi(new IspisTekstAdapter("Fizički obrisani svi aranžmani: " + obrisano));
+    ispis.ispisi("Fizički obrisani svi aranžmani: " + obrisano);
   }
 
   private void obrisiSveRezervacijeFizicki() {
     int ukupnoRez = uprRez.brojRezervacija();
     if (ukupnoRez == 0) {
-      ispis.ispisi(new IspisTekstAdapter("Nema rezervacija za brisanje."));
+      ispis.ispisi("Nema rezervacija za brisanje.");
       return;
     }
 
     int obrisano = uprRez.obrisiSveRezervacijeFizicki();
-    ispis.ispisi(new IspisTekstAdapter("Fizički obrisane sve rezervacije: " + obrisano));
+    ispis.ispisi("Fizički obrisane sve rezervacije: " + obrisano);
   }
 
 
   private void obrisiSveAranzmaneLogicki() {
     List<Aranzman> svi = uprAranz.svi();
     if (svi.isEmpty()) {
-      ispis.ispisi(new IspisTekstAdapter("Nema aranžmana za brisanje."));
+      ispis.ispisi("Nema aranžmana za brisanje.");
       return;
     }
 
@@ -91,7 +91,7 @@ public class KomandaBp implements Komanda {
       uprRez.rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
     }
 
-    ispis.ispisi(new IspisTekstAdapter("Logički obrisani (otkazani) svi aranžmani i sve njihove rezervacije."));
+    ispis.ispisi("Logički obrisani (otkazani) svi aranžmani i sve njihove rezervacije.");
   }
 
   private void obrisiSveRezervacijeLogicki() {
@@ -113,9 +113,9 @@ public class KomandaBp implements Komanda {
     }
 
     if (bilo) {
-      ispis.ispisi(new IspisTekstAdapter("Logički obrisane (otkazane) sve rezervacije."));
+      ispis.ispisi("Logički obrisane (otkazane) sve rezervacije.");
     } else {
-      ispis.ispisi(new IspisTekstAdapter("Nema rezervacija za brisanje."));
+      ispis.ispisi("Nema rezervacija za brisanje.");
     }
   }
   
