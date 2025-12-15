@@ -1,7 +1,7 @@
 package edu.unizg.foi.uzdiz.ibeusan20.ispisi;
 
 import java.time.format.DateTimeFormatter;
-import java.util.StringJoiner;
+import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 
 /**
@@ -31,10 +31,13 @@ public class IspisAranzmanDetaljnoAdapter {
         : aranzman.getVrijemePovratka().format(FORMAT_VRIJEME);
 
     String prijevoz = "";
-    if (aranzman.getPrijevoz() != null && !aranzman.getPrijevoz().isEmpty()) {
-      StringJoiner sj = new StringJoiner(", ");
-      aranzman.getPrijevoz().forEach(sj::add);
-      prijevoz = sj.toString();
+    List<String> lista = aranzman.getPrijevoz();
+    if (lista != null && !lista.isEmpty()) {
+      prijevoz = lista.stream()
+          .filter(s -> s != null && !s.isBlank())
+          .map(String::trim)
+          .reduce((a, b) -> a + ", " + b)
+          .orElse("");
     }
 
     System.out.println("Oznaka: " + aranzman.getOznaka());
@@ -49,6 +52,7 @@ public class IspisAranzmanDetaljnoAdapter {
     System.out.println("Max. putnika: " + FormatBrojeva.cijeli(aranzman.getMaxPutnika()));
     System.out.println("Broj noćenja: " + FormatBrojeva.cijeli(aranzman.getBrojNocenja()));
     System.out.println("Doplata jednokrevetna: " + FormatBrojeva.eur(aranzman.getDoplataJednokrevetna()));
+    System.out.println("Prijevoz: " + prijevoz);
     System.out.println("Doručaka: " + FormatBrojeva.cijeli(aranzman.getBrojDorucaka()));
     System.out.println("Ručkova: " + FormatBrojeva.cijeli(aranzman.getBrojRuckova()));
     System.out.println("Večera: " + FormatBrojeva.cijeli(aranzman.getBrojVecera()));

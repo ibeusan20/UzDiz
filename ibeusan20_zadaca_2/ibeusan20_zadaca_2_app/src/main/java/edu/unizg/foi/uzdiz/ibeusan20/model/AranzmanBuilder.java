@@ -197,7 +197,10 @@ public class AranzmanBuilder {
    */
   public AranzmanBuilder postaviPrijevoz(String tekst) {
     if (tekst != null && !tekst.isBlank()) {
-      this.prijevoz = Arrays.asList(tekst.split(";"));
+      this.prijevoz = Arrays.stream(tekst.split(";"))
+          .map(String::trim)
+          .filter(s -> !s.isEmpty())
+          .toList();
     }
     return this;
   }

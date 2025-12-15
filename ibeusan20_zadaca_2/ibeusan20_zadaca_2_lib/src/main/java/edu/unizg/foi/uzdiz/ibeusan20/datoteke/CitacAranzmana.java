@@ -81,7 +81,10 @@ public class CitacAranzmana implements UcitavacPodataka<AranzmanCsv> {
 
           String prijevoz = uzmi(stupci, 12);
           if (prijevoz != null && !prijevoz.isBlank()) {
-            a.prijevoz = Arrays.asList(prijevoz.split(";"));
+            a.prijevoz = Arrays.stream(prijevoz.split(";"))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
           }
 
           a.brojDorucaka = procitajIntOpcionalno(uzmi(stupci, 13));

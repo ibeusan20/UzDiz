@@ -4,7 +4,6 @@ import java.time.format.DateTimeFormatter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisAranzmanDetaljnoAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
-import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisniRed;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
@@ -42,13 +41,8 @@ public class KomandaItap implements Komanda {
 
     ispis.ispisi(new IspisTekstAdapter("Pregled turističkog aranžmana"));
     new IspisAranzmanDetaljnoAdapter(a).ispisiDetalje();
-    ispis.ispisi(IspisTekstAdapter(""));
+    ispis.ispisi(new IspisTekstAdapter(""));
 
     return true;
-  }
-
-  private IspisniRed IspisTekstAdapter(String string) {
-    // TODO Auto-generated method stub
-    return null;
   }
 }
