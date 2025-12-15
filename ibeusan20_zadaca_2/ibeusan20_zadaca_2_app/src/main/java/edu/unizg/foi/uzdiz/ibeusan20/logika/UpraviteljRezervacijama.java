@@ -58,10 +58,10 @@ public class UpraviteljRezervacijama {
     if (r == null) {
       return;
     }
-    // spriječi identične duplikate (npr. ponovno učitavanje istog CSV-a)
-    if (postojiIdenticna(r.getIme(), r.getPrezime(), r.getOznakaAranzmana(), r.getDatumVrijeme())) {
-      return;
-    }
+    // spriječi identične duplikate (npr. ponovno učitavanje istog CSV-a) // NENENENE
+    //if (postojiIdenticna(r.getIme(), r.getPrezime(), r.getOznakaAranzmana(), r.getDatumVrijeme())) {
+    //  return;
+    //}
     Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(r.getOznakaAranzmana());
     if (a != null) {
       a.dodajRezervaciju(r);

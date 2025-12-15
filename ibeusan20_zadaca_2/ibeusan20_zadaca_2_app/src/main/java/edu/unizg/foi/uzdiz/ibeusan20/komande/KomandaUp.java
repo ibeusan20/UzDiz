@@ -1,6 +1,7 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
 import java.util.List;
+import java.util.Set;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.facade.DatotekeFacade;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.facade.DatotekeFacadeImpl;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.AranzmanCsv;
@@ -120,7 +121,7 @@ public class KomandaUp implements Komanda {
     int preskocenoLosDatum = 0;
 
     // da rekalkuliramo jednom po aranžmanu
-    java.util.Set<String> dirnutiAranzmani = new java.util.HashSet<>();
+    Set<String> dirnutiAranzmani = new java.util.HashSet<>();
 
     for (RezervacijaCsv c : dto) {
       Aranzman a = uprAranz.pronadiPoOznaci(c.oznakaAranzmana);
@@ -135,10 +136,10 @@ public class KomandaUp implements Komanda {
       }
 
       // ključna stvar: provjera identične rezervacije
-      if (uprRez.postojiIdenticna(c.ime, c.prezime, c.oznakaAranzmana, c.datumVrijeme)) {
-        preskocenoDuplikata++;
-        continue;
-      }
+      //if (uprRez.postojiIdenticna(c.ime, c.prezime, c.oznakaAranzmana, c.datumVrijeme)) {
+      //  preskocenoDuplikata++;
+      //  continue;
+      //}
 
       Rezervacija r = new Rezervacija(c.ime, c.prezime, c.oznakaAranzmana, c.datumVrijeme);
       uprRez.dodaj(r);
@@ -149,10 +150,10 @@ public class KomandaUp implements Komanda {
     // OBAVEZNO: globalna rekalkulacija (kvote + preklapanja + stabilizacija)
     uprRez.rekalkulirajSve();
 
-    System.out.println("Učitano novih rezervacija iz datoteke " + datoteka + ": " + dodano);
-    if (preskocenoDuplikata > 0) {
-      ispis.ispisi(new IspisTekstAdapter("Preskočeno duplikata (identične rezervacije): " + preskocenoDuplikata));
-    }
+    ispis.ispisi(new IspisTekstAdapter("Učitano novih rezervacija iz datoteke " + datoteka + ": " + dodano));
+    //if (preskocenoDuplikata > 0) {
+    //  ispis.ispisi(new IspisTekstAdapter("Preskočeno duplikata (identične rezervacije): " + preskocenoDuplikata));
+    //}
     if (preskocenoNepoznatiAranzman > 0) {
       ispis.ispisi(new IspisTekstAdapter("Preskočeno (nepoznat aranžman): " + preskocenoNepoznatiAranzman));
     }
