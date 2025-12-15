@@ -9,7 +9,7 @@ public final class KomandaFactory {
   private KomandaFactory() {}
 
   public static Komanda kreiraj(String unos, UpraviteljAranzmanima ua, UpraviteljRezervacijama ur) {
-    if (unos == null || unos.isBlank()) return null;
+    if (unos == null || unos.isBlank()) return new KomandaNepoznata(unos);
 
     String[] dijelovi = unos.trim().split("\\s+");
     String naredba = dijelovi[0].toUpperCase();
@@ -36,13 +36,9 @@ public final class KomandaFactory {
       case "Q"    -> new KomandaQ();
       default     -> null;
     };
-    
-    if (baza == null) return null;
-
-    // Q ne omatamo (nije nužno, ali je čišće)
+    if (baza == null) return new KomandaNepoznata(unos);
     if (baza instanceof KomandaQ) return baza;
 
     return new AuditKomandaDecorator(baza, unos);
-    
   }
 }

@@ -47,10 +47,10 @@ public class Komande {
       Komanda komanda =
           KomandaFactory.kreiraj(unos, upraviteljAranzmanima, upraviteljRezervacijama);
 
-      if (komanda == null) {
-        System.out.println("Nepoznata komanda: " + unos);
-        continue;
-      }
+//      if (komanda == null) {
+//        System.out.println("Nepoznata komanda: " + unos);
+//        continue;
+//      }
 
       boolean nastavi = komanda.izvrsi();
       if (!nastavi) {
