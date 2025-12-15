@@ -116,7 +116,7 @@ public class KomandaUp implements Komanda {
     }
 
     int dodano = 0;
-    int preskocenoDuplikata = 0;
+    //int preskocenoDuplikata = 0;
     int preskocenoNepoznatiAranzman = 0;
     int preskocenoLosDatum = 0;
 
@@ -135,7 +135,7 @@ public class KomandaUp implements Komanda {
         continue;
       }
 
-      // ključna stvar: provjera identične rezervacije
+      // provjera identične rezervacije
       //if (uprRez.postojiIdenticna(c.ime, c.prezime, c.oznakaAranzmana, c.datumVrijeme)) {
       //  preskocenoDuplikata++;
       //  continue;

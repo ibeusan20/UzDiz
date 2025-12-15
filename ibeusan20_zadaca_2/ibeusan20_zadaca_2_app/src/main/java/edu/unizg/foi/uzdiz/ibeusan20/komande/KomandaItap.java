@@ -1,6 +1,5 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
-import java.time.format.DateTimeFormatter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisAranzmanDetaljnoAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisTekstAdapter;
@@ -9,9 +8,6 @@ import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 
 public class KomandaItap implements Komanda {
-
-  private static final DateTimeFormatter FORMAT_DATUM = DateTimeFormatter.ofPattern("dd.MM.yyyy.");
-  private static final DateTimeFormatter FORMAT_VRIJEME = DateTimeFormatter.ofPattern("HH:mm");
 
   private final UpraviteljAranzmanima upravitelj;
   private final String[] argumenti;

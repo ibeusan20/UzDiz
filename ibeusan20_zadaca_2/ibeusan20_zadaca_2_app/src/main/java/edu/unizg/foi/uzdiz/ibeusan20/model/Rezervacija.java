@@ -1,7 +1,6 @@
 package edu.unizg.foi.uzdiz.ibeusan20.model;
 
 import java.time.LocalDateTime;
-import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeNovaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeOdgodenaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeOtkazanaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjePrimljenaRezervacija;
