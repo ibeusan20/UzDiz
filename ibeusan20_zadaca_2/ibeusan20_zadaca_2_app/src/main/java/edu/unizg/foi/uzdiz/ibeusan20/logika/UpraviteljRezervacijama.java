@@ -123,22 +123,18 @@ public class UpraviteljRezervacijama {
    */
   public void rekalkulirajZaAranzman(String oznaka, int minPutnika, int maxPutnika) {
     Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(oznaka);
-    if (a == null) {
-      return;
-    }
+    if (a == null) return;
 
+    // sortiraj kronološki (N)
     List<Rezervacija> sve = new ArrayList<>(a.getRezervacije());
-    // sortiraj kronološki (N), IP poredak će se riješiti pri ispisu
     sve.sort(Comparator.comparing(Rezervacija::getDatumVrijeme,
         Comparator.nullsLast(Comparator.naturalOrder())));
 
-    // kandidati = sve neotkazane
+    // kandidati za kvotu = oni koji se broje u kvotu (primljena/aktivna/čekanje)
     List<Rezervacija> kandidati = new ArrayList<>();
     for (Rezervacija r : sve) {
-      if (r.getStanje() instanceof StanjeOtkazanaRezervacija)
-        continue;
-      if (r.getStanje() instanceof StanjeOdgodenaRezervacija)
-        continue;
+      if (r == null) continue;
+      if (!r.brojiSeUKvotu()) continue; // automatski izbaci otkazane/odgođene/nova
       kandidati.add(r);
     }
 
@@ -150,11 +146,14 @@ public class UpraviteljRezervacijama {
       return;
     }
 
+    // 1) nije dostignut minimum -> sve su PRIMLJENE
     if (brojPrijava < minPutnika) {
       for (Rezervacija r : kandidati) {
         r.postaviStanje(StanjePrimljenaRezervacija.instanca());
       }
       brojAktivnih = 0;
+
+    // 2) minimum dostignut -> prvih max su AKTIVNE, ostale NA ČEKANJU
     } else {
       int kvotaAktivnih = Math.min(brojPrijava, maxPutnika);
       for (int i = 0; i < kandidati.size(); i++) {
@@ -168,8 +167,10 @@ public class UpraviteljRezervacijama {
       }
     }
 
+    // ažuriraj stanje aranžmana (sad će ti i "popunjen" raditi)
     a.azurirajStanje(brojAktivnih, brojPrijava);
   }
+
 
   /**
    * Provjerava ima li osoba već AKTIVNU rezervaciju za zadani aranžman.

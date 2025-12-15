@@ -143,6 +143,8 @@ public class KomandaUp implements Komanda {
 
       Rezervacija r = new Rezervacija(c.ime, c.prezime, c.oznakaAranzmana, c.datumVrijeme);
       uprRez.dodaj(r);
+      
+      uprRez.rekalkulirajSve(); // dobro
 
       dirnutiAranzmani.add(a.getOznaka());
       dodano++;

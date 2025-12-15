@@ -143,18 +143,23 @@ public class Aranzman {
     if (stanje instanceof StanjeOtkazanAranzman) {
       return;
     }
+
+    // Nema dovoljno prijava -> u pripremi
     if (brojPrijava < minPutnika) {
       stanje = StanjeUPripremiAranzman.instanca();
       return;
     }
-    if (brojAktivnih <= maxPutnika && brojAktivnih >= minPutnika) {
-      stanje = StanjeAktivanAranzman.instanca();
+
+    // Dosegnut maksimum aktivnih mjesta -> popunjen
+    if (brojAktivnih >= maxPutnika) {
+      stanje = StanjePopunjenAranzman.instanca();
       return;
     }
-    if (brojAktivnih > maxPutnika || brojPrijava > maxPutnika) {
-      stanje = StanjePopunjenAranzman.instanca();
-    }
+
+    // Inače je aktivan
+    stanje = StanjeAktivanAranzman.instanca();
   }
+
 
   public int obrisiSveRezervacijeFizicki() {
     int n = (rezervacije == null) ? 0 : rezervacije.size();

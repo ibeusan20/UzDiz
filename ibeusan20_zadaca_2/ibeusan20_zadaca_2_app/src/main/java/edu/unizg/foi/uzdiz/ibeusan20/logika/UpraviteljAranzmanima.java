@@ -79,9 +79,9 @@ public class UpraviteljAranzmanima {
       }
     }
 
-    if (KontekstIspisa.jeObrnuto()) {
-      Collections.reverse(rezultat);
-    }
+    //if (KontekstIspisa.jeObrnuto()) {
+    //  Collections.reverse(rezultat);
+    //}
     return rezultat;
   }
 
@@ -133,7 +133,7 @@ public class UpraviteljAranzmanima {
   }
 
   /** Filtrirani aranžmani, sortirani po početku + IP poredak. */
-  public List<Aranzman> filtrirajPoRasponuZaIspis(java.time.LocalDate od, java.time.LocalDate d0) {
+  public List<Aranzman> filtrirajPoRasponuZaIspis(LocalDate od, LocalDate d0) {
     return sortirajZaIspis(filtrirajPoRasponu(od, d0)); // koristi tvoju postojeću metodu
   }
 
