@@ -1,12 +1,12 @@
 package edu.unizg.foi.uzdiz.ibeusan20.datoteke.facade;
 
 import java.util.List;
-import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.AranzmanCsv;
-import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.RezervacijaCsv;
+import edu.unizg.foi.uzdiz.ibeusan20.datoteke.api.AranzmanPodaci;
+import edu.unizg.foi.uzdiz.ibeusan20.datoteke.api.RezervacijaPodaci;
 
 public interface DatotekeFacade {
 
-    List<AranzmanCsv> ucitajAranzmane(String putanja);
+    List<AranzmanPodaci> ucitajAranzmane(String putanja);
 
-    List<RezervacijaCsv> ucitajRezervacije(String putanja);
+    List<RezervacijaPodaci> ucitajRezervacije(String putanja);
 }

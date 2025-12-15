@@ -1,18 +1,18 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
 import java.util.List;
-import java.util.Set;
+import edu.unizg.foi.uzdiz.ibeusan20.datoteke.api.AranzmanPodaci;
+import edu.unizg.foi.uzdiz.ibeusan20.datoteke.api.RezervacijaPodaci;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.facade.DatotekeFacade;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.facade.DatotekeFacadeImpl;
-import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.AranzmanCsv;
-import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.RezervacijaCsv;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
-import edu.unizg.foi.uzdiz.ibeusan20.model.AranzmanBuilder;
+import edu.unizg.foi.uzdiz.ibeusan20.model.AranzmanDirector;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
+import edu.unizg.foi.uzdiz.ibeusan20.model.RezervacijaDirector;
 
 /**
  * UP – učitavanje podataka o aranžmanima ili rezervacijama iz datoteke.
@@ -37,7 +37,7 @@ public class KomandaUp implements Komanda {
 
   @Override
   public boolean izvrsi() {
-    if (argumenti.length < 2) {
+    if (argumenti == null || argumenti.length < 2) {
       ispis.ispisi("Sintaksa: UP [A|R] nazivDatoteke");
       return true;
     }
@@ -59,107 +59,79 @@ public class KomandaUp implements Komanda {
   }
 
   private void ucitajAranzmane(DatotekeFacade facade, String datoteka) {
-    List<AranzmanCsv> dto = facade.ucitajAranzmane(datoteka);
-    if (dto.isEmpty()) {
+    List<AranzmanPodaci> dto = facade.ucitajAranzmane(datoteka);
+    if (dto == null || dto.isEmpty()) {
       ispis.ispisi("Nije učitan nijedan aranžman iz datoteke " + datoteka + ". \n");
       return;
     }
+    AranzmanDirector director = new AranzmanDirector();
 
-    int brojac = 0;
-    for (AranzmanCsv c : dto) {
+    int dodano = 0;
+    int preskocenoPostoji = 0;
+    int greske = 0;
+
+    for (AranzmanPodaci p : dto) {
       try {
-        String prijevozTekst =
-            (c.prijevoz == null || c.prijevoz.isEmpty())
-                ? null
-                : String.join(";", c.prijevoz);
+        Aranzman a = director.konstruiraj(p);
 
-        Aranzman a = new AranzmanBuilder()
-            .postaviOznaku(c.oznaka)
-            .postaviNaziv(c.naziv)
-            .postaviProgram(c.program)
-            .postaviPocetniDatum(c.pocetniDatum)
-            .postaviZavrsniDatum(c.zavrsniDatum)
-            .postaviVrijemeKretanja(c.vrijemeKretanja)
-            .postaviVrijemePovratka(c.vrijemePovratka)
-            .postaviCijenu(c.cijena)
-            .postaviMinPutnika(c.minPutnika)
-            .postaviMaxPutnika(c.maxPutnika)
-            .postaviBrojNocenja(c.brojNocenja)
-            .postaviDoplatuJednokrevetna(c.doplataJednokrevetna)
-            .postaviPrijevoz(prijevozTekst)
-            .postaviBrojDorucaka(c.brojDorucaka)
-            .postaviBrojRuckova(c.brojRuckova)
-            .postaviBrojVecera(c.brojVecera)
-            .izgradi();
-        
         if (uprAranz.pronadiPoOznaci(a.getOznaka()) != null) {
-          System.out.println("Preskačem aranžman (već postoji): " + a.getOznaka());
+          preskocenoPostoji++;
           continue;
         }
 
         uprAranz.dodaj(a);
-        brojac++;
-      } catch (IllegalArgumentException ex) {
-        System.err.println("Preskacem aranžman " + c.oznaka + ": " + ex.getMessage());
+        dodano++;
+      } catch (IllegalArgumentException e) {
+        greske++;
+        System.err.println("[" + greske + ". greška (UP A)] " + e.getMessage());
       }
     }
 
-    ispis.ispisi("Učitano novih aranžmana iz datoteke " + datoteka + ": " + brojac);
+    ispis.ispisi("Učitano novih aranžmana iz datoteke " + datoteka + ": " + dodano);
+    if (preskocenoPostoji > 0) {
+      ispis.ispisi("Preskočeno (aranžman već postoji): " + preskocenoPostoji);
+    }
   }
 
   private void ucitajRezervacije(DatotekeFacade facade, String datoteka) {
-    List<RezervacijaCsv> dto = facade.ucitajRezervacije(datoteka);
-    if (dto.isEmpty()) {
-      System.out.println("Nije učitana nijedna rezervacija iz datoteke " + datoteka + ".");
+    List<RezervacijaPodaci> dto = facade.ucitajRezervacije(datoteka);
+
+    if (dto == null || dto.isEmpty()) {
+      ispis.ispisi("Nije učitana nijedna rezervacija iz datoteke " + datoteka + ".");
       return;
     }
 
+    RezervacijaDirector director = new RezervacijaDirector();
+
     int dodano = 0;
-    //int preskocenoDuplikata = 0;
     int preskocenoNepoznatiAranzman = 0;
-    int preskocenoLosDatum = 0;
+    int greske = 0;
 
-    // da rekalkuliramo jednom po aranžmanu
-    Set<String> dirnutiAranzmani = new java.util.HashSet<>();
+    for (RezervacijaPodaci p : dto) {
+      try {
+        Rezervacija r = director.konstruiraj(p);
 
-    for (RezervacijaCsv c : dto) {
-      Aranzman a = uprAranz.pronadiPoOznaci(c.oznakaAranzmana);
-      if (a == null) {
-        preskocenoNepoznatiAranzman++;
-        continue;
+        Aranzman a = uprAranz.pronadiPoOznaci(r.getOznakaAranzmana());
+        if (a == null) {
+          preskocenoNepoznatiAranzman++;
+          continue;
+        }
+
+        uprRez.dodaj(r);
+        dodano++;
+
+      } catch (IllegalArgumentException e) {
+        greske++;
+        System.err.println("[" + greske + ". greška (UP R)] " + e.getMessage());
       }
-
-      if (c.datumVrijeme == null) {
-        preskocenoLosDatum++;
-        continue;
-      }
-
-      // provjera identične rezervacije
-      //if (uprRez.postojiIdenticna(c.ime, c.prezime, c.oznakaAranzmana, c.datumVrijeme)) {
-      //  preskocenoDuplikata++;
-      //  continue;
-      //}
-
-      Rezervacija r = new Rezervacija(c.ime, c.prezime, c.oznakaAranzmana, c.datumVrijeme);
-      uprRez.dodaj(r);
-      
-      uprRez.rekalkulirajSve(); // dobro
-
-      dirnutiAranzmani.add(a.getOznaka());
-      dodano++;
     }
-    // OBAVEZNO: globalna rekalkulacija (kvote + preklapanja + stabilizacija)
+
+    // OBAVEZNO: jedna globalna rekalkulacija na kraju (kvote + preklapanja + stabilizacija)
     uprRez.rekalkulirajSve();
 
     ispis.ispisi("Učitano novih rezervacija iz datoteke " + datoteka + ": " + dodano);
-    //if (preskocenoDuplikata > 0) {
-    //  ispis.ispisi("Preskočeno duplikata (identične rezervacije): " + preskocenoDuplikata));
-    //}
     if (preskocenoNepoznatiAranzman > 0) {
       ispis.ispisi("Preskočeno (nepoznat aranžman): " + preskocenoNepoznatiAranzman);
-    }
-    if (preskocenoLosDatum > 0) {
-      ispis.ispisi("Preskočeno (neispravan datum/vrijeme): " + preskocenoLosDatum);
     }
   }
 

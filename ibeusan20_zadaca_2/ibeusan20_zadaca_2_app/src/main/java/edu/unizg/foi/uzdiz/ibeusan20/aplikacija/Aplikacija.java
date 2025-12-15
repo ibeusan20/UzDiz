@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
+import edu.unizg.foi.uzdiz.ibeusan20.datoteke.api.AranzmanPodaci;
+import edu.unizg.foi.uzdiz.ibeusan20.datoteke.api.RezervacijaPodaci;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.facade.DatotekeFacade;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.facade.DatotekeFacadeImpl;
-import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.AranzmanCsv;
-import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.RezervacijaCsv;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
-import edu.unizg.foi.uzdiz.ibeusan20.model.AranzmanBuilder;
+import edu.unizg.foi.uzdiz.ibeusan20.model.AranzmanDirector;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
+import edu.unizg.foi.uzdiz.ibeusan20.model.RezervacijaDirector;
 
 /**
  * Glavna klasa aplikacije Turistička agencija.
@@ -38,92 +38,81 @@ public class Aplikacija {
    */
   public static void main(String[] args) {
     int redniBrojGreske = 0;
-    int redniBroj = 0;
+    int redniBrojA = 0;
+    int redniBrojR = 0;
     try {
       Argumenti argumenti = new Argumenti(args);
 
       DatotekeFacade facade = DatotekeFacadeImpl.getInstance();
 
       // 1) čitanje CSV podataka preko LIB modula
-      List<AranzmanCsv> aranzmaniCsv = new ArrayList<>();
-      List<RezervacijaCsv> rezervacijeCsv = new ArrayList<>();
+      List<AranzmanPodaci> aranzmaniDto = List.of();
+      List<RezervacijaPodaci> rezervacijeDto = List.of();
 
       if (argumenti.imaAranzmane()) {
-        aranzmaniCsv = facade.ucitajAranzmane(argumenti.dohvatiPutanjuAranzmana());
+        aranzmaniDto = facade.ucitajAranzmane(argumenti.dohvatiPutanjuAranzmana());
       }
       if (argumenti.imaRezervacije()) {
-        rezervacijeCsv = facade.ucitajRezervacije(argumenti.dohvatiPutanjuRezervacija());
+        rezervacijeDto = facade.ucitajRezervacije(argumenti.dohvatiPutanjuRezervacija());
       }
+      
+      // 2) Direktori (Builder + Director u APP-u)
+      AranzmanDirector arDirector = new AranzmanDirector();
+      RezervacijaDirector rezDirector = new RezervacijaDirector();
 
 
       // 2) kreiranje domenskih objekata (Aranzman) i mapa po oznaci
       List<Aranzman> aranzmani = new ArrayList<>();
-      redniBroj = 0;
       Map<String, Aranzman> mapaAranzmana = new LinkedHashMap<>();
 
-      for (AranzmanCsv aCsv : aranzmaniCsv) {
-        redniBroj++;
+      redniBrojA = 0;
+      for (AranzmanPodaci dto : aranzmaniDto) {
+        redniBrojA++;
         try {
-          AranzmanBuilder b = new AranzmanBuilder()
-              .postaviOznaku(aCsv.oznaka)
-              .postaviNaziv(aCsv.naziv)
-              .postaviProgram(aCsv.program)
-              .postaviPocetniDatum(aCsv.pocetniDatum)
-              .postaviZavrsniDatum(aCsv.zavrsniDatum)
-              .postaviVrijemeKretanja(aCsv.vrijemeKretanja)
-              .postaviVrijemePovratka(aCsv.vrijemePovratka)
-              .postaviCijenu(aCsv.cijena)
-              .postaviMinPutnika(aCsv.minPutnika)
-              .postaviMaxPutnika(aCsv.maxPutnika)
-              .postaviBrojNocenja(aCsv.brojNocenja)
-              .postaviDoplatuJednokrevetna(aCsv.doplataJednokrevetna)
-              .postaviPrijevoz(aCsv.prijevoz == null
-                  ? ""
-                  : String.join(";", aCsv.prijevoz))
-              .postaviBrojDorucaka(aCsv.brojDorucaka)
-              .postaviBrojRuckova(aCsv.brojRuckova)
-              .postaviBrojVecera(aCsv.brojVecera);
-
-          Aranzman a = b.izgradi();
+          Aranzman a = arDirector.konstruiraj(dto);
           aranzmani.add(a);
           mapaAranzmana.put(a.getOznaka(), a);
 
         } catch (IllegalArgumentException e) {
           redniBrojGreske++;
-          System.err.println("[" + redniBrojGreske + ". greška (aranžmani)] u " + redniBroj
-              + ". retku rezervacije: " + "Preskačem neispravan aranžman (" + aCsv.oznaka + "): " + e.getMessage());
+          System.err.println("[" + redniBrojGreske + ". greška (aranžmani)] u " + redniBrojA
+              + ". retku rezervacije: " + "Preskačem neispravan aranžman (" + dto.getOznaka() + "): " + e.getMessage());
         }
       }
 
       // 3) kreiranje domenskih rezervacija (još nisu u Composite-u)
       List<Rezervacija> rezervacije = new ArrayList<>();
-      redniBroj = 0;
-      for (RezervacijaCsv rCsv : rezervacijeCsv) {
-        redniBroj++;
-        Aranzman a = mapaAranzmana.get(rCsv.oznakaAranzmana);
-        if (a == null) {
-          // semantička provjera: ne postoji aranžman za rezervaciju
-          redniBrojGreske++;
-          System.err.println("[" + redniBrojGreske + ". greška (rezervacije)] u " + redniBroj
-              + ". retku rezervacije: " + "Preskačem rezervaciju " + rCsv.ime + " " + rCsv.prezime
-              + " - ne postoji aranžman s oznakom " + rCsv.oznakaAranzmana);
-          continue;
-        }
-        if (rCsv.datumVrijeme == null) {
-          System.err.println(
-              );
-          redniBrojGreske++;
-          System.err.println("[" + redniBrojGreske + ". greška (rezervacije)] u " + redniBroj
-              + ". retku rezervacije: " + "Preskačem rezervaciju (" + rCsv.ime + " " + rCsv.prezime
-              + "): neispravan datum/vrijeme.");
-          continue;
-        }
+      redniBrojR = 0;
+      for (RezervacijaPodaci dto : rezervacijeDto) {
+        try {
+          Rezervacija r = rezDirector.konstruiraj(dto);
 
-        Rezervacija r =
-            new Rezervacija(rCsv.ime, rCsv.prezime, rCsv.oznakaAranzmana, rCsv.datumVrijeme);
-        rezervacije.add(r);
+          Aranzman a = mapaAranzmana.get(r.getOznakaAranzmana());
+          if (a == null) {
+            // semantička provjera: ne postoji aranžman za rezervaciju
+            redniBrojGreske++;
+            System.err.println("[" + redniBrojGreske + ". greška (rezervacije)] u " + redniBrojR
+                + ". retku rezervacije: " + "Preskačem rezervaciju " + dto.getIme() + " " + dto.getPrezime()
+                + " - ne postoji aranžman s oznakom " + dto.getOznakaAranzmana());
+            continue;
+          }
+          if (dto.getDatumVrijeme() == null) {
+            System.err.println(
+                );
+            redniBrojGreske++;
+            System.err.println("[" + redniBrojGreske + ". greška (rezervacije)] u " + redniBrojR
+                + ". retku rezervacije: " + "Preskačem rezervaciju (" + dto.getIme() + " " + dto.getPrezime()
+                + "): neispravan datum/vrijeme.");
+            continue;
+          }
+          rezervacije.add(r);
+        } catch (IllegalArgumentException e) {
+          redniBrojR++;
+          System.err.println("[" + redniBrojGreske + ". greška (rezervacije)] u " + ". retku rezervacije: " + e.getMessage());
+        }
       }
 
+      
       // 4) upravitelji
       UpraviteljAranzmanima uprAranz = new UpraviteljAranzmanima(aranzmani);
       UpraviteljRezervacijama uprRez = new UpraviteljRezervacijama(uprAranz);
@@ -133,11 +122,11 @@ public class Aplikacija {
       uprRez.rekalkulirajSve();
 
       // 5b) INICIJALNA REKALKULACIJA STATE-OVA ZA SVE ARANŽMANE
-      for (Aranzman a : uprAranz.svi()) {
+      for (Aranzman arr : uprAranz.svi()) {
         uprRez.rekalkulirajZaAranzman(
-            a.getOznaka(),
-            a.getMinPutnika(),
-            a.getMaxPutnika());
+            arr.getOznaka(),
+            arr.getMinPutnika(),
+            arr.getMaxPutnika());
       }
 
       System.out.println("Učitano aranžmana: " + uprAranz.brojAranzmana());
