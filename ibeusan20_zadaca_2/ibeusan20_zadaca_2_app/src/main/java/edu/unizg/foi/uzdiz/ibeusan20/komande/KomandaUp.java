@@ -28,8 +28,8 @@ public class KomandaUp implements Komanda {
   private final String[] argumenti;
   private final FormatIspisaBridge ispis = new TablicniFormat();
 
-  public KomandaUp(UpraviteljAranzmanima uprAranz,
-      UpraviteljRezervacijama uprRez, String... argumenti) {
+  public KomandaUp(UpraviteljAranzmanima uprAranz, UpraviteljRezervacijama uprRez,
+      String... argumenti) {
     this.uprAranz = uprAranz;
     this.uprRez = uprRez;
     this.argumenti = argumenti;
@@ -44,7 +44,7 @@ public class KomandaUp implements Komanda {
 
     String mod = argumenti[0].trim().toUpperCase();
     String datoteka = argumenti[1].trim();
-    
+
     ispis.ispisi("UP " + mod + " " + datoteka);
 
     DatotekeFacade facade = DatotekeFacadeImpl.getInstance();
@@ -117,8 +117,18 @@ public class KomandaUp implements Komanda {
           continue;
         }
 
-        uprRez.dodaj(r);
-        dodano++;
+        if (a.jeOtkazan()) {
+          ispis.ispisi("Greška: aranžman '" + a.getOznaka()
+              + "' je otkazan - preskačem rezervaciju " + r.getIme() + " " + r.getPrezime() + ".");
+          continue;
+        }
+
+        try {
+          uprRez.dodaj(r);
+          dodano++;
+        } catch (IllegalStateException ex) {
+          ispis.ispisi("Greška: " + ex.getMessage());
+        }
 
       } catch (IllegalArgumentException e) {
         greske++;

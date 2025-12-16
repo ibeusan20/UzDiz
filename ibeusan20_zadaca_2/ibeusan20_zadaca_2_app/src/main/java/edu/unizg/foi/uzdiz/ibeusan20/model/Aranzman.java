@@ -120,9 +120,17 @@ public class Aranzman {
     return Collections.unmodifiableList(rezervacije);
   }
 
+  public boolean jeOtkazan() {
+    return stanje instanceof StanjeOtkazanAranzman;
+  }
+
   public void dodajRezervaciju(Rezervacija r) {
     if (r == null) {
       return;
+    }
+    if (jeOtkazan()) {
+      throw new IllegalStateException(
+          "Aranžman '" + oznaka + "' je otkazan - nije moguće dodavati rezervacije.");
     }
     rezervacije.add(r);
   }

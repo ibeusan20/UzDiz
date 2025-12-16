@@ -29,6 +29,7 @@ public class KomandaIp implements Komanda {
     }
 
     String mod = argumenti[0].trim().toUpperCase();
+    ispis.ispisi("IP " + mod);
 
     switch (mod) {
       case "N" -> {

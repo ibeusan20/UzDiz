@@ -59,6 +59,11 @@ public class KomandaDrta implements Komanda {
       ispis.ispisi("");
       return true;
     }
+    
+    if (a.jeOtkazan()) {
+      ispis.ispisi("Aranžman '" + a.getOznaka() + "' je otkazan - dodavanje nije dozvoljeno.");
+      return true;
+    }
 
     // provjera ispravnosti datuma i vremena
     LocalDateTime datumVrijeme = PomocnikDatum.procitajDatumIVrijeme(datum + " " + vrijeme);
