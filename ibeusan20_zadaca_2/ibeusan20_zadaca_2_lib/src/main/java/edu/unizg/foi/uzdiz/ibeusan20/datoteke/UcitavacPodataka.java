@@ -3,9 +3,15 @@ package edu.unizg.foi.uzdiz.ibeusan20.datoteke;
 import java.util.List;
 
 /**
- * Generičko sučelje za učitavanje podataka iz izvora.
+ * Generičko sučelje za učitavanje podataka iz izvora (npr. CSV) u listu DTO objekata.
+ * <p>
+ * Ovdje se koristi Java Generics kako bi isti ugovor (interface) vrijedio za različite tipove
+ * zapisa (npr. AranzmanCsv, RezervacijaCsv) uz provjeru tipova u vrijeme prevođenja.
+ * </p>
  *
- * @param <T> tip podataka koji se učitava
+ * @param <T> tip zapisa koji se učitava
+ *
+ * @see <a https://docs.oracle.com/javase/tutorial/java/generics/why.html</a>
  */
 public interface UcitavacPodataka<T> {
   
