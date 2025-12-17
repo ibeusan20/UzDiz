@@ -12,6 +12,7 @@ import java.util.List;
  * @param <T> tip zapisa koji se učitava
  *
  * @see <a https://docs.oracle.com/javase/tutorial/java/generics/why.html</a>
+ * @see <a https://stackoverflow.com/questions/39386586/c-sharp-generic-interface-and-factory-pattern</a>
  */
 public interface UcitavacPodataka<T> {
   
