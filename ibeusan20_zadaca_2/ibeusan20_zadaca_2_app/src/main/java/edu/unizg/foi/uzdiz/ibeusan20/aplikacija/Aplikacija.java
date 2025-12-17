@@ -15,7 +15,6 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.AranzmanDirector;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.RezervacijaDirector;
 
-// TODO: Auto-generated Javadoc
 /**
  * Glavna klasa aplikacije Turistička agencija.
  * <p>

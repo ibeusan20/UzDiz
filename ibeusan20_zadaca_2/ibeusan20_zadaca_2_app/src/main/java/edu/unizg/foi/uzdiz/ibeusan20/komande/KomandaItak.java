@@ -11,19 +11,12 @@ import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 
-// TODO: Auto-generated Javadoc
 /**
  * Komanda ITAK - ispis svih aranžmana (ili filtriranih po datumu).
  */
 public class KomandaItak implements Komanda {
-  
-  /** The upravitelj. */
   private final UpraviteljAranzmanima upravitelj;
-  
-  /** The argumenti. */
   private final String[] argumenti;
-  
-  /** The ispis. */
   private final FormatIspisaBridge ispis = new TablicniFormat();
 
 

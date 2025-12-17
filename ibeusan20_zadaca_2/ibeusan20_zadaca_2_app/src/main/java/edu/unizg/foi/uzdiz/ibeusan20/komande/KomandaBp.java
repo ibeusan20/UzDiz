@@ -8,31 +8,16 @@ import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
 
-// TODO: Auto-generated Javadoc
 /**
  * BP – brisanje podataka o aranžmanima ili rezervacijama.
  */
 public class KomandaBp implements Komanda {
 
-  /** The upr aranz. */
   private final UpraviteljAranzmanima uprAranz;
-  
-  /** The upr rez. */
   private final UpraviteljRezervacijama uprRez;
-  
-  /** The argumenti. */
   private final String[] argumenti;
-  
-  /** The ispis. */
   private final FormatIspisaBridge ispis = new TablicniFormat();
 
-  /**
-   * Instantiates a new komanda bp.
-   *
-   * @param uprAranz the upr aranz
-   * @param uprRez the upr rez
-   * @param argumenti the argumenti
-   */
   public KomandaBp(UpraviteljAranzmanima uprAranz,
       UpraviteljRezervacijama uprRez, String... argumenti) {
     this.uprAranz = uprAranz;
@@ -40,11 +25,6 @@ public class KomandaBp implements Komanda {
     this.argumenti = argumenti;
   }
 
-  /**
-   * Izvrsi.
-   *
-   * @return true, if successful
-   */
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 1) {
@@ -64,9 +44,6 @@ public class KomandaBp implements Komanda {
     return true;
   }
   
-  /**
-   * Obrisi sve aranzmane fizicki.
-   */
   private void obrisiSveAranzmaneFizicki() {
     int prije = uprAranz.svi().size();
 
@@ -81,9 +58,6 @@ public class KomandaBp implements Komanda {
     ispis.ispisi("Fizički obrisani svi aranžmani: " + obrisano);
   }
 
-  /**
-   * Obrisi sve rezervacije fizicki.
-   */
   private void obrisiSveRezervacijeFizicki() {
     int ukupnoRez = uprRez.brojRezervacija();
     if (ukupnoRez == 0) {
@@ -96,9 +70,6 @@ public class KomandaBp implements Komanda {
   }
 
 
-  /**
-   * Obrisi sve aranzmane logicki.
-   */
   private void obrisiSveAranzmaneLogicki() {
     List<Aranzman> svi = uprAranz.svi();
     if (svi.isEmpty()) {
@@ -122,9 +93,6 @@ public class KomandaBp implements Komanda {
     ispis.ispisi("Logički obrisani (otkazani) svi aranžmani i sve njihove rezervacije.");
   }
 
-  /**
-   * Obrisi sve rezervacije logicki.
-   */
   private void obrisiSveRezervacijeLogicki() {
     List<Aranzman> svi = uprAranz.svi();
     boolean bilo = false;

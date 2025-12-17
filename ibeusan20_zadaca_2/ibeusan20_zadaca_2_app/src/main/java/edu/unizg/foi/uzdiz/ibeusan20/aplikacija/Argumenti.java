@@ -1,31 +1,14 @@
 package edu.unizg.foi.uzdiz.ibeusan20.aplikacija;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class Argumenti.
- */
 public class Argumenti {
 
-  /** The putanja aranzmana. */
   private String putanjaAranzmana;    // --ta
-  
-  /** The putanja rezervacija. */
   private String putanjaRezervacija;  // --rta
 
-  /**
-   * Instantiates a new argumenti.
-   *
-   * @param args the args
-   */
   public Argumenti(String[] args) {
     parsiraj(args);
   }
 
-  /**
-   * Parsiraj.
-   *
-   * @param args the args
-   */
   private void parsiraj(String[] args) {
     if (args == null) {
       return; // tretiraj kao "nema argumenata"
@@ -67,38 +50,18 @@ public class Argumenti {
     }
   }
 
-  /**
-   * Ima aranzmane.
-   *
-   * @return true, if successful
-   */
   public boolean imaAranzmane() {
     return putanjaAranzmana != null && !putanjaAranzmana.isBlank();
   }
 
-  /**
-   * Ima rezervacije.
-   *
-   * @return true, if successful
-   */
   public boolean imaRezervacije() {
     return putanjaRezervacija != null && !putanjaRezervacija.isBlank();
   }
 
-  /**
-   * Dohvati putanju aranzmana.
-   *
-   * @return the string
-   */
   public String dohvatiPutanjuAranzmana() {
     return putanjaAranzmana;
   }
 
-  /**
-   * Dohvati putanju rezervacija.
-   *
-   * @return the string
-   */
   public String dohvatiPutanjuRezervacija() {
     return putanjaRezervacija;
   }

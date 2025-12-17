@@ -4,25 +4,10 @@ import edu.unizg.foi.uzdiz.ibeusan20.komande.dekoratori.AuditKomandaDecorator;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 
-// TODO: Auto-generated Javadoc
-/**
- * A factory for creating Komanda objects.
- */
 public final class KomandaFactory {
 
-  /**
-   * Instantiates a new komanda factory.
-   */
   private KomandaFactory() {}
 
-  /**
-   * Kreiraj.
-   *
-   * @param unos the unos
-   * @param ua the ua
-   * @param ur the ur
-   * @return the komanda
-   */
   public static Komanda kreiraj(String unos, UpraviteljAranzmanima ua, UpraviteljRezervacijama ur) {
     if (unos == null || unos.isBlank()) return new KomandaNepoznata(unos);
 

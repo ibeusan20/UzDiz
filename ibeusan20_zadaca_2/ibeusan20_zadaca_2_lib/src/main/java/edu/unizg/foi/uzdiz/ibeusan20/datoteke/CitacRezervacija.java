@@ -8,18 +8,8 @@ import java.util.List;
 
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.RezervacijaCsv;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class CitacRezervacija.
- */
 public class CitacRezervacija implements UcitavacPodataka<RezervacijaCsv> {
 
-  /**
-   * Ucitaj.
-   *
-   * @param nazivDatoteke the naziv datoteke
-   * @return the list
-   */
   @Override
   public List<RezervacijaCsv> ucitaj(String nazivDatoteke) {
     List<RezervacijaCsv> rezultat = new ArrayList<>();
@@ -94,13 +84,6 @@ public class CitacRezervacija implements UcitavacPodataka<RezervacijaCsv> {
     return rezultat;
   }
 
-  /**
-   * Uzmi.
-   *
-   * @param polja the polja
-   * @param i the i
-   * @return the string
-   */
   private String uzmi(List<String> polja, int i) {
     if (polja == null || i >= polja.size()) return "";
     return polja.get(i);
@@ -110,11 +93,6 @@ public class CitacRezervacija implements UcitavacPodataka<RezervacijaCsv> {
    * Pročita cijeli CSV zapis (podržava višeredni zapis kad su navodnici neparni).
    * Ovo je praktički isto ponašanje kao CsvParser.procitajZapis, ali vraća TEKST zapisa
    * da ga možemo ispisati kod greške.
-   *
-   * @param prviRedak the prvi redak
-   * @param br the br
-   * @return the string
-   * @throws IOException Signals that an I/O exception has occurred.
    */
   private String procitajZapisTekst(String prviRedak, BufferedReader br) throws IOException {
     StringBuilder sb = new StringBuilder(prviRedak);
@@ -129,12 +107,6 @@ public class CitacRezervacija implements UcitavacPodataka<RezervacijaCsv> {
     return sb.toString();
   }
 
-  /**
-   * Broj navodnika.
-   *
-   * @param tekst the tekst
-   * @return the int
-   */
   private int brojNavodnika(CharSequence tekst) {
     int br = 0;
     for (int i = 0; i < tekst.length(); i++) {

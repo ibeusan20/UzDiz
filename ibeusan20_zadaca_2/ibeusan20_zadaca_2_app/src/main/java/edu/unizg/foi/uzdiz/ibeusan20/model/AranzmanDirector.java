@@ -2,17 +2,21 @@ package edu.unizg.foi.uzdiz.ibeusan20.model;
 
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.api.AranzmanPodaci;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class AranzmanDirector.
+ * Director za izgradnju {@link Aranzman} objekata iz ulaznih podataka.
+ * <p>
+ * Dio je uzorka <b>Builder</b>: preuzima {@link AranzmanPodaci}, priprema ih 
+ * i koristi {@link AranzmanBuilder} za kreiranje aranžmana.
+ * </p>
  */
 public class AranzmanDirector {
 
   /**
-   * Konstruiraj.
+   * Konstruira {@link Aranzman} iz zadanih podataka.
    *
-   * @param p the p
-   * @return the aranzman
+   * @param p podaci aranžmana (npr. iz datoteke)
+   * @return kreirani aranžman
+   * @throws IllegalArgumentException ako su podaci {@code null}
    */
   public Aranzman konstruiraj(AranzmanPodaci p) {
     if (p == null) throw new IllegalArgumentException("Podaci aranžmana nisu definirani.");

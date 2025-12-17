@@ -6,7 +6,6 @@ import edu.unizg.foi.uzdiz.ibeusan20.komande.KomandaFactory;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 
-// TODO: Auto-generated Javadoc
 /**
  * Klasa zadužena za interaktivni rad s korisnikom.
  * <p>
@@ -16,10 +15,7 @@ import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
  */
 public class Komande {
 
-  /** The upravitelj aranzmanima. */
   private final UpraviteljAranzmanima upraviteljAranzmanima;
-  
-  /** The upravitelj rezervacijama. */
   private final UpraviteljRezervacijama upraviteljRezervacijama;
 
   /**

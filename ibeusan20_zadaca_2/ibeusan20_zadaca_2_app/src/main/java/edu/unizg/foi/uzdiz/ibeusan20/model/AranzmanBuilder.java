@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-// TODO: Auto-generated Javadoc
 /**
  * <b>Kreacijski uzorak:</b> Builder
  * <p>
@@ -15,56 +14,22 @@ import java.util.List;
  * </p>
  */
 public class AranzmanBuilder {
-  
-  /** The oznaka. */
   private String oznaka;
-  
-  /** The naziv. */
   private String naziv;
-  
-  /** The program. */
   private String program;
-  
-  /** The pocetni datum. */
   private LocalDate pocetniDatum;
-  
-  /** The zavrsni datum. */
   private LocalDate zavrsniDatum;
-  
-  /** The vrijeme kretanja. */
   private LocalTime vrijemeKretanja;
-  
-  /** The vrijeme povratka. */
   private LocalTime vrijemePovratka;
-  
-  /** The cijena. */
   private float cijena;
-  
-  /** The min putnika. */
   private int minPutnika;
-  
-  /** The max putnika. */
   private int maxPutnika;
-  
-  /** The broj nocenja. */
   private int brojNocenja;
-  
-  /** The doplata jednokrevetna. */
   private float doplataJednokrevetna;
-  
-  /** The prijevoz. */
   private List<String> prijevoz = new ArrayList<>();
-  
-  /** The broj dorucaka. */
   private int brojDorucaka;
-  
-  /** The broj ruckova. */
   private int brojRuckova;
-  
-  /** The broj vecera. */
   private int brojVecera;
-
-  // setteri
 
   /**
    * Postavi oznaku.
@@ -276,7 +241,6 @@ public class AranzmanBuilder {
   /**
    * Izgrađuje objekt {@link Aranzman} uz validaciju svih logičkih pravila.
    *
-   * @return the aranzman
    * @throws IllegalArgumentException ako bilo koje polje nije ispravno
    */
   public Aranzman izgradi() {

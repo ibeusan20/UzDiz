@@ -11,37 +11,17 @@ import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class KomandaItas.
- */
 public class KomandaItas implements Komanda {
 
-  /** The upr aranz. */
   private final UpraviteljAranzmanima uprAranz;
-  
-  /** The argumenti. */
   private final String[] argumenti;
-  
-  /** The ispis. */
   private final FormatIspisaBridge ispis = new TablicniFormat();
 
-  /**
-   * Instantiates a new komanda itas.
-   *
-   * @param uprAranz the upr aranz
-   * @param argumenti the argumenti
-   */
   public KomandaItas(UpraviteljAranzmanima uprAranz, String... argumenti) {
     this.uprAranz = uprAranz;
     this.argumenti = argumenti;
   }
 
-  /**
-   * Izvrsi.
-   *
-   * @return true, if successful
-   */
   @Override
   public boolean izvrsi() {
     LocalDate od = null;

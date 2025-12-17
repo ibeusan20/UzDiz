@@ -8,7 +8,6 @@ import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
 
-// TODO: Auto-generated Javadoc
 /**
  * IRTA – pregled rezervacija za turistički aranžman.
  * Sintaksa: IRTA oznakaAranzmana [PA|Č|O|OD]
@@ -19,31 +18,15 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
  */
 public class KomandaIrta implements Komanda {
 
-  /** The upravitelj rezervacija. */
   private final UpraviteljRezervacijama upraviteljRezervacija;
-  
-  /** The argumenti. */
   private final String[] argumenti;
-  
-  /** The tablica. */
   private final TablicniFormat tablica = new TablicniFormat(); // jedan objekt za sve ispise
 
-  /**
-   * Instantiates a new komanda irta.
-   *
-   * @param upraviteljRezervacija the upravitelj rezervacija
-   * @param argumenti the argumenti
-   */
   public KomandaIrta(UpraviteljRezervacijama upraviteljRezervacija, String... argumenti) {
     this.upraviteljRezervacija = upraviteljRezervacija;
     this.argumenti = argumenti;
   }
 
-  /**
-   * Izvrsi.
-   *
-   * @return true, if successful
-   */
   @Override
   public boolean izvrsi() {
     // IRTA mora imati barem oznaku
@@ -88,9 +71,6 @@ public class KomandaIrta implements Komanda {
   /**
    * Vraća true ako filter eksplicitno traži Otkazane.
    * Važno: "OD" NE smije paliti "O".
-   *
-   * @param filter the filter
-   * @return true, if successful
    */
   private boolean traziOtkazane(String filter) {
     if (filter == null) return false;

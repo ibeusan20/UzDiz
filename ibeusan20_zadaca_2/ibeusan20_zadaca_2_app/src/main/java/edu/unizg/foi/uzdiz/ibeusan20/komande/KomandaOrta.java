@@ -6,22 +6,13 @@ import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 
-// TODO: Auto-generated Javadoc
 /**
  * Komanda ORTA - otkaz rezervacije turističkog aranžmana.
  */
 public class KomandaOrta implements Komanda {
-  
-  /** The upravitelj rezervacija. */
   private final UpraviteljRezervacijama upraviteljRezervacija;
-  
-  /** The upravitelj aranzmanima. */
   private final UpraviteljAranzmanima upraviteljAranzmanima;
-  
-  /** The argumenti. */
   private final String[] argumenti;
-  
-  /** The ispis. */
   private final FormatIspisaBridge ispis = new TablicniFormat();
 
 

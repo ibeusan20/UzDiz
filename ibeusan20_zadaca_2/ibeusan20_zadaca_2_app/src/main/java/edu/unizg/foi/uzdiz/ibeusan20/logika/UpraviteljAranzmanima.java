@@ -10,7 +10,6 @@ import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.KontekstIspisa;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 
-// TODO: Auto-generated Javadoc
 /**
  * Upravlja kolekcijom turističkih aranžmana.
  * 
@@ -19,14 +18,8 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
  */
 public class UpraviteljAranzmanima {
 
-  /** The aranzmani. */
   private final List<Aranzman> aranzmani = new ArrayList<>();
 
-  /**
-   * Instantiates a new upravitelj aranzmanima.
-   *
-   * @param pocetni the pocetni
-   */
   public UpraviteljAranzmanima(List<Aranzman> pocetni) {
     if (pocetni != null) {
       aranzmani.addAll(pocetni);
@@ -35,8 +28,6 @@ public class UpraviteljAranzmanima {
 
   /**
    * Vraća sve aranžmane. Poštuje IP poredak (N – kronološki, S – obrnuto).
-   *
-   * @return the list
    */
   public List<Aranzman> svi() {
     List<Aranzman> kopija = new ArrayList<>(aranzmani);
@@ -50,8 +41,6 @@ public class UpraviteljAranzmanima {
 
   /**
    * Broj aranžmana.
-   *
-   * @return the int
    */
   public int brojAranzmana() {
     return aranzmani.size();
@@ -59,9 +48,6 @@ public class UpraviteljAranzmanima {
 
   /**
    * Pronalazi aranžman po oznaci.
-   *
-   * @param oznaka the oznaka
-   * @return the aranzman
    */
   public Aranzman pronadiPoOznaci(String oznaka) {
     if (oznaka == null) {
@@ -77,10 +63,6 @@ public class UpraviteljAranzmanima {
 
   /**
    * Filtrira aranžmane po rasponu datuma (uključivo). Poštuje IP poredak pri vraćanju liste.
-   *
-   * @param od the od
-   * @param d0 the d 0
-   * @return the list
    */
   public List<Aranzman> filtrirajPoRasponu(LocalDate od, LocalDate d0) {
     List<Aranzman> rezultat = new ArrayList<>();
@@ -105,18 +87,11 @@ public class UpraviteljAranzmanima {
 
   /**
    * Interna lista (ako ti negdje treba). Pazi da ne mijenjaš izvornu kolekciju izvana.
-   *
-   * @return the unutarnja lista
    */
   public List<Aranzman> getUnutarnjaLista() {
     return aranzmani;
   }
 
-  /**
-   * Dodaj.
-   *
-   * @param a the a
-   */
   public void dodaj(Aranzman a) {
     if (a == null)
       return;
@@ -127,40 +102,22 @@ public class UpraviteljAranzmanima {
     this.aranzmani.add(a);
   }
 
-  /**
-   * Obrisi sve aranzmane fizicki.
-   *
-   * @return the int
-   */
   public int obrisiSveAranzmaneFizicki() {
     int n = aranzmani.size();
     aranzmani.clear();
     return n;
   }
   
-  /** The Constant PO_POCETKU. */
   private static final Comparator<Aranzman> PO_POCETKU = Comparator
       .comparing(UpraviteljAranzmanima::pocetakAranzmana, Comparator.nullsLast(Comparator.naturalOrder()))
       .thenComparing(a -> a.getOznaka() == null ? "" : a.getOznaka(), String.CASE_INSENSITIVE_ORDER);
 
-  /**
-   * Pocetak aranzmana.
-   *
-   * @param a the a
-   * @return the local date time
-   */
   private static LocalDateTime pocetakAranzmana(Aranzman a) {
     if (a == null || a.getPocetniDatum() == null) return null;
     LocalTime t = (a.getVrijemeKretanja() != null) ? a.getVrijemeKretanja() : LocalTime.MIN;
     return LocalDateTime.of(a.getPocetniDatum(), t);
   }
 
-  /**
-   * Sortiraj za ispis.
-   *
-   * @param ulaz the ulaz
-   * @return the list
-   */
   private List<Aranzman> sortirajZaIspis(List<Aranzman> ulaz) {
     List<Aranzman> lista = new ArrayList<>(ulaz == null ? List.of() : ulaz);
     lista.sort(PO_POCETKU);
@@ -170,22 +127,12 @@ public class UpraviteljAranzmanima {
     return lista;
   }
 
-  /**
-   * Svi aranžmani, sortirani po početku + IP poredak.
-   *
-   * @return the list
-   */
+  /** Svi aranžmani, sortirani po početku + IP poredak. */
   public List<Aranzman> sviZaIspis() {
     return sortirajZaIspis(svi()); // koristi tvoju postojeću metodu
   }
 
-  /**
-   * Filtrirani aranžmani, sortirani po početku + IP poredak.
-   *
-   * @param od the od
-   * @param d0 the d 0
-   * @return the list
-   */
+  /** Filtrirani aranžmani, sortirani po početku + IP poredak. */
   public List<Aranzman> filtrirajPoRasponuZaIspis(LocalDate od, LocalDate d0) {
     return sortirajZaIspis(filtrirajPoRasponu(od, d0)); // koristi tvoju postojeću metodu
   }

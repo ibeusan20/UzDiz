@@ -4,31 +4,15 @@ import java.time.LocalDateTime;
 import edu.unizg.foi.uzdiz.ibeusan20.audit.AuditDnevnik;
 import edu.unizg.foi.uzdiz.ibeusan20.komande.Komanda;
 
-// TODO: Auto-generated Javadoc
-/**
- * The Class AuditKomandaDecorator.
- */
 public class AuditKomandaDecorator extends KomandaDecorator {
 
-  /** The izvorni unos. */
   private final String izvorniUnos;
 
-  /**
-   * Instantiates a new audit komanda decorator.
-   *
-   * @param omotana the omotana
-   * @param izvorniUnos the izvorni unos
-   */
   public AuditKomandaDecorator(Komanda omotana, String izvorniUnos) {
     super(omotana);
     this.izvorniUnos = izvorniUnos == null ? "" : izvorniUnos.trim();
   }
 
-  /**
-   * Izvrsi.
-   *
-   * @return true, if successful
-   */
   @Override
   public boolean izvrsi() {
     LocalDateTime vrijeme = LocalDateTime.now();

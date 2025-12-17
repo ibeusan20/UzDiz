@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-// TODO: Auto-generated Javadoc
 /**
  * Pomoćna klasa za formatiranje datuma i vremena u standardizirani hrvatski format.
  * <p>
@@ -13,29 +12,14 @@ import java.time.format.DateTimeFormatter;
  * </p>
  */
 public class FormatDatuma {
-  
-  /** The Constant FORMAT_DATUM. */
   private static final String FORMAT_DATUM = "dd.MM.yyyy.";
-  
-  /** The Constant FORMAT_VRIJEME. */
   private static final String FORMAT_VRIJEME = "HH:mm:ss";
-  
-  /** The Constant FORMAT_DATUM_VRIJEME. */
   private static final String FORMAT_DATUM_VRIJEME = "dd.MM.yyyy. HH:mm:ss";
-  
-  /** The Constant DF_DATUM. */
   private static final DateTimeFormatter DF_DATUM = DateTimeFormatter.ofPattern(FORMAT_DATUM);
-  
-  /** The Constant DF_VRIJEME. */
   private static final DateTimeFormatter DF_VRIJEME = DateTimeFormatter.ofPattern(FORMAT_VRIJEME);
-  
-  /** The Constant DF_DATUM_VRIJEME. */
   private static final DateTimeFormatter DF_DATUM_VRIJEME =
       DateTimeFormatter.ofPattern(FORMAT_DATUM_VRIJEME);
 
-  /**
-   * Instantiates a new format datuma.
-   */
   private FormatDatuma() {}
 
   /**
