@@ -10,6 +10,20 @@ import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisAuditZbrojAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisniRed;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 
+/**
+ * Komanda AUDIT – pregled i održavanje audit dnevnika.
+ * <p>
+ * Podržane varijante:
+ * </p>
+ * <ul>
+ *   <li>{@code AUDIT} – ispis svih audit zapisa</li>
+ *   <li>{@code AUDIT N} – ispis zadnjih {@code N} zapisa</li>
+ *   <li>{@code AUDIT CLEAR} – brisanje svih audit zapisa</li>
+ * </ul>
+ * <p>
+ * Uz tablicu zapisa ispisuje i sažetak (broj izvršavanja po komandi).
+ * </p>
+ */
 public class KomandaAudit implements Komanda {
 
   private final String[] argumenti;

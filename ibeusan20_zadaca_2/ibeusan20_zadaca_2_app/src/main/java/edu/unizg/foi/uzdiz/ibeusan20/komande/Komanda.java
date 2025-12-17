@@ -1,5 +1,12 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
+/**
+ * Osnovno sučelje za sve konzolne komande aplikacije.
+ * <p>
+ * Svaka komanda mora implementirati izvršavanje i vratiti informaciju treba li aplikacija nastaviti
+ * s radom ili završiti.
+ * </p>
+ */
 public interface Komanda {
 
   /**

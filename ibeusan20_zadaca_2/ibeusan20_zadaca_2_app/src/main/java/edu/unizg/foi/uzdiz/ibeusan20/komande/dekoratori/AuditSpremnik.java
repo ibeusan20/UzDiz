@@ -13,7 +13,7 @@ public final class AuditSpremnik {
     public final String unos;
     public final long trajanjeMs;
     public final boolean nastavi;
-    public final String greska; // null ako nema
+    public final String greska;
 
     public Zapis(LocalDateTime vrijeme, String unos, long trajanjeMs, boolean nastavi, String greska) {
       this.vrijeme = vrijeme;

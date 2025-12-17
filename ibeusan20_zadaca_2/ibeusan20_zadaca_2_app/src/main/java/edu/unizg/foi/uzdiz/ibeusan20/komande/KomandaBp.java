@@ -9,7 +9,18 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
 
 /**
- * BP – brisanje podataka o aranžmanima ili rezervacijama.
+ * BP – brisanje podataka.
+ * <p>
+ * Podržane varijante:
+ * </p>
+ * <ul>
+ *   <li>{@code BP A} – fizičko brisanje svih aranžmana</li>
+ *   <li>{@code BP R} – fizičko brisanje svih rezervacija</li>
+ * </ul>
+ * <p>
+ * Napomena: u klasi postoje i pomoćne metode za “logičko brisanje” (otkazivanje), ali u trenutnoj
+ * izvedbi {@link #izvrsi()} koristi fizičko brisanje.
+ * </p>
  */
 public class KomandaBp implements Komanda {
 

@@ -11,6 +11,19 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeOtkazanAranzman;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjePopunjenAranzman;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeUPripremiAranzman;
 
+/**
+ * Predstavlja turistički aranžman.
+ * <p>
+ * Aranžman sadrži osnovne podatke (termin, cijenu, ograničenja broja putnika, prijevoz i obroke)
+ * te povezane {@link Rezervacija} zapise.
+ * </p>
+ *
+ * <p>
+ * Stanje aranžmana se vodi uz pomoć uzorka <b>State</b> (implementacije {@link StanjeAranzmana}).
+ * Početno stanje je {@link StanjeUPripremiAranzman}. Kada je aranžman otkazan
+ * ({@link StanjeOtkazanAranzman}), dodavanje rezervacija nije dozvoljeno.
+ * </p>
+ */
 public class Aranzman {
 
   private final String oznaka;
@@ -168,7 +181,6 @@ public class Aranzman {
     stanje = StanjeAktivanAranzman.instanca();
   }
 
-
   public int obrisiSveRezervacijeFizicki() {
     int n = (rezervacije == null) ? 0 : rezervacije.size();
     if (rezervacije != null) {
@@ -181,7 +193,6 @@ public class Aranzman {
     if (r == null || rezervacije == null) return false;
     return rezervacije.remove(r);
   }
-
 
   @Override
   public String toString() {

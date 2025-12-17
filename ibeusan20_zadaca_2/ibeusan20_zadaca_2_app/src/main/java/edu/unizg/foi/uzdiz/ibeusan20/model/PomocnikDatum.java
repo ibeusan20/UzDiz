@@ -6,6 +6,13 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+/**
+ * Pomoćna klasa za parsiranje datuma i vremena iz tekstualnog zapisa.
+ * <p>
+ * Metode pokušavaju parsirati ulaz prema više podržanih formata.
+ * Ako parsiranje ne uspije ili je ulaz prazan, vraća se null.
+ * </p>
+ */
 public class PomocnikDatum {
 
     public static LocalDate procitajDatum(String tekst) {

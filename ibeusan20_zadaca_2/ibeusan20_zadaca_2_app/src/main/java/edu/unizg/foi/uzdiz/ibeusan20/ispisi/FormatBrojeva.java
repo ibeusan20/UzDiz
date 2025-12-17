@@ -5,6 +5,20 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 
+/**
+ * Pomoćna klasa za formatiranje brojeva u ispisima.
+ * <p>
+ * Pravila formatiranja:
+ * </p>
+ * <ul>
+ *   <li>tisućice se odvajaju točkom (.)</li>
+ *   <li>decimalni separator je točka (.)</li>
+ *   <li>valuta se ispisuje s dvije decimale i sufiksom " €"</li>
+ * </ul>
+ * <p>
+ * Koristi {@link ThreadLocal} formatera kako bi bila sigurna za korištenje iz više dretvi.
+ * </p>
+ */
 public final class FormatBrojeva {
 
   private static final DecimalFormatSymbols SYM;

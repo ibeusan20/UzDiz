@@ -9,6 +9,10 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeRezervacije;
 /**
  * Predstavlja rezervaciju turističkog aranžmana.
  * Koristi uzorak State za upravljanje statusima.
+ * 
+ * <p>
+ * Status rezervacije se vodi uz pomoć uzorka <b>State</b> (implementacije {@link StanjeRezervacije}).
+ * </p>
  */
 public class Rezervacija {
 

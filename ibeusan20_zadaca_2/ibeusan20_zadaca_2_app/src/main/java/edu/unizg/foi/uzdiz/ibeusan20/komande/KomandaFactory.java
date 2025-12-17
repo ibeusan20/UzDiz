@@ -4,6 +4,17 @@ import edu.unizg.foi.uzdiz.ibeusan20.komande.dekoratori.AuditKomandaDecorator;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 
+/**
+ * Tvornica komandi
+ * <p>
+ * Prima tekst unosa, parsira naziv komande i argumente te vraća odgovarajuću implementaciju
+ * {@link Komanda}.
+ * </p>
+ * <p>
+ * Sve komande osim {@link KomandaQ} se dodatno omataju u {@link AuditKomandaDecorator} kako bi se
+ * izvršavanje bilježilo u audit dnevnik.
+ * </p>
+ */
 public final class KomandaFactory {
 
   private KomandaFactory() {}

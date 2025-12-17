@@ -7,10 +7,16 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * <b>Kreacijski uzorak:</b> Builder
+ * Builder za izgradnju objekta {@link Aranzman}.
  * <p>
- * Omogućuje stvaranje složenog objekta {@link Aranzman} uz validaciju svih obaveznih polja. Ako je
- * neko polje neispravno, baca se {@link IllegalArgumentException}.
+ * Omogućuje postupno postavljanje atributa i centraliziranu validaciju pravila prije kreiranja
+ * aranžmana. Ako je neki obavezni atribut neispravan ili nedostaje, baca se
+ * {@link IllegalArgumentException}.
+ * </p>
+ *
+ * <p>
+ * Ova klasa je dio kreacijskog uzorka <b>Builder</b> (u kombinaciji s {@link Aranzman} i
+ * {@link AranzmanDirector}).
  * </p>
  */
 public class AranzmanBuilder {

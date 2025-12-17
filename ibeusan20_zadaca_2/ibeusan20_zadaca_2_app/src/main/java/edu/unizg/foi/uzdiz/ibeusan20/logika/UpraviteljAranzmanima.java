@@ -79,15 +79,9 @@ public class UpraviteljAranzmanima {
       }
     }
 
-    //if (KontekstIspisa.jeObrnuto()) {
-    //  Collections.reverse(rezultat);
-    //}
     return rezultat;
   }
 
-  /**
-   * Interna lista (ako ti negdje treba). Pazi da ne mijenjaš izvornu kolekciju izvana.
-   */
   public List<Aranzman> getUnutarnjaLista() {
     return aranzmani;
   }
@@ -96,7 +90,6 @@ public class UpraviteljAranzmanima {
     if (a == null)
       return;
     if (pronadiPoOznaci(a.getOznaka()) != null) {
-      // već postoji – možeš ili ignorirati ili baciti iznimku
       return;
     }
     this.aranzmani.add(a);

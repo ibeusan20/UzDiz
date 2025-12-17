@@ -4,6 +4,13 @@ import java.time.LocalDateTime;
 import edu.unizg.foi.uzdiz.ibeusan20.audit.AuditDnevnik;
 import edu.unizg.foi.uzdiz.ibeusan20.komande.Komanda;
 
+/**
+ * Dekorator koji bilježi izvršavanje komandi u audit dnevnik.
+ * <p>
+ * Bilježi: vrijeme, izvorni unos, naziv klase komande, status i
+ * trajanje izvršavanja.
+ * </p>
+ */
 public class AuditKomandaDecorator extends KomandaDecorator {
 
   private final String izvorniUnos;
