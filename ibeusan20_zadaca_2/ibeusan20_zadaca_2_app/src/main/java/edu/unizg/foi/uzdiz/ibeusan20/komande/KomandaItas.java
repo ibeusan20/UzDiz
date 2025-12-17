@@ -39,10 +39,9 @@ public class KomandaItas implements Komanda {
       return true;
     }
 
-    List<Aranzman> lista = (od == null)
-        ? uprAranz.sviZaIspis()
-        : uprAranz.filtrirajPoRasponuZaIspis(od, d0);
-    
+    List<Aranzman> lista =
+        (od == null) ? uprAranz.sviZaIspis() : uprAranz.filtrirajPoRasponuZaIspis(od, d0);
+
     String komandaTekst = (od == null) ? "ITAS" : ("ITAS " + argumenti[0] + " " + argumenti[1]);
     String nazivTablice = "Statistika turističkih aranžmana";
 

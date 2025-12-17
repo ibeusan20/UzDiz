@@ -7,11 +7,11 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjePrimljenaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeRezervacije;
 
 /**
- * Predstavlja rezervaciju turističkog aranžmana.
- * Koristi uzorak State za upravljanje statusima.
+ * Predstavlja rezervaciju turističkog aranžmana. Koristi uzorak State za upravljanje statusima.
  * 
  * <p>
- * Status rezervacije se vodi uz pomoć uzorka <b>State</b> (implementacije {@link StanjeRezervacije}).
+ * Status rezervacije se vodi uz pomoć uzorka <b>State</b> (implementacije
+ * {@link StanjeRezervacije}).
  * </p>
  */
 public class Rezervacija {
@@ -26,13 +26,11 @@ public class Rezervacija {
 
   public Rezervacija(String ime, String prezime, String oznakaAranzmana,
       LocalDateTime datumVrijeme) {
-    this(ime, prezime, oznakaAranzmana, datumVrijeme,
-        StanjePrimljenaRezervacija.instanca(), null);
+    this(ime, prezime, oznakaAranzmana, datumVrijeme, StanjePrimljenaRezervacija.instanca(), null);
   }
 
-  public Rezervacija(String ime, String prezime, String oznakaAranzmana,
-      LocalDateTime datumVrijeme, StanjeRezervacije stanje,
-      LocalDateTime datumVrijemeOtkaza) {
+  public Rezervacija(String ime, String prezime, String oznakaAranzmana, LocalDateTime datumVrijeme,
+      StanjeRezervacije stanje, LocalDateTime datumVrijemeOtkaza) {
     this.ime = ime;
     this.prezime = prezime;
     this.oznakaAranzmana = oznakaAranzmana;
@@ -91,10 +89,8 @@ public class Rezervacija {
     this.datumVrijemeOtkaza = vrijemeOtkaza;
     this.stanje = StanjeOtkazanaRezervacija.instanca();
   }
-  
+
   public void odgodi(LocalDateTime vrijemeOdgode) {
-    // koristimo isto polje datumVrijemeOtkaza i za odgodu,
-    // jer se u ispisima IRTA/ITAS ionako traži "Datum i vrijeme otkaza/odgode"
     this.datumVrijemeOtkaza = vrijemeOdgode;
     this.stanje = StanjeOdgodenaRezervacija.instanca();
   }

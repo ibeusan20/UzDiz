@@ -16,9 +16,9 @@ import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
  * Podržane varijante:
  * </p>
  * <ul>
- *   <li>{@code AUDIT} – ispis svih audit zapisa</li>
- *   <li>{@code AUDIT N} – ispis zadnjih {@code N} zapisa</li>
- *   <li>{@code AUDIT CLEAR} – brisanje svih audit zapisa</li>
+ * <li>{@code AUDIT} – ispis svih audit zapisa</li>
+ * <li>{@code AUDIT N} – ispis zadnjih {@code N} zapisa</li>
+ * <li>{@code AUDIT CLEAR} – brisanje svih audit zapisa</li>
  * </ul>
  * <p>
  * Uz tablicu zapisa ispisuje i sažetak (broj izvršavanja po komandi).
@@ -77,12 +77,13 @@ public class KomandaAudit implements Komanda {
       return;
     }
 
-    // 1) tablica zapisa (kao do sad)
+    // tablica zapisa
     List<IspisniRed> redovi = new ArrayList<>();
-    for (AuditStavka s : stavke) redovi.add(new IspisAuditAdapter(s));
+    for (AuditStavka s : stavke)
+      redovi.add(new IspisAuditAdapter(s));
     tab.ispisiTablicu(komandaTekst, nazivTablice, redovi);
 
-    // 2) sažetak po komandi (ukupno u dnevniku, ne samo prikazani)
+    // sažetak po komandi (ukupno u dnevniku, ne samo prikazani)
     List<AuditStavka> sve = AuditDnevnik.instanca().sve();
     ispisiZbroj(tab, "AUDIT - Sažetak po komandi (ukupno)", sve);
   }
@@ -115,9 +116,11 @@ public class KomandaAudit implements Komanda {
   }
 
   private String izvuciKomandu(String unos) {
-    if (unos == null) return "?";
+    if (unos == null)
+      return "?";
     String t = unos.trim();
-    if (t.isEmpty()) return "?";
+    if (t.isEmpty())
+      return "?";
     String[] dijelovi = t.split("\\s+");
     return (dijelovi.length == 0) ? "?" : dijelovi[0].toUpperCase();
   }

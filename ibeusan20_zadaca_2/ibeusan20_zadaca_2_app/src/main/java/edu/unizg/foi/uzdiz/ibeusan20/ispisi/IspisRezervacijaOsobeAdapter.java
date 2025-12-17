@@ -33,11 +33,6 @@ public class IspisRezervacijaOsobeAdapter implements IspisniRed {
 
     String naziv = (aranzman == null) ? "" : aranzman.getNaziv();
 
-    return new String[] {
-        dv,
-        oznaka,
-        naziv,
-        rezervacija.nazivStanja()
-    };
+    return new String[] {dv, oznaka, naziv, rezervacija.nazivStanja()};
   }
 }

@@ -9,8 +9,23 @@ public class RezervacijaCsv implements RezervacijaPodaci {
   public String oznakaAranzmana;
   public LocalDateTime datumVrijeme;
 
-  @Override public String getIme() { return ime; }
-  @Override public String getPrezime() { return prezime; }
-  @Override public String getOznakaAranzmana() { return oznakaAranzmana; }
-  @Override public LocalDateTime getDatumVrijeme() { return datumVrijeme; }
+  @Override
+  public String getIme() {
+    return ime;
+  }
+
+  @Override
+  public String getPrezime() {
+    return prezime;
+  }
+
+  @Override
+  public String getOznakaAranzmana() {
+    return oznakaAranzmana;
+  }
+
+  @Override
+  public LocalDateTime getDatumVrijeme() {
+    return datumVrijeme;
+  }
 }

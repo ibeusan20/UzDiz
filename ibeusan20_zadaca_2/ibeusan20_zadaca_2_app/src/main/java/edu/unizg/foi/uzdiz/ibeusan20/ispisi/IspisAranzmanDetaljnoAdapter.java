@@ -9,10 +9,8 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
  */
 public class IspisAranzmanDetaljnoAdapter {
 
-  private static final DateTimeFormatter FORMAT_DATUM =
-      DateTimeFormatter.ofPattern("dd.MM.yyyy.");
-  private static final DateTimeFormatter FORMAT_VRIJEME =
-      DateTimeFormatter.ofPattern("HH:mm");
+  private static final DateTimeFormatter FORMAT_DATUM = DateTimeFormatter.ofPattern("dd.MM.yyyy.");
+  private static final DateTimeFormatter FORMAT_VRIJEME = DateTimeFormatter.ofPattern("HH:mm");
 
   private final Aranzman aranzman;
 
@@ -21,10 +19,10 @@ public class IspisAranzmanDetaljnoAdapter {
   }
 
   public void ispisiDetalje() {
-    String od = aranzman.getPocetniDatum() == null ? ""
-        : aranzman.getPocetniDatum().format(FORMAT_DATUM);
-    String d0 = aranzman.getZavrsniDatum() == null ? ""
-        : aranzman.getZavrsniDatum().format(FORMAT_DATUM);
+    String od =
+        aranzman.getPocetniDatum() == null ? "" : aranzman.getPocetniDatum().format(FORMAT_DATUM);
+    String d0 =
+        aranzman.getZavrsniDatum() == null ? "" : aranzman.getZavrsniDatum().format(FORMAT_DATUM);
     String vk = aranzman.getVrijemeKretanja() == null ? ""
         : aranzman.getVrijemeKretanja().format(FORMAT_VRIJEME);
     String vp = aranzman.getVrijemePovratka() == null ? ""
@@ -33,11 +31,8 @@ public class IspisAranzmanDetaljnoAdapter {
     String prijevoz = "";
     List<String> lista = aranzman.getPrijevoz();
     if (lista != null && !lista.isEmpty()) {
-      prijevoz = lista.stream()
-          .filter(s -> s != null && !s.isBlank())
-          .map(String::trim)
-          .reduce((a, b) -> a + ", " + b)
-          .orElse("");
+      prijevoz = lista.stream().filter(s -> s != null && !s.isBlank()).map(String::trim)
+          .reduce((a, b) -> a + ", " + b).orElse("");
     }
 
     System.out.println("Oznaka: " + aranzman.getOznaka());
@@ -51,7 +46,8 @@ public class IspisAranzmanDetaljnoAdapter {
     System.out.println("Min. putnika: " + FormatBrojeva.cijeli(aranzman.getMinPutnika()));
     System.out.println("Max. putnika: " + FormatBrojeva.cijeli(aranzman.getMaxPutnika()));
     System.out.println("Broj noćenja: " + FormatBrojeva.cijeli(aranzman.getBrojNocenja()));
-    System.out.println("Doplata jednokrevetna: " + FormatBrojeva.eur(aranzman.getDoplataJednokrevetna()));
+    System.out
+        .println("Doplata jednokrevetna: " + FormatBrojeva.eur(aranzman.getDoplataJednokrevetna()));
     System.out.println("Prijevoz: " + prijevoz);
     System.out.println("Doručaka: " + FormatBrojeva.cijeli(aranzman.getBrojDorucaka()));
     System.out.println("Ručkova: " + FormatBrojeva.cijeli(aranzman.getBrojRuckova()));

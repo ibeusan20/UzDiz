@@ -35,8 +35,7 @@ public class UpraviteljRezervacijama {
   }
 
   /**
-   * Dodaje početne rezervacije u pripadajuće aranžmane (Composite). Ne radi rekalkulaciju – to
-   * radiš posebno u Aplikaciji.
+   * Dodaje početne rezervacije u pripadajuće aranžmane
    */
   public void dodajPocetne(List<Rezervacija> pocetne) {
     if (pocetne == null) {
@@ -51,39 +50,27 @@ public class UpraviteljRezervacijama {
   }
 
   /**
-   * Dodaje novu rezervaciju u odgovarajući aranžman (Composite). State inicijalno postavlja
-   * konstruktor Rezervacija (NOVA).
+   * Dodaje novu rezervaciju u odgovarajući aranžman
    */
   public void dodaj(Rezervacija r) {
     if (r == null) {
       return;
     }
-    // spriječi identične duplikate (npr. ponovno učitavanje istog CSV-a) // NENENENE
-    //if (postojiIdenticna(r.getIme(), r.getPrezime(), r.getOznakaAranzmana(), r.getDatumVrijeme())) {
-    //  return;
-    //}
     Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(r.getOznakaAranzmana());
     if (a != null) {
       a.dodajRezervaciju(r);
     }
   }
 
-  /**
-   * Glavna Z2 rekalkulacija: - po aranžmanu: PRIMLJENA/AKTIVNA/ČEKANJE po min/max - po osobi: ako
-   * ima više AKTIVNIH u preklapanju → najranija ostaje AKTIVNA, ostale postaju ODGOĐENE - ponavlja
-   * dok se stanja ne stabiliziraju
-   */
   public void rekalkulirajSve() {
-    // sigurnosna ograda da ne upadnemo u beskonačnu petlju
     for (int iter = 0; iter < 10; iter++) {
       Map<Rezervacija, String> prije = snapshotStanja();
 
-      // 1) kvote po aranžmanima (ne diramo OTKAZANE i ODGOĐENE)
       for (Aranzman a : upraviteljAranzmanima.svi()) {
         rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
       }
 
-      // 2) pravilo preklapanja po osobi (ODGOĐENE)
+      // pravilo preklapanja po osobi (ODGOĐENE)
       primijeniPraviloPreklapanja();
 
       Map<Rezervacija, String> poslije = snapshotStanja();
@@ -113,17 +100,10 @@ public class UpraviteljRezervacijama {
     return true;
   }
 
-  /**
-   * Rekalkulira stanja rezervacija i aranžmana za zadanu oznaku.
-   * 
-   * Pravila (uskladivo sa zadaćom): - ignorira otkazane rezervacije (ne diraju se) - N prijava <
-   * minPutnika → sve neotkazane = PRIMLJENA, aranžman U PRIPREMI - inače: * kronološki po datumu
-   * rezervacije * prvih do maxPutnika = AKTIVNA * ostale neotkazane = NA ČEKANJU - poziva
-   * Aranzman.azurirajStanje(brojAktivnih, brojPrijava)
-   */
   public void rekalkulirajZaAranzman(String oznaka, int minPutnika, int maxPutnika) {
     Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(oznaka);
-    if (a == null) return;
+    if (a == null)
+      return;
 
     // sortiraj kronološki (N)
     List<Rezervacija> sve = new ArrayList<>(a.getRezervacije());
@@ -133,8 +113,10 @@ public class UpraviteljRezervacijama {
     // kandidati za kvotu = oni koji se broje u kvotu (primljena/aktivna/čekanje)
     List<Rezervacija> kandidati = new ArrayList<>();
     for (Rezervacija r : sve) {
-      if (r == null) continue;
-      if (!r.brojiSeUKvotu()) continue; // automatski izbaci otkazane/odgođene/nova
+      if (r == null)
+        continue;
+      if (!r.brojiSeUKvotu())
+        continue; // automatski izbaci otkazane/odgođene/nova
       kandidati.add(r);
     }
 
@@ -146,14 +128,14 @@ public class UpraviteljRezervacijama {
       return;
     }
 
-    // 1) nije dostignut minimum -> sve su PRIMLJENE
+    // nije dostignut minimum -> sve su PRIMLJENE
     if (brojPrijava < minPutnika) {
       for (Rezervacija r : kandidati) {
         r.postaviStanje(StanjePrimljenaRezervacija.instanca());
       }
       brojAktivnih = 0;
 
-    // 2) minimum dostignut -> prvih max su AKTIVNE, ostale NA ČEKANJU
+      // minimum dostignut -> prvih max su AKTIVNE, ostale NA ČEKANJU
     } else {
       int kvotaAktivnih = Math.min(brojPrijava, maxPutnika);
       for (int i = 0; i < kandidati.size(); i++) {
@@ -167,7 +149,7 @@ public class UpraviteljRezervacijama {
       }
     }
 
-    // ažuriraj stanje aranžmana (sad će ti i "popunjen" raditi)
+    // ažuriraj stanje aranžmana
     a.azurirajStanje(brojAktivnih, brojPrijava);
   }
 
@@ -194,14 +176,10 @@ public class UpraviteljRezervacijama {
 
   /**
    * Pravilo preklapanja: Ako osoba ima više AKTIVNIH rezervacija koje se preklapaju po periodu
-   * aranžmana: - najranija (po datumu rezervacije) ostaje aktivna - ostale u presjeku idu u
-   * ODGOĐENE
-   *
-   * Također: ako osoba NEMA više konflikt (nema aktivnu u tom preklapanju), ODGOĐENE rezervacije
-   * koje se više ne preklapaju vraćamo u PRIMLJENU (da ponovno uđu u kvote).
+   * aranžmana.
    */
   private void primijeniPraviloPreklapanja() {
-    // grupiraj sve rezervacije po osobi
+    // grupira sve rezervacije po osobi
     Map<String, List<Rezervacija>> poOsobi = new HashMap<>();
 
     for (Aranzman a : upraviteljAranzmanima.svi()) {
@@ -221,7 +199,7 @@ public class UpraviteljRezervacijama {
           aktivne.add(r);
       }
 
-      // ako nema aktivnih, sve odgođene oslobodi (postaju primljene) → scenarij 3 nakon otkaza
+      // ako nema aktivnih, sve odgođene oslobađa (postaju primljene)
       if (aktivne.isEmpty()) {
         for (Rezervacija r : lista) {
           if (r.getStanje() instanceof StanjeOdgodenaRezervacija) {
@@ -231,11 +209,11 @@ public class UpraviteljRezervacijama {
         continue;
       }
 
-      // sortiraj aktivne po datumu rezervacije (kronološki najranija ostaje aktivna)
+      // sortira aktivne po datumu rezervacije (kronološki najranija ostaje aktivna)
       aktivne.sort(Comparator.comparing(Rezervacija::getDatumVrijeme,
           Comparator.nullsLast(Comparator.naturalOrder())));
 
-      // za svaki konflikt preklapanja: samo prva ostaje aktivna u tom konfliktu
+      // za svaki konflikt preklapanja samo prva ostaje aktivna u tom konfliktu
       for (int i = 0; i < aktivne.size(); i++) {
         Rezervacija rGlavna = aktivne.get(i);
         Aranzman aGlavna = upraviteljAranzmanima.pronadiPoOznaci(rGlavna.getOznakaAranzmana());
@@ -260,7 +238,7 @@ public class UpraviteljRezervacijama {
         }
       }
 
-      // dodatno: ako neka ODGOĐENA više ne preklapa nijednu aktivnu osobe → vrati u PRIMLJENU
+      // dodatno: ako neka ODGOĐENA više ne preklapa nijednu aktivnu osobe onda ju vrati u PRIMLJENU
       for (Rezervacija r : lista) {
         if (!(r.getStanje() instanceof StanjeOdgodenaRezervacija))
           continue;
@@ -360,7 +338,7 @@ public class UpraviteljRezervacijama {
   }
 
   private boolean preklapaSe(LocalDate od1, LocalDate do1, LocalDate od2, LocalDate do2) {
-    // nema preklapanja samo ako je jedan interval potpuno "prije" drugog
+    // nema preklapanja samo ako je jedan interval potpuno prije drugog
     if (do1.isBefore(od2) || do2.isBefore(od1)) {
       return false;
     }
@@ -368,7 +346,7 @@ public class UpraviteljRezervacijama {
   }
 
   /**
-   * Otkazuje rezervaciju osobe za zadani aranžman (ORTA). Koristi State: Rezervacija.otkazi(time).
+   * Otkazuje rezervaciju osobe za zadani aranžman (ORTA).
    */
   public boolean otkaziRezervaciju(String ime, String prezime, String oznakaAranzmana) {
     if (ime == null || prezime == null || oznakaAranzmana == null) {
@@ -420,7 +398,7 @@ public class UpraviteljRezervacijama {
 
     LocalDateTime sada = LocalDateTime.now();
 
-    // 3) AKTIVNA + ODGOĐENA za istu osobu i aranžman:
+    // AKTIVNA + ODGOĐENA za istu osobu i aranžman:
     // - otkazuje se AKTIVNA
     // - ODGOĐENA prelazi u AKTIVNU
     if (aktivna != null && odgodena != null) {
@@ -429,18 +407,16 @@ public class UpraviteljRezervacijama {
       return true;
     }
 
-    // 2) samo AKTIVNA (bez odgođenih za tu osobu):
+    // samo AKTIVNA (bez odgođenih za tu osobu):
     // - otkazuje se aktivna
-    // - radi se rekalkulacija, netko s čekanja može “uskočiti”
     if (aktivna != null) {
       aktivna.otkazi(sada);
       rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
       return true;
     }
 
-    // 1) nema aktivne, ali ima PRIMLJENA:
-    // - otkazuje se primljena (tzv. lista prijava)
-    // - rekalkulacija (obično neće puno promijeniti aktivne, ali ostaje konzistentno)
+    // nema aktivne, ali ima PRIMLJENA:
+    // - otkazuje se primljena
     if (primljena != null) {
       primljena.otkazi(sada);
       rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
@@ -460,7 +436,7 @@ public class UpraviteljRezervacijama {
       return false;
     }
     String u = ns.toUpperCase();
-    // pokriva "odgođena", "odgođena rezervacija", bez obzira na dijakritike
+    // pokriva "odgođena", "odgođena rezervacija", bez obzira na d i đ
     return u.contains("ODGOĐ") || u.contains("ODGOD");
   }
 
@@ -468,10 +444,6 @@ public class UpraviteljRezervacijama {
 
   /**
    * Vraća rezervacije za aranžman uz filtriranje po "vrstama" (PAČO).
-   * 
-   * Vrste se sada mapiraju preko nazivStanja(), npr.: - 'P' → stanje s "PRIMLJEN" u nazivu - 'A' →
-   * stanje s "AKTIV" u nazivu - 'Č'/'C' → stanje s "ČEKANJ" / "CEKANJ" u nazivu - 'O' → stanje s
-   * "OTKAZ" u nazivu
    * 
    * IP (N/S) poredak se primjenjuje na kraju.
    */
@@ -488,10 +460,10 @@ public class UpraviteljRezervacijama {
     boolean fA = filter.contains("A");
     boolean fC = filter.contains("Č") || filter.contains("C");
     boolean fO = filter.contains("O");
-    boolean fD = filter.contains("OD") || filter.contains("D"); // OD||D za ODGOĐENE
+    boolean fD = filter.contains("OD") || filter.contains("D");
 
-    // ako je string filtera ne-prazan → imamo filtere,
-    // i kad su svi gore false (npr. "X"), tretiramo to kao "ništa se ne poklapa", a NE "bez
+    // ako je string filtera ne-prazan onda ima filtere
+    // i kad su svi gore false (npr. "X") to se tretira kao "ništa se ne poklapa", a NE "bez
     // filtera"
     boolean imaFiltera = !filter.isBlank();
 
@@ -500,7 +472,7 @@ public class UpraviteljRezervacijama {
       String ns = r.nazivStanja();
       String u = ns == null ? "" : ns.toUpperCase();
 
-      // bez filtera → vrati sve
+      // bez filtera - vrati sve
       if (!imaFiltera) {
         rezultat.add(r);
         continue;
@@ -520,7 +492,6 @@ public class UpraviteljRezervacijama {
       if (fO && u.contains("OTKAZ")) {
         pripada = true;
       }
-      // ODGOĐENE – prema nazivu stanja
       if (fD && (u.contains("ODGOĐ") || u.contains("ODGOD"))) {
         pripada = true;
       }
@@ -582,8 +553,7 @@ public class UpraviteljRezervacijama {
   }
 
   /**
-   * Odgađa sve NEotkazane rezervacije za zadani aranžman. Korisno za scenarije gdje se aranžman
-   * odgađa/otkazuje, a rezervacije prelaze u stanje ODGOĐENA.
+   * Odgađa sve neotkazane rezervacije za zadani aranžman.
    */
   public int odgodiSveRezervacijeZaAranzman(String oznaka, LocalDateTime vrijeme) {
     Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(oznaka);
@@ -601,8 +571,6 @@ public class UpraviteljRezervacijama {
       r.odgodi(vrijeme);
       br++;
     }
-    // nakon toga kvote nema smisla (sve su odgođene/neaktivne),
-    // ali možeš ako želiš pozvati rekalkulaciju s 0/0
     a.azurirajStanje(0, 0);
     return br;
   }
@@ -639,13 +607,10 @@ public class UpraviteljRezervacijama {
     for (Aranzman a : upraviteljAranzmanima.svi()) {
       obrisano += a.obrisiSveRezervacijeFizicki();
 
-      // nakon brisanja rezervacija, aranžman treba biti konzistentan
-      // ako je aranžman otkazan, nemoj ga "oživljavati"
       String st = a.nazivStanja();
       boolean otkazan = st != null && st.toUpperCase().contains("OTKAZ");
 
       if (!otkazan) {
-        // nema prijava -> u pripremi (ovisno o tvojoj implementaciji)
         a.azurirajStanje(0, 0);
       }
     }
@@ -686,10 +651,7 @@ public class UpraviteljRezervacijama {
       return false;
     }
 
-    dodaj(r); // tvoja postojeća metoda koja dodaje u Aranzman
+    dodaj(r);
     return true;
   }
-
-
-
 }

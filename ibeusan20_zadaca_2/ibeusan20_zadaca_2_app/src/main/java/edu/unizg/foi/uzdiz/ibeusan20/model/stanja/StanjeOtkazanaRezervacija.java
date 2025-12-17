@@ -2,8 +2,7 @@ package edu.unizg.foi.uzdiz.ibeusan20.model.stanja;
 
 public class StanjeOtkazanaRezervacija implements StanjeRezervacije {
 
-  private static final StanjeOtkazanaRezervacija INSTANCA =
-      new StanjeOtkazanaRezervacija();
+  private static final StanjeOtkazanaRezervacija INSTANCA = new StanjeOtkazanaRezervacija();
 
   private StanjeOtkazanaRezervacija() {}
 

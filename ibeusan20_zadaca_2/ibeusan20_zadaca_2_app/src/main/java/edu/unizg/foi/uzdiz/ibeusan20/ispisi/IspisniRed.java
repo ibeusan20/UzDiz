@@ -1,8 +1,7 @@
 package edu.unizg.foi.uzdiz.ibeusan20.ispisi;
 
 /**
- * Predstavlja jedan red tabličnog ispisa.
- * Adapteri za aranžmane i rezervacije ga implementiraju.
+ * Predstavlja jedan red tabličnog ispisa. Adapteri za aranžmane i rezervacije ga implementiraju.
  */
 public interface IspisniRed {
 

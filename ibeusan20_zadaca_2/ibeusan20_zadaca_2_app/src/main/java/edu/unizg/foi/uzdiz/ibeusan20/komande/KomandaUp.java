@@ -136,7 +136,6 @@ public class KomandaUp implements Komanda {
       }
     }
 
-    // OBAVEZNO: jedna globalna rekalkulacija na kraju (kvote + preklapanja + stabilizacija)
     uprRez.rekalkulirajSve();
 
     ispis.ispisi("Učitano novih rezervacija iz datoteke " + datoteka + ": " + dodano);

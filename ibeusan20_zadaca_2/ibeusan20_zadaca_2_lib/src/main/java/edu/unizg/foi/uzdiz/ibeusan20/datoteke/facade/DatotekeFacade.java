@@ -6,7 +6,7 @@ import edu.unizg.foi.uzdiz.ibeusan20.datoteke.api.RezervacijaPodaci;
 
 public interface DatotekeFacade {
 
-    List<AranzmanPodaci> ucitajAranzmane(String putanja);
+  List<AranzmanPodaci> ucitajAranzmane(String putanja);
 
-    List<RezervacijaPodaci> ucitajRezervacije(String putanja);
+  List<RezervacijaPodaci> ucitajRezervacije(String putanja);
 }

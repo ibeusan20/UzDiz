@@ -12,14 +12,11 @@ public class IspisAuditZbrojAdapter implements IspisniRed {
 
   @Override
   public String[] zaglavlje() {
-    return new String[] { "Komanda", "Broj" };
+    return new String[] {"Komanda", "Broj"};
   }
 
   @Override
   public String[] vrijednosti() {
-    return new String[] {
-        komanda == null ? "" : komanda,
-        String.valueOf(broj)
-    };
+    return new String[] {komanda == null ? "" : komanda, String.valueOf(broj)};
   }
 }

@@ -26,16 +26,10 @@ public class IspisRezervacijaAdapter implements IspisniRed {
     }
 
     String dv = PomocnikDatum.formatirajDatumVrijeme(rezervacija.getDatumVrijeme());
-    String dvo = rezervacija.getDatumVrijemeOtkaza() == null
-        ? ""
+    String dvo = rezervacija.getDatumVrijemeOtkaza() == null ? ""
         : PomocnikDatum.formatirajDatumVrijeme(rezervacija.getDatumVrijemeOtkaza());
 
-    return new String[] {
-        rezervacija.getIme(),
-        rezervacija.getPrezime(),
-        dv,
-        rezervacija.nazivStanja(),
-        dvo
-    };
+    return new String[] {rezervacija.getIme(), rezervacija.getPrezime(), dv,
+        rezervacija.nazivStanja(), dvo};
   }
 }

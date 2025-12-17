@@ -34,16 +34,14 @@ public class TablicniFormat implements FormatIspisaBridge {
     valutaStupci.add("Prihod"); // ITAS
   }
 
-  /**
-   * Ako je false, redovi koji su OTKAZANI se preskaču (IRTA kad filter ne uključuje O).
-   */
   public void setIspisujeOtkazane(boolean vrijednost) {
     this.ispisujeOtkazane = vrijednost;
   }
 
   @Override
   public void ispisi(String tekst) {
-    if (tekst == null) return;
+    if (tekst == null)
+      return;
     System.out.println(tekst);
   }
 
@@ -74,7 +72,8 @@ public class TablicniFormat implements FormatIspisaBridge {
     if (header == null) {
       System.out.println();
       for (IspisniRed r : redovi) {
-        if (r == null || r.vrijednosti() == null) continue;
+        if (r == null || r.vrijednosti() == null)
+          continue;
         System.out.println(String.join(" ", r.vrijednosti()));
       }
       System.out.println();
@@ -83,13 +82,14 @@ public class TablicniFormat implements FormatIspisaBridge {
 
     int cols = header.length;
 
-    // pripremi redove (pad/punjenje) + filtriranje otkazanih
     List<String[]> values = new ArrayList<>();
     for (IspisniRed r : redovi) {
-      if (r == null) continue;
+      if (r == null)
+        continue;
 
       String[] v = r.vrijednosti();
-      if (v == null) v = new String[0];
+      if (v == null)
+        v = new String[0];
 
       String[] row = new String[cols];
       for (int i = 0; i < cols; i++) {
@@ -108,14 +108,15 @@ public class TablicniFormat implements FormatIspisaBridge {
       return;
     }
 
-    // detekcija numeričkih kolona (za poravnanje desno)
+    // detekcija numeričkih kolona za poravnanje desno
     boolean[] numericCol = new boolean[cols];
     for (int c = 0; c < cols; c++) {
       boolean any = false;
       boolean allNumeric = true;
       for (String[] row : values) {
         String cell = row[c];
-        if (cell == null || cell.isBlank()) continue;
+        if (cell == null || cell.isBlank())
+          continue;
         any = true;
         if (!isNumeric(cell)) {
           allNumeric = false;
@@ -181,24 +182,28 @@ public class TablicniFormat implements FormatIspisaBridge {
 
     for (int i = 0; i < header.length; i++) {
       String h = header[i] == null ? "" : header[i].toLowerCase();
-      if (idxStanje == -1 && h.contains("stanje")) idxStanje = i;
-      if (idxOtkaz == -1 && h.contains("otkaz")) idxOtkaz = i;
+      if (idxStanje == -1 && h.contains("stanje"))
+        idxStanje = i;
+      if (idxOtkaz == -1 && h.contains("otkaz"))
+        idxOtkaz = i;
     }
 
     if (idxStanje >= 0) {
       String s = row[idxStanje] == null ? "" : row[idxStanje].toUpperCase();
-      if (s.contains("OTKAZ")) return true;
+      if (s.contains("OTKAZ"))
+        return true;
     }
 
     if (idxOtkaz >= 0) {
       String t = row[idxOtkaz] == null ? "" : row[idxOtkaz].trim();
-      if (!t.isEmpty()) return true;
+      if (!t.isEmpty())
+        return true;
     }
 
-    // fallback: zadnja kolona
     if (row.length > 0) {
       String last = row[row.length - 1] == null ? "" : row[row.length - 1].toUpperCase();
-      if (last.contains("OTKAZ")) return true;
+      if (last.contains("OTKAZ"))
+        return true;
     }
 
     return false;
@@ -212,8 +217,10 @@ public class TablicniFormat implements FormatIspisaBridge {
       boolean numeric = (numericCol != null && c < numericCol.length && numericCol[c]);
 
       sb.append(" ");
-      if (numeric) sb.append(String.format("%" + widths[c] + "s", v));
-      else sb.append(String.format("%-" + widths[c] + "s", v));
+      if (numeric)
+        sb.append(String.format("%" + widths[c] + "s", v));
+      else
+        sb.append(String.format("%-" + widths[c] + "s", v));
       sb.append(" |");
     }
     return sb.toString();
@@ -224,11 +231,15 @@ public class TablicniFormat implements FormatIspisaBridge {
   }
 
   private boolean isNumeric(String s) {
-    if (s == null) return false;
+    if (s == null)
+      return false;
     String t = s.trim();
-    if (t.isEmpty()) return false;
-    if (t.contains(":")) return false;   // vrijeme
-    if (t.endsWith(".")) return false;   // datumi tipa 01.10.2025.
+    if (t.isEmpty())
+      return false;
+    if (t.contains(":"))
+      return false; // vrijeme
+    if (t.endsWith("."))
+      return false; // datumi tipa 01.10.2025.
     return t.matches("^-?\\d+(?:[\\.,]\\d+)?$");
   }
 }

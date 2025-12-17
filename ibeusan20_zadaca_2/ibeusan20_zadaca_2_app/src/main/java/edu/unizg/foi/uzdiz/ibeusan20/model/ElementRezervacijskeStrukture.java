@@ -8,8 +8,8 @@ import java.util.List;
  * Predviđeno za primjenu uzorka <b>Composite</b>:
  * </p>
  * <ul>
- *   <li>kompozit (npr. aranžman) može sadržavati podređene elemente</li>
- *   <li>list (npr. rezervacija) predstavlja krajnji element</li>
+ * <li>kompozit (npr. aranžman) može sadržavati podređene elemente</li>
+ * <li>list (npr. rezervacija) predstavlja krajnji element</li>
  * </ul>
  *
  * <p>

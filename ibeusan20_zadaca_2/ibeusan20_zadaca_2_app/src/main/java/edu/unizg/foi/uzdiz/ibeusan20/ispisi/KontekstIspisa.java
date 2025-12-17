@@ -11,8 +11,7 @@ public final class KontekstIspisa {
 
   private static boolean obrnuto = false; // default: N
 
-  private KontekstIspisa() {
-  }
+  private KontekstIspisa() {}
 
   /**
    * Vraća je li trenutno postavljen obrnuti poredak (S).

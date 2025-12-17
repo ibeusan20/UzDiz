@@ -49,7 +49,7 @@ public class KomandaDrta implements Komanda {
     String oznaka = argumenti[2].trim();
     String datum = argumenti[3].trim();
     String vrijeme = argumenti[4].trim();
-    
+
     ispis.ispisi("DRTA " + ime + " " + prezime + " " + oznaka + " " + datum + " " + vrijeme);
 
     // provjera postojanja aranžmana
@@ -59,7 +59,7 @@ public class KomandaDrta implements Komanda {
       ispis.ispisi("");
       return true;
     }
-    
+
     if (a.jeOtkazan()) {
       ispis.ispisi("Aranžman '" + a.getOznaka() + "' je otkazan - dodavanje nije dozvoljeno.");
       return true;
@@ -90,9 +90,8 @@ public class KomandaDrta implements Komanda {
     // dodaj novu rezervaciju
     Rezervacija r = new Rezervacija(ime, prezime, oznaka, datumVrijeme);
     upraviteljRezervacija.dodaj(r);
-    // upraviteljRezervacija.rekalkulirajZaAranzman(oznaka, a.getMinPutnika(), a.getMaxPutnika());
     upraviteljRezervacija.rekalkulirajSve();
-    
+
     ispis.ispisi(
         "Dodana rezervacija za " + ime + " " + prezime + " za turistički aranžman s oznakom "
             + oznaka + " u " + PomocnikDatum.formatirajDatumVrijeme(datumVrijeme) + "\n");

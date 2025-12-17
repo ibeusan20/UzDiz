@@ -8,14 +8,12 @@ public interface StanjeRezervacije {
   String naziv();
 
   /**
-   * Označava broji li se rezervacija u kvotu prijava
-   * (za min / max broj putnika).
+   * Označava broji li se rezervacija u kvotu prijava (za min / max broj putnika).
    */
   boolean brojiSeUKvotu();
 
   /**
    * Označava je li rezervacija aktivna
-   * (osoba stvarno putuje na aranžman).
    */
   boolean jeAktivna();
 

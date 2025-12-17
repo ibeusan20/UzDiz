@@ -18,9 +18,8 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.RezervacijaDirector;
 /**
  * Glavna klasa aplikacije Turistička agencija.
  * <p>
- * Učitava podatke pomoću LIB facada, kreira domenske objekte,
- * puni Composite strukturu (aranžman -> rezervacije) i pokreće
- * interaktivno izvršavanje komandi.
+ * Učitava podatke pomoću LIB facada, kreira domenske objekte, puni Composite strukturu (aranžman ->
+ * rezervacije) i pokreće interaktivno izvršavanje komandi.
  * </p>
  */
 public class Aplikacija {
@@ -30,8 +29,8 @@ public class Aplikacija {
    *
    * Očekuje argumente:
    * <ul>
-   *   <li><code>--ta &lt;datoteka_aranzmana&gt;</code></li>
-   *   <li><code>--rta &lt;datoteka_rezervacija&gt;</code></li>
+   * <li><code>--ta &lt;datoteka_aranzmana&gt;</code></li>
+   * <li><code>--rta &lt;datoteka_rezervacija&gt;</code></li>
    * </ul>
    *
    * @param args argumenti komandne linije
@@ -45,7 +44,7 @@ public class Aplikacija {
 
       DatotekeFacade facade = DatotekeFacadeImpl.getInstance();
 
-      // 1) čitanje CSV podataka preko LIB modula
+      // čitanje CSV podataka preko LIB modula
       List<AranzmanPodaci> aranzmaniDto = List.of();
       List<RezervacijaPodaci> rezervacijeDto = List.of();
 
@@ -55,13 +54,11 @@ public class Aplikacija {
       if (argumenti.imaRezervacije()) {
         rezervacijeDto = facade.ucitajRezervacije(argumenti.dohvatiPutanjuRezervacija());
       }
-      
-      // 2) Direktori (Builder + Director u APP-u)
+
+      // Direktori (Builder + Director u APP-u)
       AranzmanDirector arDirector = new AranzmanDirector();
       RezervacijaDirector rezDirector = new RezervacijaDirector();
 
-
-      // 2) kreiranje domenskih objekata (Aranzman) i mapa po oznaci
       List<Aranzman> aranzmani = new ArrayList<>();
       Map<String, Aranzman> mapaAranzmana = new LinkedHashMap<>();
 
@@ -76,11 +73,11 @@ public class Aplikacija {
         } catch (IllegalArgumentException e) {
           redniBrojGreske++;
           System.err.println("[" + redniBrojGreske + ". greška (aranžmani)] u " + redniBrojA
-              + ". retku rezervacije: " + "Preskačem neispravan aranžman (" + dto.getOznaka() + "): " + e.getMessage());
+              + ". retku rezervacije: " + "Preskačem neispravan aranžman (" + dto.getOznaka()
+              + "): " + e.getMessage());
         }
       }
 
-      // 3) kreiranje domenskih rezervacija (još nisu u Composite-u)
       List<Rezervacija> rezervacije = new ArrayList<>();
       redniBrojR = 0;
       for (RezervacijaPodaci dto : rezervacijeDto) {
@@ -93,53 +90,49 @@ public class Aplikacija {
             // semantička provjera: ne postoji aranžman za rezervaciju
             redniBrojGreske++;
             System.err.println("[" + redniBrojGreske + ". greška (rezervacije)] u " + redniBrojR
-                + ". retku rezervacije: " + "Preskačem rezervaciju " + dto.getIme() + " " + dto.getPrezime()
-                + " - ne postoji aranžman s oznakom " + dto.getOznakaAranzmana());
+                + ". retku rezervacije: " + "Preskačem rezervaciju " + dto.getIme() + " "
+                + dto.getPrezime() + " - ne postoji aranžman s oznakom "
+                + dto.getOznakaAranzmana());
             continue;
           }
           if (dto.getDatumVrijeme() == null) {
-            System.err.println(
-                );
+            System.err.println();
             redniBrojGreske++;
             System.err.println("[" + redniBrojGreske + ". greška (rezervacije)] u " + redniBrojR
-                + ". retku rezervacije: " + "Preskačem rezervaciju (" + dto.getIme() + " " + dto.getPrezime()
-                + "): neispravan datum/vrijeme.");
+                + ". retku rezervacije: " + "Preskačem rezervaciju (" + dto.getIme() + " "
+                + dto.getPrezime() + "): neispravan datum/vrijeme.");
             continue;
           }
           rezervacije.add(r);
         } catch (IllegalArgumentException e) {
           redniBrojGreske++;
-          System.err.println("[" + redniBrojGreske + ". greška (rezervacije)] u " + ". retku rezervacije: " + e.getMessage());
+          System.err.println("[" + redniBrojGreske + ". greška (rezervacije)] u "
+              + ". retku rezervacije: " + e.getMessage());
         }
       }
 
-      
-      // 4) upravitelji
+      // upravitelji
       UpraviteljAranzmanima uprAranz = new UpraviteljAranzmanima(aranzmani);
       UpraviteljRezervacijama uprRez = new UpraviteljRezervacijama(uprAranz);
 
-      // 5a) popunjavanje Composite strukture (aranžman -> rezervacije)
+      // popunjavanje Composite strukture (aranžman -> rezervacije)
       uprRez.dodajPocetne(rezervacije);
       uprRez.rekalkulirajSve();
 
-      // 5b) INICIJALNA REKALKULACIJA STATE-OVA ZA SVE ARANŽMANE
+      // INICIJALNA REKALKULACIJA STATE-OVA ZA SVE ARANŽMANE
       for (Aranzman arr : uprAranz.svi()) {
-        uprRez.rekalkulirajZaAranzman(
-            arr.getOznaka(),
-            arr.getMinPutnika(),
-            arr.getMaxPutnika());
+        uprRez.rekalkulirajZaAranzman(arr.getOznaka(), arr.getMinPutnika(), arr.getMaxPutnika());
       }
 
       System.out.println("Učitano aranžmana: " + uprAranz.brojAranzmana());
       System.out.println("Učitano rezervacija: " + uprRez.brojRezervacija());
 
-      // 6) pokretanje obrade komandi
+      // pokretanje obrade komandi
       Komande komande = new Komande(uprAranz, uprRez);
       komande.pokreni();
 
     } catch (IllegalArgumentException e) {
       System.err.println("Greška u argumentima: " + e.getMessage());
-      //return;
     } catch (Exception e) {
       System.err.println("Neočekivana greška pri pokretanju aplikacije: " + e.getMessage());
     }

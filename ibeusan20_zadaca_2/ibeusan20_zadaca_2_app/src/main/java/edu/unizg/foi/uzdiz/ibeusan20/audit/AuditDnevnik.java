@@ -12,7 +12,6 @@ public final class AuditDnevnik {
   private final List<AuditStavka> stavke = new ArrayList<>();
   private int brojac = 0;
 
-  // da ne raste beskonačno (bez fileova)
   private int maxZapisa = 2000;
 
   private AuditDnevnik() {}
@@ -22,19 +21,22 @@ public final class AuditDnevnik {
   }
 
   public synchronized void postaviMaxZapisa(int max) {
-    if (max > 0) this.maxZapisa = max;
+    if (max > 0)
+      this.maxZapisa = max;
   }
 
   public synchronized void dodaj(LocalDateTime vrijeme, String unos, String komandaNaziv,
       String status, long trajanjeMs, String poruka) {
 
     brojac++;
-    AuditStavka s = new AuditStavka(brojac, vrijeme, unos, komandaNaziv, status, trajanjeMs, poruka);
+    AuditStavka s =
+        new AuditStavka(brojac, vrijeme, unos, komandaNaziv, status, trajanjeMs, poruka);
     stavke.add(s);
 
     if (stavke.size() > maxZapisa) {
       int visak = stavke.size() - maxZapisa;
-      for (int i = 0; i < visak; i++) stavke.remove(0);
+      for (int i = 0; i < visak; i++)
+        stavke.remove(0);
     }
   }
 
@@ -43,9 +45,12 @@ public final class AuditDnevnik {
   }
 
   public synchronized List<AuditStavka> zadnjih(int n) {
-    if (n <= 0) return List.of();
-    if (n >= stavke.size()) return sve();
-    return Collections.unmodifiableList(new ArrayList<>(stavke.subList(stavke.size() - n, stavke.size())));
+    if (n <= 0)
+      return List.of();
+    if (n >= stavke.size())
+      return sve();
+    return Collections
+        .unmodifiableList(new ArrayList<>(stavke.subList(stavke.size() - n, stavke.size())));
   }
 
   public synchronized void obrisiSve() {

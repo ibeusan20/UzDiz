@@ -201,10 +201,8 @@ public class AranzmanBuilder {
    */
   public AranzmanBuilder postaviPrijevoz(String tekst) {
     if (tekst != null && !tekst.isBlank()) {
-      this.prijevoz = Arrays.stream(tekst.split(";"))
-          .map(String::trim)
-          .filter(s -> !s.isEmpty())
-          .toList();
+      this.prijevoz =
+          Arrays.stream(tekst.split(";")).map(String::trim).filter(s -> !s.isEmpty()).toList();
     }
     return this;
   }
@@ -242,7 +240,6 @@ public class AranzmanBuilder {
     return this;
   }
 
-  // ------------------------------------------------------------
   // Izgradnja objekta
   /**
    * Izgrađuje objekt {@link Aranzman} uz validaciju svih logičkih pravila.
@@ -275,11 +272,9 @@ public class AranzmanBuilder {
       }
     }
 
-    // Ako sve prolazi, kreiraj objekt
     return new Aranzman(this);
   }
 
-  // ------------------------------------------------------------
   // Getteri za Aranzman
   /**
    * Gets the oznaka.

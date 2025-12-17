@@ -14,8 +14,8 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeUPripremiAranzman;
 /**
  * Predstavlja turistički aranžman.
  * <p>
- * Aranžman sadrži osnovne podatke (termin, cijenu, ograničenja broja putnika, prijevoz i obroke)
- * te povezane {@link Rezervacija} zapise.
+ * Aranžman sadrži osnovne podatke (termin, cijenu, ograničenja broja putnika, prijevoz i obroke) te
+ * povezane {@link Rezervacija} zapise.
  * </p>
  *
  * <p>
@@ -188,9 +188,10 @@ public class Aranzman {
     }
     return n;
   }
-  
+
   public boolean obrisiRezervacijuFizicki(Rezervacija r) {
-    if (r == null || rezervacije == null) return false;
+    if (r == null || rezervacije == null)
+      return false;
     return rezervacije.remove(r);
   }
 

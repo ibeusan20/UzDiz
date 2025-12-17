@@ -47,7 +47,7 @@ public class CitacRezervacija implements UcitavacPodataka<RezervacijaCsv> {
 
           String datumTekst = uzmi(stupci, 3);
 
-          // --- VALIDACIJE (da bi se greške stvarno ispisale) ---
+          // validacije
           if (r.ime == null || r.ime.isBlank()) {
             throw new IllegalArgumentException("Ime nije definirano.");
           }
@@ -85,14 +85,13 @@ public class CitacRezervacija implements UcitavacPodataka<RezervacijaCsv> {
   }
 
   private String uzmi(List<String> polja, int i) {
-    if (polja == null || i >= polja.size()) return "";
+    if (polja == null || i >= polja.size())
+      return "";
     return polja.get(i);
   }
 
   /**
-   * Pročita cijeli CSV zapis (podržava višeredni zapis kad su navodnici neparni).
-   * Ovo je praktički isto ponašanje kao CsvParser.procitajZapis, ali vraća TEKST zapisa
-   * da ga možemo ispisati kod greške.
+   * Pročita cijeli CSV zapis i vraća TEKST zapisa da ga možemo ispisati kod greške.
    */
   private String procitajZapisTekst(String prviRedak, BufferedReader br) throws IOException {
     StringBuilder sb = new StringBuilder(prviRedak);
@@ -100,7 +99,8 @@ public class CitacRezervacija implements UcitavacPodataka<RezervacijaCsv> {
 
     while (brojNavodnika % 2 != 0) {
       String nastavak = br.readLine();
-      if (nastavak == null) break;
+      if (nastavak == null)
+        break;
       sb.append("\n").append(nastavak);
       brojNavodnika = brojNavodnika(sb);
     }
@@ -110,7 +110,8 @@ public class CitacRezervacija implements UcitavacPodataka<RezervacijaCsv> {
   private int brojNavodnika(CharSequence tekst) {
     int br = 0;
     for (int i = 0; i < tekst.length(); i++) {
-      if (tekst.charAt(i) == '"') br++;
+      if (tekst.charAt(i) == '"')
+        br++;
     }
     return br;
   }

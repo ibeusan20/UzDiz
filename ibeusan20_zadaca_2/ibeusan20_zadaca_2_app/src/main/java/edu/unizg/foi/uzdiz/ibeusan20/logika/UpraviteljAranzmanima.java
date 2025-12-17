@@ -62,7 +62,7 @@ public class UpraviteljAranzmanima {
   }
 
   /**
-   * Filtrira aranžmane po rasponu datuma (uključivo). Poštuje IP poredak pri vraćanju liste.
+   * Filtrira aranžmane po rasponu datuma. Poštuje IP poredak pri vraćanju liste.
    */
   public List<Aranzman> filtrirajPoRasponu(LocalDate od, LocalDate d0) {
     List<Aranzman> rezultat = new ArrayList<>();
@@ -100,13 +100,15 @@ public class UpraviteljAranzmanima {
     aranzmani.clear();
     return n;
   }
-  
-  private static final Comparator<Aranzman> PO_POCETKU = Comparator
-      .comparing(UpraviteljAranzmanima::pocetakAranzmana, Comparator.nullsLast(Comparator.naturalOrder()))
-      .thenComparing(a -> a.getOznaka() == null ? "" : a.getOznaka(), String.CASE_INSENSITIVE_ORDER);
+
+  private static final Comparator<Aranzman> PO_POCETKU =
+      Comparator.comparing(UpraviteljAranzmanima::pocetakAranzmana,
+          Comparator.nullsLast(Comparator.naturalOrder())).thenComparing(
+              a -> a.getOznaka() == null ? "" : a.getOznaka(), String.CASE_INSENSITIVE_ORDER);
 
   private static LocalDateTime pocetakAranzmana(Aranzman a) {
-    if (a == null || a.getPocetniDatum() == null) return null;
+    if (a == null || a.getPocetniDatum() == null)
+      return null;
     LocalTime t = (a.getVrijemeKretanja() != null) ? a.getVrijemeKretanja() : LocalTime.MIN;
     return LocalDateTime.of(a.getPocetniDatum(), t);
   }
@@ -127,8 +129,6 @@ public class UpraviteljAranzmanima {
 
   /** Filtrirani aranžmani, sortirani po početku + IP poredak. */
   public List<Aranzman> filtrirajPoRasponuZaIspis(LocalDate od, LocalDate d0) {
-    return sortirajZaIspis(filtrirajPoRasponu(od, d0)); // koristi tvoju postojeću metodu
+    return sortirajZaIspis(filtrirajPoRasponu(od, d0));
   }
-
-
 }

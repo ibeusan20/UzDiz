@@ -11,9 +11,9 @@ import java.util.Locale;
  * Pravila formatiranja:
  * </p>
  * <ul>
- *   <li>tisućice se odvajaju točkom (.)</li>
- *   <li>decimalni separator je točka (.)</li>
- *   <li>valuta se ispisuje s dvije decimale i sufiksom " €"</li>
+ * <li>tisućice se odvajaju točkom (.)</li>
+ * <li>decimalni separator je točka (.)</li>
+ * <li>valuta se ispisuje s dvije decimale i sufiksom " €"</li>
  * </ul>
  * <p>
  * Koristi {@link ThreadLocal} formatera kako bi bila sigurna za korištenje iz više dretvi.
@@ -30,7 +30,7 @@ public final class FormatBrojeva {
   static {
     SYM = new DecimalFormatSymbols(Locale.ROOT);
     SYM.setGroupingSeparator('.'); // tisućice s točkom
-    SYM.setDecimalSeparator('.');  // decimale s točkom (bez zareza)
+    SYM.setDecimalSeparator('.'); // decimale s točkom
 
     NOVAC = ThreadLocal.withInitial(() -> {
       DecimalFormat df = new DecimalFormat("#,##0.00", SYM);
@@ -57,17 +57,20 @@ public final class FormatBrojeva {
   private FormatBrojeva() {}
 
   public static String eur(Number n) {
-    if (n == null) return "";
+    if (n == null)
+      return "";
     return NOVAC.get().format(toBigDecimal(n)) + " €";
   }
 
   public static String dec2(Number n) {
-    if (n == null) return "";
+    if (n == null)
+      return "";
     return DEC2.get().format(toBigDecimal(n));
   }
 
   public static String cijeli(Number n) {
-    if (n == null) return "";
+    if (n == null)
+      return "";
     return INT.get().format(toBigDecimal(n));
   }
 
@@ -88,21 +91,26 @@ public final class FormatBrojeva {
 
   public static String auto(String s) {
     BigDecimal bd = parse(s);
-    if (bd == null) return nullToEmpty(s);
+    if (bd == null)
+      return nullToEmpty(s);
     boolean whole = bd.stripTrailingZeros().scale() <= 0;
     return whole ? INT.get().format(bd) : DEC2.get().format(bd);
   }
 
   private static BigDecimal parse(String s) {
-    if (s == null) return null;
+    if (s == null)
+      return null;
     String t = s.trim();
-    if (t.isEmpty()) return null;
-    if (t.contains(":")) return null; // vrijeme
-    if (t.endsWith(".")) return null; // datum "01.10.2025."
+    if (t.isEmpty())
+      return null;
+    if (t.contains(":"))
+      return null; // vrijeme
+    if (t.endsWith("."))
+      return null; // datum "01.10.2025."
 
     try {
-      // Podrži ulaz koji možda dođe kao "4100,00" ili "4.100,00"
-      // ali izlaz uvijek formatiramo s točkama.
+      // Podržava ulaz koji možda dođe kao "4100,00" ili "4.100,00"
+      // ali izlaz uvijek s točkama.
       if (t.contains(".") && t.contains(",")) {
         // "4.100,00" -> "4100.00"
         t = t.replace(".", "").replace(",", ".");
@@ -117,7 +125,8 @@ public final class FormatBrojeva {
   }
 
   private static BigDecimal toBigDecimal(Number n) {
-    if (n instanceof BigDecimal bd) return bd;
+    if (n instanceof BigDecimal bd)
+      return bd;
     return new BigDecimal(String.valueOf(n));
   }
 

@@ -2,8 +2,7 @@ package edu.unizg.foi.uzdiz.ibeusan20.model.stanja;
 
 public class StanjePopunjenAranzman implements StanjeAranzmana {
 
-  private static final StanjePopunjenAranzman INSTANCA =
-      new StanjePopunjenAranzman();
+  private static final StanjePopunjenAranzman INSTANCA = new StanjePopunjenAranzman();
 
   private StanjePopunjenAranzman() {}
 

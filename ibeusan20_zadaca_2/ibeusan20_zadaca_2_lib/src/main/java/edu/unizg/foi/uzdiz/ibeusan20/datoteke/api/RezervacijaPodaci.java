@@ -4,7 +4,10 @@ import java.time.LocalDateTime;
 
 public interface RezervacijaPodaci {
   String getIme();
+
   String getPrezime();
+
   String getOznakaAranzmana();
+
   LocalDateTime getDatumVrijeme();
 }

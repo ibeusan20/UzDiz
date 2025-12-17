@@ -26,7 +26,7 @@ public class KomandaItap implements Komanda {
 
     String oznaka = argumenti[0].trim();
     Aranzman a = upravitelj.pronadiPoOznaci(oznaka);
-    
+
     ispis.ispisi("ITAP " + oznaka);
 
     if (a == null) {

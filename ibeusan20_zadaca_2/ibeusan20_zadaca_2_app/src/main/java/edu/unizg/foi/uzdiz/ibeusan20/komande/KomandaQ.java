@@ -7,7 +7,7 @@ import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
  * Komanda Q - završetak rada programa.
  */
 public class KomandaQ implements Komanda {
-  
+
   private final FormatIspisaBridge ispis = new TablicniFormat();
 
   /**

@@ -14,12 +14,12 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
  * Podržane varijante:
  * </p>
  * <ul>
- *   <li>{@code BP A} – fizičko brisanje svih aranžmana</li>
- *   <li>{@code BP R} – fizičko brisanje svih rezervacija</li>
+ * <li>{@code BP A} – fizičko brisanje svih aranžmana</li>
+ * <li>{@code BP R} – fizičko brisanje svih rezervacija</li>
  * </ul>
  * <p>
- * Napomena: u klasi postoje i pomoćne metode za “logičko brisanje” (otkazivanje), ali u trenutnoj
- * izvedbi {@link #izvrsi()} koristi fizičko brisanje.
+ * U klasi postoje i pomoćne metode za “logičko brisanje” (otkazivanje) koje su prije korištene za
+ * testiranje, ali u trenutnoj izvedbi {@link #izvrsi()} koristi fizičko brisanje.
  * </p>
  */
 public class KomandaBp implements Komanda {
@@ -29,8 +29,8 @@ public class KomandaBp implements Komanda {
   private final String[] argumenti;
   private final FormatIspisaBridge ispis = new TablicniFormat();
 
-  public KomandaBp(UpraviteljAranzmanima uprAranz,
-      UpraviteljRezervacijama uprRez, String... argumenti) {
+  public KomandaBp(UpraviteljAranzmanima uprAranz, UpraviteljRezervacijama uprRez,
+      String... argumenti) {
     this.uprAranz = uprAranz;
     this.uprRez = uprRez;
     this.argumenti = argumenti;
@@ -54,7 +54,7 @@ public class KomandaBp implements Komanda {
 
     return true;
   }
-  
+
   private void obrisiSveAranzmaneFizicki() {
     int prije = uprAranz.svi().size();
 
@@ -63,7 +63,7 @@ public class KomandaBp implements Komanda {
       return;
     }
 
-    // fizičko brisanje aranžmana (rezervacije nestaju s njima)
+    // fizičko brisanje aranžmana
     int obrisano = uprAranz.obrisiSveAranzmaneFizicki();
 
     ispis.ispisi("Fizički obrisani svi aranžmani: " + obrisano);
@@ -80,7 +80,6 @@ public class KomandaBp implements Komanda {
     ispis.ispisi("Fizički obrisane sve rezervacije: " + obrisano);
   }
 
-
   private void obrisiSveAranzmaneLogicki() {
     List<Aranzman> svi = uprAranz.svi();
     if (svi.isEmpty()) {
@@ -89,15 +88,12 @@ public class KomandaBp implements Komanda {
     }
 
     for (Aranzman a : svi) {
-      // otkaži sve rezervacije tog aranžmana (primljene, aktivne, čekanje, odgođene)
-      List<Rezervacija> rez =
-          uprRez.dohvatiZaAranzmanIVrste(a.getOznaka(), "PAČOD");
+      // otkaži sve rezervacije tog aranžmana
+      List<Rezervacija> rez = uprRez.dohvatiZaAranzmanIVrste(a.getOznaka(), "PAČOD");
       for (Rezervacija r : rez) {
         uprRez.otkaziRezervaciju(r.getIme(), r.getPrezime(), a.getOznaka());
       }
-      // stanje aranžmana: OTKAZAN
       a.postaviOtkazan();
-      // dodatna rekalkulacija radi konzistencije koja ne mijenja status otkazanosti
       uprRez.rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
     }
 
@@ -109,16 +105,13 @@ public class KomandaBp implements Komanda {
     boolean bilo = false;
 
     for (Aranzman a : svi) {
-      List<Rezervacija> rez =
-          uprRez.dohvatiZaAranzmanIVrste(a.getOznaka(), "PAČOD");
+      List<Rezervacija> rez = uprRez.dohvatiZaAranzmanIVrste(a.getOznaka(), "PAČOD");
       for (Rezervacija r : rez) {
-        boolean ok =
-            uprRez.otkaziRezervaciju(r.getIme(), r.getPrezime(), a.getOznaka());
+        boolean ok = uprRez.otkaziRezervaciju(r.getIme(), r.getPrezime(), a.getOznaka());
         if (ok) {
           bilo = true;
         }
       }
-      // svaki put rekalkulacija kota i stanja aranžmana
       uprRez.rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
     }
 
@@ -128,5 +121,4 @@ public class KomandaBp implements Komanda {
       ispis.ispisi("Nema rezervacija za brisanje.");
     }
   }
-  
 }

@@ -13,9 +13,8 @@ public class IspisStatistikaAranzmanaAdapter implements IspisniRed {
 
   @Override
   public String[] zaglavlje() {
-    return new String[] {
-        "Oznaka", "Ukupan broj", "Aktivne", "Na čekanju", "Odgođene", "Otkazane", "Ukupan prihod"
-    };
+    return new String[] {"Oznaka", "Ukupan broj", "Aktivne", "Na čekanju", "Odgođene", "Otkazane",
+        "Ukupan prihod"};
   }
 
   @Override
@@ -26,22 +25,20 @@ public class IspisStatistikaAranzmanaAdapter implements IspisniRed {
       ukupno++;
       String s = (r.nazivStanja() == null) ? "" : r.nazivStanja().toUpperCase();
 
-      if (s.contains("AKTIV")) aktivne++;
-      else if (s.contains("ČEKAN") || s.contains("CEKAN")) cekanje++;
-      else if (s.contains("ODGOD") || s.contains("ODGO")) odgodene++;
-      else if (s.contains("OTKAZ")) otkazane++;
+      if (s.contains("AKTIV"))
+        aktivne++;
+      else if (s.contains("ČEKAN") || s.contains("CEKAN"))
+        cekanje++;
+      else if (s.contains("ODGOD") || s.contains("ODGO"))
+        odgodene++;
+      else if (s.contains("OTKAZ"))
+        otkazane++;
     }
 
     double prihod = aktivne * a.getCijena();
 
-    return new String[] {
-        a.getOznaka(),
-        String.valueOf(ukupno),
-        String.valueOf(aktivne),
-        String.valueOf(cekanje),
-        String.valueOf(odgodene),
-        String.valueOf(otkazane),
-        String.valueOf(prihod)
-    };
+    return new String[] {a.getOznaka(), String.valueOf(ukupno), String.valueOf(aktivne),
+        String.valueOf(cekanje), String.valueOf(odgodene), String.valueOf(otkazane),
+        String.valueOf(prihod)};
   }
 }

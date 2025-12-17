@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List; 
+import java.util.List;
 import java.util.Map;
 
 public final class AuditSpremnik {
@@ -15,7 +15,8 @@ public final class AuditSpremnik {
     public final boolean nastavi;
     public final String greska;
 
-    public Zapis(LocalDateTime vrijeme, String unos, long trajanjeMs, boolean nastavi, String greska) {
+    public Zapis(LocalDateTime vrijeme, String unos, long trajanjeMs, boolean nastavi,
+        String greska) {
       this.vrijeme = vrijeme;
       this.unos = unos;
       this.trajanjeMs = trajanjeMs;
@@ -37,8 +38,10 @@ public final class AuditSpremnik {
     return INSTANCA;
   }
 
-  public synchronized void dodaj(String nazivKomande, String unos, long trajanjeMs, boolean nastavi, String greska) {
-    if (nazivKomande == null) nazivKomande = "?";
+  public synchronized void dodaj(String nazivKomande, String unos, long trajanjeMs, boolean nastavi,
+      String greska) {
+    if (nazivKomande == null)
+      nazivKomande = "?";
     brojacPoKomandi.merge(nazivKomande, 1, Integer::sum);
     ukupnoTrajanjePoKomandi.merge(nazivKomande, trajanjeMs, Long::sum);
 
@@ -49,7 +52,8 @@ public final class AuditSpremnik {
   }
 
   public synchronized List<Zapis> zadnjih(int n) {
-    if (n <= 0) return List.of();
+    if (n <= 0)
+      return List.of();
     int from = Math.max(0, zapisi.size() - n);
     return Collections.unmodifiableList(new ArrayList<>(zapisi.subList(from, zapisi.size())));
   }

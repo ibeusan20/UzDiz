@@ -42,7 +42,7 @@ public class CitacAranzmana implements UcitavacPodataka<AranzmanCsv> {
           a.naziv = uzmi(stupci, 1);
           a.program = uzmi(stupci, 2);
 
-          // VALIDACIJE (po uzoru na poruke koje želiš)
+          // VALIDACIJE
           if (a.oznaka == null || a.oznaka.isBlank()) {
             throw new IllegalArgumentException("Oznaka aranžmana nije definirana.");
           }
@@ -63,10 +63,12 @@ public class CitacAranzmana implements UcitavacPodataka<AranzmanCsv> {
           a.vrijemeKretanja = PomocnikDatum.procitajVrijeme(uzmi(stupci, 5));
           a.vrijemePovratka = PomocnikDatum.procitajVrijeme(uzmi(stupci, 6));
 
-          // Cijena, min, max – obično obavezni (ako želiš labavije, promijeni na opcionalno)
+          // Cijena, min, max – obično obavezni
           a.cijena = procitajFloatObavezno(uzmi(stupci, 7), "Cijena nije definirana.");
-          a.minPutnika = procitajIntObavezno(uzmi(stupci, 8), "Minimalni broj putnika nije definiran.");
-          a.maxPutnika = procitajIntObavezno(uzmi(stupci, 9), "Maksimalni broj putnika nije definiran.");
+          a.minPutnika =
+              procitajIntObavezno(uzmi(stupci, 8), "Minimalni broj putnika nije definiran.");
+          a.maxPutnika =
+              procitajIntObavezno(uzmi(stupci, 9), "Maksimalni broj putnika nije definiran.");
 
           if (a.minPutnika < 0 || a.maxPutnika < 0) {
             throw new IllegalArgumentException("Min/Max putnika ne može biti negativan.");
@@ -75,16 +77,14 @@ public class CitacAranzmana implements UcitavacPodataka<AranzmanCsv> {
             throw new IllegalArgumentException("Max putnika ne može biti manji od Min putnika.");
           }
 
-          // ostalo može biti 0 ako prazno (ili napravi strože ako treba)
+          // ostalo može biti 0 ako prazno
           a.brojNocenja = procitajIntOpcionalno(uzmi(stupci, 10));
           a.doplataJednokrevetna = procitajFloatOpcionalno(uzmi(stupci, 11));
 
           String prijevoz = uzmi(stupci, 12);
           if (prijevoz != null && !prijevoz.isBlank()) {
-            a.prijevoz = Arrays.stream(prijevoz.split(";"))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .toList();
+            a.prijevoz = Arrays.stream(prijevoz.split(";")).map(String::trim)
+                .filter(s -> !s.isEmpty()).toList();
           }
 
           a.brojDorucaka = procitajIntOpcionalno(uzmi(stupci, 13));
@@ -108,37 +108,54 @@ public class CitacAranzmana implements UcitavacPodataka<AranzmanCsv> {
     return rezultat;
   }
 
-  // ---- helpers ----
+  // ---- helperi ----
 
   private String uzmi(List<String> polja, int i) {
-    if (polja == null || i >= polja.size()) return "";
+    if (polja == null || i >= polja.size())
+      return "";
     return polja.get(i);
   }
 
   private float procitajFloatObavezno(String tekst, String porukaAkoNema) {
-    if (tekst == null || tekst.isBlank()) throw new IllegalArgumentException(porukaAkoNema);
+    if (tekst == null || tekst.isBlank())
+      throw new IllegalArgumentException(porukaAkoNema);
     String t = tekst.trim().replace(",", ".");
-    try { return Float.parseFloat(t); }
-    catch (Exception e) { throw new IllegalArgumentException("Neispravan broj: " + tekst); }
+    try {
+      return Float.parseFloat(t);
+    } catch (Exception e) {
+      throw new IllegalArgumentException("Neispravan broj: " + tekst);
+    }
   }
 
   private int procitajIntObavezno(String tekst, String porukaAkoNema) {
-    if (tekst == null || tekst.isBlank()) throw new IllegalArgumentException(porukaAkoNema);
-    try { return Integer.parseInt(tekst.trim()); }
-    catch (Exception e) { throw new IllegalArgumentException("Neispravan cijeli broj: " + tekst); }
+    if (tekst == null || tekst.isBlank())
+      throw new IllegalArgumentException(porukaAkoNema);
+    try {
+      return Integer.parseInt(tekst.trim());
+    } catch (Exception e) {
+      throw new IllegalArgumentException("Neispravan cijeli broj: " + tekst);
+    }
   }
 
   private float procitajFloatOpcionalno(String tekst) {
-    if (tekst == null || tekst.isBlank()) return 0f;
+    if (tekst == null || tekst.isBlank())
+      return 0f;
     String t = tekst.trim().replace(",", ".");
-    try { return Float.parseFloat(t); }
-    catch (Exception e) { return 0f; }
+    try {
+      return Float.parseFloat(t);
+    } catch (Exception e) {
+      return 0f;
+    }
   }
 
   private int procitajIntOpcionalno(String tekst) {
-    if (tekst == null || tekst.isBlank()) return 0;
-    try { return Integer.parseInt(tekst.trim()); }
-    catch (Exception e) { return 0; }
+    if (tekst == null || tekst.isBlank())
+      return 0;
+    try {
+      return Integer.parseInt(tekst.trim());
+    } catch (Exception e) {
+      return 0;
+    }
   }
 
   private String procitajZapisTekst(String prviRedak, BufferedReader br) throws IOException {
@@ -147,7 +164,8 @@ public class CitacAranzmana implements UcitavacPodataka<AranzmanCsv> {
 
     while (brojNavodnika % 2 != 0) {
       String nastavak = br.readLine();
-      if (nastavak == null) break;
+      if (nastavak == null)
+        break;
       sb.append("\n").append(nastavak);
       brojNavodnika = brojNavodnika(sb);
     }
@@ -157,7 +175,8 @@ public class CitacAranzmana implements UcitavacPodataka<AranzmanCsv> {
   private int brojNavodnika(CharSequence tekst) {
     int br = 0;
     for (int i = 0; i < tekst.length(); i++) {
-      if (tekst.charAt(i) == '"') br++;
+      if (tekst.charAt(i) == '"')
+        br++;
     }
     return br;
   }

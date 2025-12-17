@@ -2,8 +2,7 @@ package edu.unizg.foi.uzdiz.ibeusan20.model.stanja;
 
 public class StanjeAktivanAranzman implements StanjeAranzmana {
 
-  private static final StanjeAktivanAranzman INSTANCA =
-      new StanjeAktivanAranzman();
+  private static final StanjeAktivanAranzman INSTANCA = new StanjeAktivanAranzman();
 
   private StanjeAktivanAranzman() {}
 

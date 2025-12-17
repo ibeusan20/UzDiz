@@ -55,15 +55,16 @@ public class KomandaItak implements Komanda {
       return true;
     }
 
-    List<Aranzman> lista = (datumOd == null)
-        ? upravitelj.sviZaIspis()
+    List<Aranzman> lista = (datumOd == null) ? upravitelj.sviZaIspis()
         : upravitelj.filtrirajPoRasponuZaIspis(datumOd, datumDo);
-    
-    String komandaTekst = (datumOd == null) ? "ITAK" : ("ITAK " + argumenti[0] + " " + argumenti[1]);
+
+    String komandaTekst =
+        (datumOd == null) ? "ITAK" : ("ITAK " + argumenti[0] + " " + argumenti[1]);
     String nazivTablice = "Turistički aranžmani";
 
     List<IspisniRed> redovi = new ArrayList<>();
-    for (Aranzman a : lista) redovi.add(new IspisAranzmanaAdapter(a));
+    for (Aranzman a : lista)
+      redovi.add(new IspisAranzmanaAdapter(a));
 
     TablicniFormat tab = new TablicniFormat();
     tab.ispisiTablicu(komandaTekst, nazivTablice, redovi);

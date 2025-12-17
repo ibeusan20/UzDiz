@@ -9,8 +9,8 @@ import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 /**
  * Klasa zadužena za interaktivni rad s korisnikom.
  * <p>
- * Čita korisničke komande, kreira odgovarajuće objekte pomoću
- * {@link KomandaFactory} i izvršava ih dok se ne unese {@code Q}.
+ * Čita korisničke komande, kreira odgovarajuće objekte pomoću {@link KomandaFactory} i izvršava ih
+ * dok se ne unese {@code Q}.
  * </p>
  */
 public class Komande {
@@ -46,11 +46,6 @@ public class Komande {
 
       Komanda komanda =
           KomandaFactory.kreiraj(unos, upraviteljAranzmanima, upraviteljRezervacijama);
-
-//      if (komanda == null) {
-//        System.out.println("Nepoznata komanda: " + unos);
-//        continue;
-//      }
 
       boolean nastavi = komanda.izvrsi();
       if (!nastavi) {

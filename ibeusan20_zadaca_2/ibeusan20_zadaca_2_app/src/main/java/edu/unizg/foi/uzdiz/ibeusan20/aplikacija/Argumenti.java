@@ -2,8 +2,8 @@ package edu.unizg.foi.uzdiz.ibeusan20.aplikacija;
 
 public class Argumenti {
 
-  private String putanjaAranzmana;    // --ta
-  private String putanjaRezervacija;  // --rta
+  private String putanjaAranzmana; // --ta
+  private String putanjaRezervacija; // --rta
 
   public Argumenti(String[] args) {
     parsiraj(args);
@@ -11,10 +11,10 @@ public class Argumenti {
 
   private void parsiraj(String[] args) {
     if (args == null) {
-      return; // tretiraj kao "nema argumenata"
+      return;
     }
 
-    for (int i = 0; i < args.length; ) {
+    for (int i = 0; i < args.length;) {
       String opt = args[i];
 
       if (opt == null || opt.isBlank()) {

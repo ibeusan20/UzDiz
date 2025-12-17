@@ -19,10 +19,8 @@ public class IspisAranzmanaAdapter implements IspisniRed {
 
   @Override
   public String[] zaglavlje() {
-    return new String[] {
-        "Oznaka", "Naziv", "Početni datum", "Završni datum",
-        "Kretanje", "Povratak", "Cijena", "Min", "Max", "Status"
-    };
+    return new String[] {"Oznaka", "Naziv", "Početni datum", "Završni datum", "Kretanje",
+        "Povratak", "Cijena", "Min", "Max", "Status"};
   }
 
   @Override
@@ -31,25 +29,20 @@ public class IspisAranzmanaAdapter implements IspisniRed {
       return new String[] {"", "", "", "", "", "", "", "", "", ""};
     }
 
-    String od = aranzman.getPocetniDatum() == null ? "" : aranzman.getPocetniDatum().format(FORMAT_DATUM);
-    String d0 = aranzman.getZavrsniDatum() == null ? "" : aranzman.getZavrsniDatum().format(FORMAT_DATUM);
+    String od =
+        aranzman.getPocetniDatum() == null ? "" : aranzman.getPocetniDatum().format(FORMAT_DATUM);
+    String d0 =
+        aranzman.getZavrsniDatum() == null ? "" : aranzman.getZavrsniDatum().format(FORMAT_DATUM);
 
-    String vk = aranzman.getVrijemeKretanja() == null ? "" : aranzman.getVrijemeKretanja().format(FORMAT_VRIJEME);
-    String vp = aranzman.getVrijemePovratka() == null ? "" : aranzman.getVrijemePovratka().format(FORMAT_VRIJEME);
+    String vk = aranzman.getVrijemeKretanja() == null ? ""
+        : aranzman.getVrijemeKretanja().format(FORMAT_VRIJEME);
+    String vp = aranzman.getVrijemePovratka() == null ? ""
+        : aranzman.getVrijemePovratka().format(FORMAT_VRIJEME);
 
     String cijena = String.valueOf(aranzman.getCijena());
 
-    return new String[] {
-        aranzman.getOznaka(),
-        aranzman.getNaziv(),
-        od,
-        d0,
-        vk,
-        vp,
-        cijena,
-        String.valueOf(aranzman.getMinPutnika()),
-        String.valueOf(aranzman.getMaxPutnika()),
-        aranzman.nazivStanja()
-    };
+    return new String[] {aranzman.getOznaka(), aranzman.getNaziv(), od, d0, vk, vp, cijena,
+        String.valueOf(aranzman.getMinPutnika()), String.valueOf(aranzman.getMaxPutnika()),
+        aranzman.nazivStanja()};
   }
 }

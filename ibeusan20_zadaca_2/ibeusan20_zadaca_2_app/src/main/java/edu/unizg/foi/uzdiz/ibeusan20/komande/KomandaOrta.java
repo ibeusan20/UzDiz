@@ -45,7 +45,7 @@ public class KomandaOrta implements Komanda {
     String ime = argumenti[0].trim();
     String prezime = argumenti[1].trim();
     String oznaka = argumenti[2].trim();
-    
+
     ispis.ispisi("ORTA " + ime + " " + prezime + " " + oznaka);
 
     boolean uspjeh = upraviteljRezervacija.otkaziRezervaciju(ime, prezime, oznaka);
@@ -57,11 +57,11 @@ public class KomandaOrta implements Komanda {
 
     Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(oznaka);
     if (a != null) {
-      // upraviteljRezervacija.rekalkulirajZaAranzman(oznaka, a.getMinPutnika(), a.getMaxPutnika());
       upraviteljRezervacija.rekalkulirajSve();
     }
 
-    ispis.ispisi("Uspješno otkazana rezervacija za " + ime + " " + prezime + " (" + oznaka + ").\n");
+    ispis
+        .ispisi("Uspješno otkazana rezervacija za " + ime + " " + prezime + " (" + oznaka + ").\n");
     return true;
   }
 }

@@ -44,7 +44,6 @@ public class KomandaIp implements Komanda {
         ispis.ispisi("Nepoznata opcija za IP. Dozvoljeno: N ili S.");
       }
     }
-
     return true;
   }
 }
