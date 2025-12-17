@@ -7,8 +7,18 @@ import java.util.Arrays;
 import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.model.AranzmanCsv;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class CitacAranzmana.
+ */
 public class CitacAranzmana implements UcitavacPodataka<AranzmanCsv> {
 
+  /**
+   * Ucitaj.
+   *
+   * @param nazivDatoteke the naziv datoteke
+   * @return the list
+   */
   @Override
   public List<AranzmanCsv> ucitaj(String nazivDatoteke) {
     List<AranzmanCsv> rezultat = new ArrayList<>();
@@ -110,11 +120,25 @@ public class CitacAranzmana implements UcitavacPodataka<AranzmanCsv> {
 
   // ---- helpers ----
 
+  /**
+   * Uzmi.
+   *
+   * @param polja the polja
+   * @param i the i
+   * @return the string
+   */
   private String uzmi(List<String> polja, int i) {
     if (polja == null || i >= polja.size()) return "";
     return polja.get(i);
   }
 
+  /**
+   * Procitaj float obavezno.
+   *
+   * @param tekst the tekst
+   * @param porukaAkoNema the poruka ako nema
+   * @return the float
+   */
   private float procitajFloatObavezno(String tekst, String porukaAkoNema) {
     if (tekst == null || tekst.isBlank()) throw new IllegalArgumentException(porukaAkoNema);
     String t = tekst.trim().replace(",", ".");
@@ -122,12 +146,25 @@ public class CitacAranzmana implements UcitavacPodataka<AranzmanCsv> {
     catch (Exception e) { throw new IllegalArgumentException("Neispravan broj: " + tekst); }
   }
 
+  /**
+   * Procitaj int obavezno.
+   *
+   * @param tekst the tekst
+   * @param porukaAkoNema the poruka ako nema
+   * @return the int
+   */
   private int procitajIntObavezno(String tekst, String porukaAkoNema) {
     if (tekst == null || tekst.isBlank()) throw new IllegalArgumentException(porukaAkoNema);
     try { return Integer.parseInt(tekst.trim()); }
     catch (Exception e) { throw new IllegalArgumentException("Neispravan cijeli broj: " + tekst); }
   }
 
+  /**
+   * Procitaj float opcionalno.
+   *
+   * @param tekst the tekst
+   * @return the float
+   */
   private float procitajFloatOpcionalno(String tekst) {
     if (tekst == null || tekst.isBlank()) return 0f;
     String t = tekst.trim().replace(",", ".");
@@ -135,12 +172,26 @@ public class CitacAranzmana implements UcitavacPodataka<AranzmanCsv> {
     catch (Exception e) { return 0f; }
   }
 
+  /**
+   * Procitaj int opcionalno.
+   *
+   * @param tekst the tekst
+   * @return the int
+   */
   private int procitajIntOpcionalno(String tekst) {
     if (tekst == null || tekst.isBlank()) return 0;
     try { return Integer.parseInt(tekst.trim()); }
     catch (Exception e) { return 0; }
   }
 
+  /**
+   * Procitaj zapis tekst.
+   *
+   * @param prviRedak the prvi redak
+   * @param br the br
+   * @return the string
+   * @throws IOException Signals that an I/O exception has occurred.
+   */
   private String procitajZapisTekst(String prviRedak, BufferedReader br) throws IOException {
     StringBuilder sb = new StringBuilder(prviRedak);
     int brojNavodnika = brojNavodnika(sb);
@@ -154,6 +205,12 @@ public class CitacAranzmana implements UcitavacPodataka<AranzmanCsv> {
     return sb.toString();
   }
 
+  /**
+   * Broj navodnika.
+   *
+   * @param tekst the tekst
+   * @return the int
+   */
   private int brojNavodnika(CharSequence tekst) {
     int br = 0;
     for (int i = 0; i < tekst.length(); i++) {

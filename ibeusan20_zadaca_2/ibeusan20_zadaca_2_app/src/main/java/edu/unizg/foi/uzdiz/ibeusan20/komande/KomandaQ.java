@@ -3,11 +3,13 @@ package edu.unizg.foi.uzdiz.ibeusan20.komande;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 
+// TODO: Auto-generated Javadoc
 /**
  * Komanda Q - završetak rada programa.
  */
 public class KomandaQ implements Komanda {
   
+  /** The ispis. */
   private final FormatIspisaBridge ispis = new TablicniFormat();
 
   /**

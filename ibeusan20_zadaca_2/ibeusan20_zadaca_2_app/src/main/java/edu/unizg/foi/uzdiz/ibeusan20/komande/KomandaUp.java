@@ -14,6 +14,7 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.AranzmanDirector;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.RezervacijaDirector;
 
+// TODO: Auto-generated Javadoc
 /**
  * UP – učitavanje podataka o aranžmanima ili rezervacijama iz datoteke.
  * <p>
@@ -23,11 +24,25 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.RezervacijaDirector;
  */
 public class KomandaUp implements Komanda {
 
+  /** The upr aranz. */
   private final UpraviteljAranzmanima uprAranz;
+  
+  /** The upr rez. */
   private final UpraviteljRezervacijama uprRez;
+  
+  /** The argumenti. */
   private final String[] argumenti;
+  
+  /** The ispis. */
   private final FormatIspisaBridge ispis = new TablicniFormat();
 
+  /**
+   * Instantiates a new komanda up.
+   *
+   * @param uprAranz the upr aranz
+   * @param uprRez the upr rez
+   * @param argumenti the argumenti
+   */
   public KomandaUp(UpraviteljAranzmanima uprAranz, UpraviteljRezervacijama uprRez,
       String... argumenti) {
     this.uprAranz = uprAranz;
@@ -35,6 +50,11 @@ public class KomandaUp implements Komanda {
     this.argumenti = argumenti;
   }
 
+  /**
+   * Izvrsi.
+   *
+   * @return true, if successful
+   */
   @Override
   public boolean izvrsi() {
     if (argumenti == null || argumenti.length < 2) {
@@ -58,6 +78,12 @@ public class KomandaUp implements Komanda {
     return true;
   }
 
+  /**
+   * Ucitaj aranzmane.
+   *
+   * @param facade the facade
+   * @param datoteka the datoteka
+   */
   private void ucitajAranzmane(DatotekeFacade facade, String datoteka) {
     List<AranzmanPodaci> dto = facade.ucitajAranzmane(datoteka);
     if (dto == null || dto.isEmpty()) {
@@ -93,6 +119,12 @@ public class KomandaUp implements Komanda {
     }
   }
 
+  /**
+   * Ucitaj rezervacije.
+   *
+   * @param facade the facade
+   * @param datoteka the datoteka
+   */
   private void ucitajRezervacije(DatotekeFacade facade, String datoteka) {
     List<RezervacijaPodaci> dto = facade.ucitajRezervacije(datoteka);
 

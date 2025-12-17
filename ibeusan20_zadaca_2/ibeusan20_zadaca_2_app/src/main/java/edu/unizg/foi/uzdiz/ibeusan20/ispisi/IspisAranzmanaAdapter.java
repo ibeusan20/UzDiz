@@ -3,20 +3,35 @@ package edu.unizg.foi.uzdiz.ibeusan20.ispisi;
 import java.time.format.DateTimeFormatter;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 
+// TODO: Auto-generated Javadoc
 /**
  * Adapter za osnovni ispis aranžmana (ITAK).
  */
 public class IspisAranzmanaAdapter implements IspisniRed {
 
+  /** The Constant FORMAT_DATUM. */
   private static final DateTimeFormatter FORMAT_DATUM = DateTimeFormatter.ofPattern("dd.MM.yyyy.");
+  
+  /** The Constant FORMAT_VRIJEME. */
   private static final DateTimeFormatter FORMAT_VRIJEME = DateTimeFormatter.ofPattern("HH:mm:ss");
 
+  /** The aranzman. */
   private final Aranzman aranzman;
 
+  /**
+   * Instantiates a new ispis aranzmana adapter.
+   *
+   * @param aranzman the aranzman
+   */
   public IspisAranzmanaAdapter(Aranzman aranzman) {
     this.aranzman = aranzman;
   }
 
+  /**
+   * Zaglavlje.
+   *
+   * @return the string[]
+   */
   @Override
   public String[] zaglavlje() {
     return new String[] {
@@ -25,6 +40,11 @@ public class IspisAranzmanaAdapter implements IspisniRed {
     };
   }
 
+  /**
+   * Vrijednosti.
+   *
+   * @return the string[]
+   */
   @Override
   public String[] vrijednosti() {
     if (aranzman == null) {

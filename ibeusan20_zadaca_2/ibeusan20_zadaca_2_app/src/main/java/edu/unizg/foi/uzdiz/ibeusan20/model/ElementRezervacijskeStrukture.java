@@ -2,6 +2,7 @@ package edu.unizg.foi.uzdiz.ibeusan20.model;
 
 import java.util.List;
 
+// TODO: Auto-generated Javadoc
 /**
  * Zajedničko sučelje za Composite uzorak.
  * Aranžman je kompozit, Rezervacija je list.

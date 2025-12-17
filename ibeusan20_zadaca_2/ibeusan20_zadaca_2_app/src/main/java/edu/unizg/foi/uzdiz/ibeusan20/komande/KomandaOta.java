@@ -8,16 +8,31 @@ import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
 
+// TODO: Auto-generated Javadoc
 /**
  * OTA – otkaz turističkog aranžmana.
  */
 public class KomandaOta implements Komanda {
 
+  /** The upr aranz. */
   private final UpraviteljAranzmanima uprAranz;
+  
+  /** The upr rez. */
   private final UpraviteljRezervacijama uprRez;
+  
+  /** The argumenti. */
   private final String[] argumenti;
+  
+  /** The ispis. */
   private final FormatIspisaBridge ispis = new TablicniFormat();
 
+  /**
+   * Instantiates a new komanda ota.
+   *
+   * @param uprAranz the upr aranz
+   * @param uprRez the upr rez
+   * @param argumenti the argumenti
+   */
   public KomandaOta(UpraviteljAranzmanima uprAranz,
       UpraviteljRezervacijama uprRez, String... argumenti) {
     this.uprAranz = uprAranz;
@@ -25,6 +40,11 @@ public class KomandaOta implements Komanda {
     this.argumenti = argumenti;
   }
 
+  /**
+   * Izvrsi.
+   *
+   * @return true, if successful
+   */
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 1) {

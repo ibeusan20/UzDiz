@@ -1,5 +1,9 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Interface Komanda.
+ */
 public interface Komanda {
 
   /**

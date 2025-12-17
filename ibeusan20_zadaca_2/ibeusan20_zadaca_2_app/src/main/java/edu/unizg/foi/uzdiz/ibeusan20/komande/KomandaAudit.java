@@ -10,14 +10,29 @@ import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisAuditZbrojAdapter;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisniRed;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class KomandaAudit.
+ */
 public class KomandaAudit implements Komanda {
 
+  /** The argumenti. */
   private final String[] argumenti;
 
+  /**
+   * Instantiates a new komanda audit.
+   *
+   * @param argumenti the argumenti
+   */
   public KomandaAudit(String... argumenti) {
     this.argumenti = argumenti == null ? new String[0] : argumenti;
   }
 
+  /**
+   * Izvrsi.
+   *
+   * @return true, if successful
+   */
   @Override
   public boolean izvrsi() {
     String komandaTekst = "AUDIT";
@@ -53,6 +68,13 @@ public class KomandaAudit implements Komanda {
     return true;
   }
 
+  /**
+   * Ispisi tablicu.
+   *
+   * @param tab the tab
+   * @param komandaTekst the komanda tekst
+   * @param stavke the stavke
+   */
   private void ispisiTablicu(TablicniFormat tab, String komandaTekst, List<AuditStavka> stavke) {
     String nazivTablice = "Dnevnik izvršavanja komandi";
 
@@ -73,6 +95,13 @@ public class KomandaAudit implements Komanda {
     ispisiZbroj(tab, "AUDIT - Sažetak po komandi (ukupno)", sve);
   }
 
+  /**
+   * Ispisi zbroj.
+   *
+   * @param tab the tab
+   * @param naslov the naslov
+   * @param stavke the stavke
+   */
   private void ispisiZbroj(TablicniFormat tab, String naslov, List<AuditStavka> stavke) {
     if (stavke == null || stavke.isEmpty()) {
       tab.ispisi(naslov);
@@ -100,6 +129,12 @@ public class KomandaAudit implements Komanda {
     tab.ispisiTablicu("", naslov, redovi);
   }
 
+  /**
+   * Izvuci komandu.
+   *
+   * @param unos the unos
+   * @return the string
+   */
   private String izvuciKomandu(String unos) {
     if (unos == null) return "?";
     String t = unos.trim();

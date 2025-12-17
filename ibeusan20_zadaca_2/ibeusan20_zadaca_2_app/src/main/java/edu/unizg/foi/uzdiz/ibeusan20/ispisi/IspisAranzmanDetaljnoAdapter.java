@@ -4,22 +4,35 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 
+// TODO: Auto-generated Javadoc
 /**
  * Detaljni ispis jednog aranžmana (ITAP).
  */
 public class IspisAranzmanDetaljnoAdapter {
 
+  /** The Constant FORMAT_DATUM. */
   private static final DateTimeFormatter FORMAT_DATUM =
       DateTimeFormatter.ofPattern("dd.MM.yyyy.");
+  
+  /** The Constant FORMAT_VRIJEME. */
   private static final DateTimeFormatter FORMAT_VRIJEME =
       DateTimeFormatter.ofPattern("HH:mm");
 
+  /** The aranzman. */
   private final Aranzman aranzman;
 
+  /**
+   * Instantiates a new ispis aranzman detaljno adapter.
+   *
+   * @param aranzman the aranzman
+   */
   public IspisAranzmanDetaljnoAdapter(Aranzman aranzman) {
     this.aranzman = aranzman;
   }
 
+  /**
+   * Ispisi detalje.
+   */
   public void ispisiDetalje() {
     String od = aranzman.getPocetniDatum() == null ? ""
         : aranzman.getPocetniDatum().format(FORMAT_DATUM);

@@ -4,6 +4,7 @@ import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.KontekstIspisa;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 
+// TODO: Auto-generated Javadoc
 /**
  * Komanda IP - postavljanje načina sređivanja podataka kod ispisa tablica.
  * <p>
@@ -13,14 +14,27 @@ import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
  */
 public class KomandaIp implements Komanda {
 
+  /** The argumenti. */
   private final String[] argumenti;
+  
+  /** The ispis. */
   private final FormatIspisaBridge ispis = new TablicniFormat();
 
 
+  /**
+   * Instantiates a new komanda ip.
+   *
+   * @param argumenti the argumenti
+   */
   public KomandaIp(String... argumenti) {
     this.argumenti = argumenti;
   }
 
+  /**
+   * Izvrsi.
+   *
+   * @return true, if successful
+   */
   @Override
   public boolean izvrsi() {
     if (argumenti.length < 1) {

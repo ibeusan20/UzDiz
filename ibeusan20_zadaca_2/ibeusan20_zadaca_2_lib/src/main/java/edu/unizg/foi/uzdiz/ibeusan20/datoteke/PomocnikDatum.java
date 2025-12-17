@@ -6,8 +6,18 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class PomocnikDatum.
+ */
 public class PomocnikDatum {
 
+  /**
+   * Procitaj datum.
+   *
+   * @param tekst the tekst
+   * @return the local date
+   */
   public static LocalDate procitajDatum(String tekst) {
     if (tekst == null || tekst.isBlank())
       return null;
@@ -24,6 +34,12 @@ public class PomocnikDatum {
     return null;
   }
 
+  /**
+   * Procitaj vrijeme.
+   *
+   * @param tekst the tekst
+   * @return the local time
+   */
   public static LocalTime procitajVrijeme(String tekst) {
     if (tekst == null || tekst.isBlank())
       return null;
@@ -39,6 +55,12 @@ public class PomocnikDatum {
     return null;
   }
 
+  /**
+   * Procitaj datum I vrijeme.
+   *
+   * @param tekst the tekst
+   * @return the local date time
+   */
   public static LocalDateTime procitajDatumIVrijeme(String tekst) {
     if (tekst == null || tekst.isBlank())
       return null;
@@ -54,6 +76,12 @@ public class PomocnikDatum {
     return null;
   }
 
+  /**
+   * Formatiraj datum vrijeme.
+   *
+   * @param datumVrijeme the datum vrijeme
+   * @return the string
+   */
   public static String formatirajDatumVrijeme(LocalDateTime datumVrijeme) {
     if (datumVrijeme == null)
       return "";

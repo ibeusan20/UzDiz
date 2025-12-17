@@ -5,16 +5,26 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TablicniFormat.
+ */
 public class TablicniFormat implements FormatIspisaBridge {
 
+  /** The ispisuje otkazane. */
   private boolean ispisujeOtkazane = true;
 
+  /** The int stupci. */
   // Stupci koji se uvijek ispisuju kao cijeli brojevi
   private final Set<String> intStupci = new HashSet<>();
 
+  /** The valuta stupci. */
   // Stupci koji se ispisuju kao valuta (2 decimale + €)
   private final Set<String> valutaStupci = new HashSet<>();
 
+  /**
+   * Instantiates a new tablicni format.
+   */
   public TablicniFormat() {
     intStupci.add("Min");
     intStupci.add("Max");
@@ -36,17 +46,31 @@ public class TablicniFormat implements FormatIspisaBridge {
 
   /**
    * Ako je false, redovi koji su OTKAZANI se preskaču (IRTA kad filter ne uključuje O).
+   *
+   * @param vrijednost the new ispisuje otkazane
    */
   public void setIspisujeOtkazane(boolean vrijednost) {
     this.ispisujeOtkazane = vrijednost;
   }
 
+  /**
+   * Ispisi.
+   *
+   * @param tekst the tekst
+   */
   @Override
   public void ispisi(String tekst) {
     if (tekst == null) return;
     System.out.println(tekst);
   }
 
+  /**
+   * Ispisi tablicu.
+   *
+   * @param komandaTekst the komanda tekst
+   * @param nazivTablice the naziv tablice
+   * @param redovi the redovi
+   */
   public void ispisiTablicu(String komandaTekst, String nazivTablice,
       List<? extends IspisniRed> redovi) {
 
@@ -175,6 +199,13 @@ public class TablicniFormat implements FormatIspisaBridge {
     System.out.println();
   }
 
+  /**
+   * Je otkazana row.
+   *
+   * @param header the header
+   * @param row the row
+   * @return true, if successful
+   */
   private boolean jeOtkazanaRow(String[] header, String[] row) {
     int idxStanje = -1;
     int idxOtkaz = -1;
@@ -204,6 +235,14 @@ public class TablicniFormat implements FormatIspisaBridge {
     return false;
   }
 
+  /**
+   * Render row.
+   *
+   * @param cells the cells
+   * @param widths the widths
+   * @param numericCol the numeric col
+   * @return the string
+   */
   private String renderRow(String[] cells, int[] widths, boolean[] numericCol) {
     StringBuilder sb = new StringBuilder();
     sb.append("|");
@@ -219,10 +258,22 @@ public class TablicniFormat implements FormatIspisaBridge {
     return sb.toString();
   }
 
+  /**
+   * Null to empty.
+   *
+   * @param s the s
+   * @return the string
+   */
   private String nullToEmpty(String s) {
     return s == null ? "" : s;
   }
 
+  /**
+   * Checks if is numeric.
+   *
+   * @param s the s
+   * @return true, if is numeric
+   */
   private boolean isNumeric(String s) {
     if (s == null) return false;
     String t = s.trim();

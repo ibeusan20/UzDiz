@@ -15,6 +15,7 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.AranzmanDirector;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.RezervacijaDirector;
 
+// TODO: Auto-generated Javadoc
 /**
  * Glavna klasa aplikacije Turistička agencija.
  * <p>
@@ -84,6 +85,7 @@ public class Aplikacija {
       List<Rezervacija> rezervacije = new ArrayList<>();
       redniBrojR = 0;
       for (RezervacijaPodaci dto : rezervacijeDto) {
+        redniBrojR++;
         try {
           Rezervacija r = rezDirector.konstruiraj(dto);
 
@@ -107,7 +109,7 @@ public class Aplikacija {
           }
           rezervacije.add(r);
         } catch (IllegalArgumentException e) {
-          redniBrojR++;
+          redniBrojGreske++;
           System.err.println("[" + redniBrojGreske + ". greška (rezervacije)] u " + ". retku rezervacije: " + e.getMessage());
         }
       }

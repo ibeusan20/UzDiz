@@ -2,8 +2,18 @@ package edu.unizg.foi.uzdiz.ibeusan20.model;
 
 import edu.unizg.foi.uzdiz.ibeusan20.datoteke.api.AranzmanPodaci;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class AranzmanDirector.
+ */
 public class AranzmanDirector {
 
+  /**
+   * Konstruiraj.
+   *
+   * @param p the p
+   * @return the aranzman
+   */
   public Aranzman konstruiraj(AranzmanPodaci p) {
     if (p == null) throw new IllegalArgumentException("Podaci aranžmana nisu definirani.");
 
