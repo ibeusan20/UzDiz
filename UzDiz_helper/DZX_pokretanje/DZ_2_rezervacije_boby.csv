@@ -1,0 +1,76 @@
+Ime,Prezime,Oznaka aranžmana,Datum i vrijeme
+# --- ARANŽMAN 1 (Japan) → točno MAX=10 → svi AKTIVNI ---
+Ana,Horvat,1,01.10.2025 09:00:00
+Marko,Kovač,1,01.10.2025 09:05:00
+Ivana,Novak,1,01.10.2025 09:10:00
+Petar,Babić,1,01.10.2025 09:15:00
+Lucija,Marić,1,01.10.2025 09:20:00
+Filip,Jurić,1,01.10.2025 09:25:00
+Sara,Perić,1,01.10.2025 09:30:00
+Ivan,Božić,1,01.10.2025 09:35:00
+Maja,Grgić,1,01.10.2025 09:40:00
+Tomislav,Šimić,1,01.10.2025 09:45:00
+
+# --- dodatna → ČEKANJE ---
+Lea,Novak,1,01.10.2025 10:00:00
+
+# --- ARANŽMAN 2 (Venecija) → ispod MIN=20 → PRIMLJENE ---
+Ana,Horvat,2,02.10.2025 08:00:00
+Marko,Kovač,2,02.10.2025 08:05:00
+Ivana,Novak,2,02.10.2025 08:10:00
+Petar,Babić,2,02.10.2025 08:15:00
+Lucija,Marić,2,02.10.2025 08:20:00
+Filip,Jurić,2,02.10.2025 08:25:00
+Sara,Perić,2,02.10.2025 08:30:00
+Ivan,Božić,2,02.10.2025 08:35:00
+Maja,Grgić,2,02.10.2025 08:40:00
+Tomislav,Šimić,2,02.10.2025 08:45:00
+Lea,Novak,2,02.10.2025 08:50:00
+Luka,Radić,2,02.10.2025 08:55:00
+
+# --- ARANŽMAN 3 (London) → do MIN=15 → prelazak u AKTIVNE ---
+Ana,Horvat,3,03.10.2025 09:00:00
+Marko,Kovač,3,03.10.2025 09:01:00
+Ivana,Novak,3,03.10.2025 09:02:00
+Petar,Babić,3,03.10.2025 09:03:00
+Lucija,Marić,3,03.10.2025 09:04:00
+Filip,Jurić,3,03.10.2025 09:05:00
+Sara,Perić,3,03.10.2025 09:06:00
+Ivan,Božić,3,03.10.2025 09:07:00
+Maja,Grgić,3,03.10.2025 09:08:00
+Tomislav,Šimić,3,03.10.2025 09:09:00
+Lea,Novak,3,03.10.2025 09:10:00
+Luka,Radić,3,03.10.2025 09:11:00
+Marija,Klarić,3,03.10.2025 09:12:00
+Dario,Vuković,3,03.10.2025 09:13:00
+Katarina,Buljan,3,03.10.2025 09:14:00
+
+# --- dodatni → još uvijek AKTIVNI ---
+Nikola,Žagar,3,03.10.2025 09:20:00
+Ema,Pavić,3,03.10.2025 09:25:00
+
+# --- ARANŽMAN 4 (Beč) → PREKLAPANJE s Londonom ---
+# iste osobe koje već imaju AKTIVNU (London) → ODGOĐENE
+Ana,Horvat,4,04.10.2025 10:00:00
+Marko,Kovač,4,04.10.2025 10:05:00
+Ivana,Novak,4,04.10.2025 10:10:00
+
+# nove osobe → PRIMLJENE
+Petra,Krpan,4,04.10.2025 10:15:00
+Josip,Matijević,4,04.10.2025 10:20:00
+
+# --- SCENARIJ: ODGODENE NA ARANŽMANU 3 (London) ---
+# 1) osoba prvo dobije AKTIVNU na Beču (4)
+# 2) zatim dobije AKTIVNU na Londonu (3) -> ODGODENA
+
+Ivana,Kralj,4,05.10.2025 08:00:00
+Marko,Zec,4,05.10.2025 08:05:00
+Petra,Horvat,4,05.10.2025 08:10:00
+
+Ivana,Kralj,3,06.10.2025 09:00:00
+Marko,Zec,3,06.10.2025 09:05:00
+Petra,Horvat,3,06.10.2025 09:10:00
+
+# --- DOPUNA: Beč do MIN=10 ---
+Mario,Šarić,4,05.10.2025 08:15:00
+Ivona,Pavlek,4,05.10.2025 08:20:00
