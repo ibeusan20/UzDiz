@@ -6,6 +6,6 @@ public class StrategijaBezOgranicenja implements StrategijaOgranicenjaRezervacij
 
   @Override
   public void primijeni(UpraviteljAranzmanima upraviteljAranzmanima) {
-    // Null Object: nema ograničenja, samo već postojeći min i max 
+    // Null Object: nema ograničenja, samo već postojeći min i max
   }
 }

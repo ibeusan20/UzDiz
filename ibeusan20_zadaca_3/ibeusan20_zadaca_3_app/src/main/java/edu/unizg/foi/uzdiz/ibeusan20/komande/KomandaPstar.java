@@ -1,5 +1,7 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
+import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.memento.AranzmanMemento;
 import edu.unizg.foi.uzdiz.ibeusan20.memento.SpremisteAranzmana;
@@ -9,6 +11,7 @@ public class KomandaPstar implements Komanda {
 
   private final UpraviteljAranzmanima ua;
   private final String[] argumenti;
+  private final FormatIspisaBridge ispis = new TablicniFormat();
 
   public KomandaPstar(UpraviteljAranzmanima ua, String[] argumenti) {
     this.ua = ua;
@@ -19,7 +22,7 @@ public class KomandaPstar implements Komanda {
   public boolean izvrsi() {
     // argumenti sadrže SAMO parametre nakon naredbe
     if (argumenti == null || argumenti.length < 1) {
-      System.out.println("Neispravna komanda. Sintaksa: PSTAR oznaka");
+      ispis.ispisi("Neispravna komanda. Sintaksa: PSTAR oznaka");
       return true;
     }
 
@@ -27,12 +30,12 @@ public class KomandaPstar implements Komanda {
 
     Aranzman a = ua.pronadiPoOznaci(oznaka);
     if (a == null) {
-      System.out.println("Aranžman '" + oznaka + "' ne postoji.");
+      ispis.ispisi("Aranžman '" + oznaka + "' ne postoji.");
       return true;
     }
 
     SpremisteAranzmana.instanca().spremi(oznaka, AranzmanMemento.from(a));
-    System.out.println("Spremljeno stanje aranžmana '" + oznaka + "'.");
+    ispis.ispisi("Spremljeno stanje aranžmana '" + oznaka + "'.");
     return true;
   }
 }

@@ -33,17 +33,11 @@ public final class AranzmanMemento {
 
   private final List<RezervacijaMemento> rezervacije;
 
-  private AranzmanMemento(
-      String oznaka, String naziv, String program,
-      LocalDate pocetniDatum, LocalDate zavrsniDatum,
-      LocalTime vrijemeKretanja, LocalTime vrijemePovratka,
-      float cijena, int minPutnika, int maxPutnika,
-      int brojNocenja, float doplataJednokrevetna,
-      List<String> prijevoz,
-      int brojDorucaka, int brojRuckova, int brojVecera,
-      boolean otkazan, int brojPrijavaUKvoti, int brojAktivnih,
-      List<RezervacijaMemento> rezervacije
-  ) {
+  private AranzmanMemento(String oznaka, String naziv, String program, LocalDate pocetniDatum,
+      LocalDate zavrsniDatum, LocalTime vrijemeKretanja, LocalTime vrijemePovratka, float cijena,
+      int minPutnika, int maxPutnika, int brojNocenja, float doplataJednokrevetna,
+      List<String> prijevoz, int brojDorucaka, int brojRuckova, int brojVecera, boolean otkazan,
+      int brojPrijavaUKvoti, int brojAktivnih, List<RezervacijaMemento> rezervacije) {
     this.oznaka = oznaka;
     this.naziv = naziv;
     this.program = program;
@@ -69,61 +63,42 @@ public final class AranzmanMemento {
   }
 
   public static AranzmanMemento from(Aranzman a) {
-    if (a == null) return null;
+    if (a == null)
+      return null;
 
     int prijave = 0;
     int aktivne = 0;
     List<RezervacijaMemento> rez = new ArrayList<>();
 
     for (Rezervacija r : a.getRezervacije()) {
-      if (r == null) continue;
+      if (r == null)
+        continue;
       rez.add(RezervacijaMemento.from(r));
-      if (r.brojiSeUKvotu()) prijave++;
-      if (r.jeAktivna()) aktivne++;
+      if (r.brojiSeUKvotu())
+        prijave++;
+      if (r.jeAktivna())
+        aktivne++;
     }
 
-    return new AranzmanMemento(
-        a.getOznaka(),
-        a.getNaziv(),
-        a.getProgram(),
-        a.getPocetniDatum(),
-        a.getZavrsniDatum(),
-        a.getVrijemeKretanja(),
-        a.getVrijemePovratka(),
-        a.getCijena(),
-        a.getMinPutnika(),
-        a.getMaxPutnika(),
-        a.getBrojNocenja(),
-        a.getDoplataJednokrevetna(),
-        a.getPrijevoz(),
-        a.getBrojDorucaka(),
-        a.getBrojRuckova(),
-        a.getBrojVecera(),
-        a.jeOtkazan(),
-        prijave,
-        aktivne,
-        rez
-    );
+    return new AranzmanMemento(a.getOznaka(), a.getNaziv(), a.getProgram(), a.getPocetniDatum(),
+        a.getZavrsniDatum(), a.getVrijemeKretanja(), a.getVrijemePovratka(), a.getCijena(),
+        a.getMinPutnika(), a.getMaxPutnika(), a.getBrojNocenja(), a.getDoplataJednokrevetna(),
+        a.getPrijevoz(), a.getBrojDorucaka(), a.getBrojRuckova(), a.getBrojVecera(), a.jeOtkazan(),
+        prijave, aktivne, rez);
   }
 
   public Aranzman restore() {
-    AranzmanBuilder b = new AranzmanBuilder()
-        .postaviOznaku(oznaka)
-        .postaviNaziv(naziv)
-        .postaviProgram(program)
-        .postaviPocetniDatum(pocetniDatum)
-        .postaviZavrsniDatum(zavrsniDatum)
-        .postaviCijenu(cijena)
-        .postaviMinPutnika(minPutnika)
-        .postaviMaxPutnika(maxPutnika)
-        .postaviBrojNocenja(brojNocenja)
-        .postaviDoplatuJednokrevetna(doplataJednokrevetna)
-        .postaviBrojDorucaka(brojDorucaka)
-        .postaviBrojRuckova(brojRuckova)
+    AranzmanBuilder b = new AranzmanBuilder().postaviOznaku(oznaka).postaviNaziv(naziv)
+        .postaviProgram(program).postaviPocetniDatum(pocetniDatum).postaviZavrsniDatum(zavrsniDatum)
+        .postaviCijenu(cijena).postaviMinPutnika(minPutnika).postaviMaxPutnika(maxPutnika)
+        .postaviBrojNocenja(brojNocenja).postaviDoplatuJednokrevetna(doplataJednokrevetna)
+        .postaviBrojDorucaka(brojDorucaka).postaviBrojRuckova(brojRuckova)
         .postaviBrojVecera(brojVecera);
 
-    if (vrijemeKretanja != null) b.postaviVrijemeKretanja(vrijemeKretanja);
-    if (vrijemePovratka != null) b.postaviVrijemePovratka(vrijemePovratka);
+    if (vrijemeKretanja != null)
+      b.postaviVrijemeKretanja(vrijemeKretanja);
+    if (vrijemePovratka != null)
+      b.postaviVrijemePovratka(vrijemePovratka);
 
     if (prijevoz != null && !prijevoz.isEmpty()) {
       b.postaviPrijevoz(String.join(";", prijevoz));
@@ -131,9 +106,10 @@ public final class AranzmanMemento {
 
     Aranzman a = b.izgradi();
 
-    // dodaj rezervacije, aranžman još NIJE otkazan da ne baci iznimku kod dodavanja
+    // dodaje rezervacije, aranžman još nije otkazan da ne baci iznimku kod dodavanja
     for (RezervacijaMemento rm : rezervacije) {
-      if (rm == null) continue;
+      if (rm == null)
+        continue;
       a.dodajRezervaciju(rm.restore());
     }
 

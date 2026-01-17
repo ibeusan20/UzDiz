@@ -18,13 +18,15 @@ public final class SpremisteAranzmana {
   }
 
   public synchronized void spremi(String oznaka, AranzmanMemento m) {
-    if (oznaka == null || oznaka.isBlank() || m == null) return;
+    if (oznaka == null || oznaka.isBlank() || m == null)
+      return;
     String key = oznaka.trim().toUpperCase();
     poOznaci.computeIfAbsent(key, k -> new ArrayDeque<>()).push(m); // zadnje na vrh
   }
 
   public synchronized AranzmanMemento zadnji(String oznaka) {
-    if (oznaka == null || oznaka.isBlank()) return null;
+    if (oznaka == null || oznaka.isBlank())
+      return null;
     Deque<AranzmanMemento> stog = poOznaci.get(oznaka.trim().toUpperCase());
     return (stog == null || stog.isEmpty()) ? null : stog.peek();
   }

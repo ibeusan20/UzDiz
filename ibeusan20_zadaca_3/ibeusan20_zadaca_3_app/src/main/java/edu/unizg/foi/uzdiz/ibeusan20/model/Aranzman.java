@@ -27,7 +27,7 @@ import edu.unizg.foi.uzdiz.ibeusan20.visitor.Posjetljiv;
  * ({@link StanjeOtkazanAranzman}), dodavanje rezervacija nije dozvoljeno.
  * </p>
  */
-public class Aranzman implements Posjetljiv{
+public class Aranzman implements Posjetljiv {
 
   private final String oznaka;
   private final String naziv;
@@ -203,7 +203,7 @@ public class Aranzman implements Posjetljiv{
     return "Aranzman{" + "oznaka='" + oznaka + '\'' + ", naziv='" + naziv + '\'' + ", pocetniDatum="
         + pocetniDatum + ", zavrsniDatum=" + zavrsniDatum + ", stanje=" + stanje.naziv() + '}';
   }
-  
+
   @Override
   public void prihvati(Posjetitelj p, Aranzman kontekst) {
     if (p == null) {

@@ -97,7 +97,7 @@ public class Rezervacija implements Posjetljiv {
     this.datumVrijemeOtkaza = vrijemeOdgode;
     this.stanje = StanjeOdgodenaRezervacija.instanca();
   }
-  
+
   @Override
   public void prihvati(Posjetitelj p, Aranzman kontekst) {
     if (p == null) {
