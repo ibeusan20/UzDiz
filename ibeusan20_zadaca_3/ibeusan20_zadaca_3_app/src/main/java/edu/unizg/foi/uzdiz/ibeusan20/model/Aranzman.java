@@ -10,6 +10,9 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeAranzmana;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeOtkazanAranzman;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjePopunjenAranzman;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeUPripremiAranzman;
+import edu.unizg.foi.uzdiz.ibeusan20.visitor.Posjetitelj;
+import edu.unizg.foi.uzdiz.ibeusan20.visitor.Posjetljiv;
+
 
 /**
  * Predstavlja turistički aranžman.
@@ -24,7 +27,7 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeUPripremiAranzman;
  * ({@link StanjeOtkazanAranzman}), dodavanje rezervacija nije dozvoljeno.
  * </p>
  */
-public class Aranzman {
+public class Aranzman implements Posjetljiv{
 
   private final String oznaka;
   private final String naziv;
@@ -200,4 +203,18 @@ public class Aranzman {
     return "Aranzman{" + "oznaka='" + oznaka + '\'' + ", naziv='" + naziv + '\'' + ", pocetniDatum="
         + pocetniDatum + ", zavrsniDatum=" + zavrsniDatum + ", stanje=" + stanje.naziv() + '}';
   }
+  
+  @Override
+  public void prihvati(Posjetitelj p, Aranzman kontekst) {
+    if (p == null) {
+      return;
+    }
+    p.posjetiAranzman(this);
+    for (Rezervacija r : rezervacije) {
+      if (r != null) {
+        r.prihvati(p, this);
+      }
+    }
+  }
+
 }

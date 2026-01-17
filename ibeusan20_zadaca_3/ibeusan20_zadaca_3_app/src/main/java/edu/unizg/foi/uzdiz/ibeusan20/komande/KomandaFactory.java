@@ -45,6 +45,15 @@ public final class KomandaFactory {
       case "UP" -> new KomandaUp(ua, ur, argumenti);
       case "ITAS" -> new KomandaItas(ua, argumenti);
       case "AUDIT" -> new KomandaAudit(argumenti);
+      
+      case "PPTAR" -> {
+        if (argumenti.length < 2) {
+          yield new KomandaNepoznata("Neispravna komanda. Sintaksa: PPTAR [A|R] riječ");
+        }
+        yield new KomandaPptar(ua, argumenti[0], argumenti[1]);
+      }
+
+      
       case "Q" -> new KomandaQ();
       default -> null;
     };

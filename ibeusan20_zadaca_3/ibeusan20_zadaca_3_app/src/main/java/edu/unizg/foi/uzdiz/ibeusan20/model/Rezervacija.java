@@ -5,6 +5,9 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeOdgodenaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeOtkazanaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjePrimljenaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeRezervacije;
+import edu.unizg.foi.uzdiz.ibeusan20.visitor.Posjetitelj;
+import edu.unizg.foi.uzdiz.ibeusan20.visitor.Posjetljiv;
+
 
 /**
  * Predstavlja rezervaciju turističkog aranžmana. Koristi uzorak State za upravljanje statusima.
@@ -14,7 +17,7 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeRezervacije;
  * {@link StanjeRezervacije}).
  * </p>
  */
-public class Rezervacija {
+public class Rezervacija implements Posjetljiv {
 
   private final String ime;
   private final String prezime;
@@ -94,4 +97,13 @@ public class Rezervacija {
     this.datumVrijemeOtkaza = vrijemeOdgode;
     this.stanje = StanjeOdgodenaRezervacija.instanca();
   }
+  
+  @Override
+  public void prihvati(Posjetitelj p, Aranzman kontekst) {
+    if (p == null) {
+      return;
+    }
+    p.posjetiRezervaciju(this, kontekst);
+  }
+
 }
