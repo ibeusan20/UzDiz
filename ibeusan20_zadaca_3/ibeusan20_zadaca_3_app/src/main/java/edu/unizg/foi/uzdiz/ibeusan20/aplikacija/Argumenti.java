@@ -5,8 +5,12 @@ public class Argumenti {
   private String putanjaAranzmana; // --ta
   private String putanjaRezervacija; // --rta
 
+  private boolean jdr; // --jdr
+  private boolean vdr; // --vdr
+
   public Argumenti(String[] args) {
     parsiraj(args);
+    provjeriStrategije();
   }
 
   private void parsiraj(String[] args) {
@@ -14,39 +18,63 @@ public class Argumenti {
       return;
     }
 
-    for (int i = 0; i < args.length;) {
+    for (int i = 0; i < args.length; i++) {
       String opt = args[i];
 
       if (opt == null || opt.isBlank()) {
-        i++;
         continue;
       }
 
       if (!opt.startsWith("--")) {
-        throw new IllegalArgumentException("Neispravan argument: '" + opt
-            + "'. Očekujem opcije: --ta <datoteka> i/ili --rta <datoteka>.");
-      }
-
-      if (!opt.equals("--ta") && !opt.equals("--rta")) {
-        throw new IllegalArgumentException("Nepoznata opcija: " + opt);
-      }
-
-      if (i + 1 >= args.length) {
-        throw new IllegalArgumentException("Nedostaje vrijednost za opciju: " + opt);
-      }
-
-      String vrijednost = args[i + 1];
-      if (vrijednost.startsWith("--")) {
-        throw new IllegalArgumentException("Nedostaje vrijednost za opciju: " + opt);
+        throw new IllegalArgumentException("Neispravan argument: '" + opt + "'.");
       }
 
       if (opt.equals("--ta")) {
-        putanjaAranzmana = vrijednost;
-      } else { // --rta
-        putanjaRezervacija = vrijednost;
+        i = obradiOpcijuSaVrijednoscu(args, i, true);
+        continue;
       }
 
-      i += 2;
+      if (opt.equals("--rta")) {
+        i = obradiOpcijuSaVrijednoscu(args, i, false);
+        continue;
+      }
+
+      if (opt.equals("--jdr")) {
+        jdr = true;
+        continue;
+      }
+
+      if (opt.equals("--vdr")) {
+        vdr = true;
+        continue;
+      }
+
+      throw new IllegalArgumentException("Nepoznata opcija: " + opt);
+    }
+  }
+
+  private int obradiOpcijuSaVrijednoscu(String[] args, int i, boolean jeTa) {
+    if (i + 1 >= args.length) {
+      throw new IllegalArgumentException("Nedostaje vrijednost za opciju: " + args[i]);
+    }
+
+    String vrijednost = args[i + 1];
+    if (vrijednost == null || vrijednost.isBlank() || vrijednost.startsWith("--")) {
+      throw new IllegalArgumentException("Nedostaje vrijednost za opciju: " + args[i]);
+    }
+
+    if (jeTa) {
+      putanjaAranzmana = vrijednost;
+    } else {
+      putanjaRezervacija = vrijednost;
+    }
+
+    return i + 1;
+  }
+
+  private void provjeriStrategije() {
+    if (jdr && vdr) {
+      throw new IllegalArgumentException("Opcije --jdr i --vdr se ne smiju koristiti zajedno.");
     }
   }
 
@@ -64,5 +92,13 @@ public class Argumenti {
 
   public String dohvatiPutanjuRezervacija() {
     return putanjaRezervacija;
+  }
+
+  public boolean jeJdr() {
+    return jdr;
+  }
+
+  public boolean jeVdr() {
+    return vdr;
   }
 }

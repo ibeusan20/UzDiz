@@ -14,6 +14,9 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 import edu.unizg.foi.uzdiz.ibeusan20.model.AranzmanDirector;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.RezervacijaDirector;
+import edu.unizg.foi.uzdiz.ibeusan20.logika.ogranicenja.StrategijaOgranicenjaRezervacija;
+import edu.unizg.foi.uzdiz.ibeusan20.logika.ogranicenja.TvornicaStrategijeOgranicenja;
+
 
 /**
  * Glavna klasa aplikacije Turistička agencija.
@@ -112,9 +115,16 @@ public class Aplikacija {
       }
 
       // upravitelji
+      
       UpraviteljAranzmanima uprAranz = new UpraviteljAranzmanima(aranzmani);
-      UpraviteljRezervacijama uprRez = new UpraviteljRezervacijama(uprAranz);
 
+      TvornicaStrategijeOgranicenja tvornica = new TvornicaStrategijeOgranicenja();
+      StrategijaOgranicenjaRezervacija strategija =
+          tvornica.kreiraj(argumenti.jeJdr(), argumenti.jeVdr());
+
+      UpraviteljRezervacijama uprRez = new UpraviteljRezervacijama(uprAranz, strategija);
+
+      
       // popunjavanje Composite strukture (aranžman -> rezervacije)
       uprRez.dodajPocetne(rezervacije);
       uprRez.rekalkulirajSve();
