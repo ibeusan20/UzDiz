@@ -14,41 +14,40 @@ public record RezervacijaMemento(String ime, String prezime, String oznakaAranzm
     LocalDateTime datumVrijeme, String stanjeNaziv, LocalDateTime datumVrijemeOtkaza) {
 
   public static RezervacijaMemento from(Rezervacija r) {
-    if (r == null)
-      return null;
+    String st = r == null ? "" : r.nazivStanja();
+    LocalDateTime otkaz = r == null ? null : r.getDatumVrijemeOtkaza();
     return new RezervacijaMemento(r.getIme(), r.getPrezime(), r.getOznakaAranzmana(),
-        r.getDatumVrijeme(), r.nazivStanja(), r.getDatumVrijemeOtkaza());
+        r.getDatumVrijeme(), st, otkaz);
   }
 
   public Rezervacija restore() {
-    StanjeRezervacije s = mapirajStanje(stanjeNaziv);
-    return new Rezervacija(ime, prezime, oznakaAranzmana, datumVrijeme, s, datumVrijemeOtkaza);
+    StanjeRezervacije st = stanjeZaNaziv(stanjeNaziv);
+    return new Rezervacija(ime, prezime, oznakaAranzmana, datumVrijeme, st, datumVrijemeOtkaza);
   }
 
-  private static StanjeRezervacije mapirajStanje(String naziv) {
-    String n = normaliziraj(naziv);
-
-    if (n.contains("NOVA"))
-      return StanjeNovaRezervacija.instanca();
-    if (n.contains("PRIMLJ"))
+  private StanjeRezervacije stanjeZaNaziv(String naziv) {
+    if (naziv == null) {
       return StanjePrimljenaRezervacija.instanca();
-    if (n.contains("AKTIV"))
+    }
+
+    String u = naziv.trim().toUpperCase();
+
+    if (u.contains("NOVA")) {
+      return StanjeNovaRezervacija.instanca();
+    }
+    if (u.contains("AKTIV")) {
       return StanjeAktivnaRezervacija.instanca();
-    if (n.contains("CEKANJ") || n.contains("CEKANJU"))
+    }
+    if (u.contains("ČEKAN") || u.contains("CEKAN")) {
       return StanjeNaCekanjuRezervacija.instanca();
-    if (n.contains("ODGOD"))
+    }
+    if (u.contains("ODGOĐ") || u.contains("ODGOD")) {
       return StanjeOdgodenaRezervacija.instanca();
-    if (n.contains("OTKAZ"))
+    }
+    if (u.contains("OTKAZ")) {
       return StanjeOtkazanaRezervacija.instanca();
+    }
 
-    // fallback: ako dođe nešto neočekivano
     return StanjePrimljenaRezervacija.instanca();
-  }
-
-  private static String normaliziraj(String s) {
-    if (s == null)
-      return "";
-    return s.trim().toUpperCase().replace('Č', 'C').replace('Ć', 'C').replace('Đ', 'D')
-        .replace('Š', 'S').replace('Ž', 'Z');
   }
 }

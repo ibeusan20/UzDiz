@@ -53,6 +53,8 @@ public final class KomandaFactory {
       }
       case "PSTAR" -> new KomandaPstar(ua, argumenti);
       case "VSTAR" -> new KomandaVstar(ua, argumenti);
+      case "PTAR" -> new KomandaPtar(ua, argumenti);
+      case "UPTAR" -> new KomandaUptar(ua, argumenti);
       case "Q" -> new KomandaQ();
       default -> null;
     };

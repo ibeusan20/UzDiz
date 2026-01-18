@@ -12,6 +12,7 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjePopunjenAranzman;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeUPripremiAranzman;
 import edu.unizg.foi.uzdiz.ibeusan20.visitor.Posjetitelj;
 import edu.unizg.foi.uzdiz.ibeusan20.visitor.Posjetljiv;
+import edu.unizg.foi.uzdiz.ibeusan20.pretplate.Pretplatnik;
 
 
 /**
@@ -48,6 +49,7 @@ public class Aranzman implements Posjetljiv {
 
   private final List<Rezervacija> rezervacije = new ArrayList<>();
   private StanjeAranzmana stanje = StanjeUPripremiAranzman.instanca();
+  private final List<Pretplatnik> pretplatnici = new ArrayList<>();
 
   protected Aranzman(AranzmanBuilder builder) {
     this.oznaka = builder.getOznaka();
@@ -216,5 +218,91 @@ public class Aranzman implements Posjetljiv {
       }
     }
   }
+  
+  public boolean imaPretplata() {
+    return !pretplatnici.isEmpty();
+  }
+
+  public List<Pretplatnik> getPretplatnici() {
+    return Collections.unmodifiableList(pretplatnici);
+  }
+
+  public boolean dodajPretplatnika(Pretplatnik p) {
+    if (p == null) {
+      return false;
+    }
+
+    String ime = p.getIme() == null ? "" : p.getIme().trim();
+    String prezime = p.getPrezime() == null ? "" : p.getPrezime().trim();
+
+    if (ime.isBlank() || prezime.isBlank()) {
+      return false;
+    }
+
+    if (postojiPretplatnik(ime, prezime)) {
+      return false;
+    }
+
+    pretplatnici.add(p);
+    return true;
+  }
+
+  public boolean ukloniPretplatnika(String ime, String prezime) {
+    if (ime == null || prezime == null) {
+      return false;
+    }
+
+    for (int i = 0; i < pretplatnici.size(); i++) {
+      Pretplatnik p = pretplatnici.get(i);
+      if (p == null) {
+        continue;
+      }
+
+      boolean isti = ime.equalsIgnoreCase(p.getIme());
+      isti = isti && prezime.equalsIgnoreCase(p.getPrezime());
+
+      if (isti) {
+        pretplatnici.remove(i);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public int ukloniSvePretplatnike() {
+    int n = pretplatnici.size();
+    pretplatnici.clear();
+    return n;
+  }
+
+  public void obavijestiPretplatnike(String opisPromjene) {
+    if (pretplatnici.isEmpty()) {
+      return;
+    }
+
+    for (Pretplatnik p : pretplatnici) {
+      if (p == null) {
+        continue;
+      }
+      p.obavijesti(this.oznaka, opisPromjene);
+    }
+  }
+
+  private boolean postojiPretplatnik(String ime, String prezime) {
+    for (Pretplatnik p : pretplatnici) {
+      if (p == null) {
+        continue;
+      }
+
+      boolean isti = ime.equalsIgnoreCase(p.getIme());
+      isti = isti && prezime.equalsIgnoreCase(p.getPrezime());
+
+      if (isti) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 
 }

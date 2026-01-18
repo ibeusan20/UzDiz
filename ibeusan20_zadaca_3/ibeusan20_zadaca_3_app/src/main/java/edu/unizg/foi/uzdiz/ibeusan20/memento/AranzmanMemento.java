@@ -7,8 +7,12 @@ import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 import edu.unizg.foi.uzdiz.ibeusan20.model.AranzmanBuilder;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
+import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeOtkazanAranzman;
+import edu.unizg.foi.uzdiz.ibeusan20.pretplate.OsobaPretplatnik;
+import edu.unizg.foi.uzdiz.ibeusan20.pretplate.PretplataPodaci;
+import edu.unizg.foi.uzdiz.ibeusan20.pretplate.Pretplatnik;
 
-public final class AranzmanMemento {
+public class AranzmanMemento {
 
   private final String oznaka;
   private final String naziv;
@@ -28,16 +32,15 @@ public final class AranzmanMemento {
   private final int brojVecera;
 
   private final boolean otkazan;
-  private final int brojPrijavaUKvoti;
-  private final int brojAktivnih;
-
   private final List<RezervacijaMemento> rezervacije;
+  private final List<PretplataPodaci> pretplate;
 
   private AranzmanMemento(String oznaka, String naziv, String program, LocalDate pocetniDatum,
       LocalDate zavrsniDatum, LocalTime vrijemeKretanja, LocalTime vrijemePovratka, float cijena,
       int minPutnika, int maxPutnika, int brojNocenja, float doplataJednokrevetna,
       List<String> prijevoz, int brojDorucaka, int brojRuckova, int brojVecera, boolean otkazan,
-      int brojPrijavaUKvoti, int brojAktivnih, List<RezervacijaMemento> rezervacije) {
+      List<RezervacijaMemento> rezervacije, List<PretplataPodaci> pretplate) {
+
     this.oznaka = oznaka;
     this.naziv = naziv;
     this.program = program;
@@ -50,76 +53,83 @@ public final class AranzmanMemento {
     this.maxPutnika = maxPutnika;
     this.brojNocenja = brojNocenja;
     this.doplataJednokrevetna = doplataJednokrevetna;
-    this.prijevoz = (prijevoz == null) ? List.of() : List.copyOf(prijevoz);
+    this.prijevoz = prijevoz == null ? List.of() : new ArrayList<>(prijevoz);
     this.brojDorucaka = brojDorucaka;
     this.brojRuckova = brojRuckova;
     this.brojVecera = brojVecera;
 
     this.otkazan = otkazan;
-    this.brojPrijavaUKvoti = brojPrijavaUKvoti;
-    this.brojAktivnih = brojAktivnih;
-
-    this.rezervacije = (rezervacije == null) ? List.of() : List.copyOf(rezervacije);
+    this.rezervacije = rezervacije == null ? List.of() : new ArrayList<>(rezervacije);
+    this.pretplate = pretplate == null ? List.of() : new ArrayList<>(pretplate);
   }
 
   public static AranzmanMemento from(Aranzman a) {
-    if (a == null)
-      return null;
-
-    int prijave = 0;
-    int aktivne = 0;
     List<RezervacijaMemento> rez = new ArrayList<>();
-
     for (Rezervacija r : a.getRezervacije()) {
-      if (r == null)
-        continue;
       rez.add(RezervacijaMemento.from(r));
-      if (r.brojiSeUKvotu())
-        prijave++;
-      if (r.jeAktivna())
-        aktivne++;
     }
+
+    List<PretplataPodaci> pp = new ArrayList<>();
+    for (Pretplatnik p : a.getPretplatnici()) {
+      pp.add(new PretplataPodaci(p.getIme(), p.getPrezime()));
+    }
+
+    boolean otkazan = a.getStanje() instanceof StanjeOtkazanAranzman;
 
     return new AranzmanMemento(a.getOznaka(), a.getNaziv(), a.getProgram(), a.getPocetniDatum(),
         a.getZavrsniDatum(), a.getVrijemeKretanja(), a.getVrijemePovratka(), a.getCijena(),
         a.getMinPutnika(), a.getMaxPutnika(), a.getBrojNocenja(), a.getDoplataJednokrevetna(),
-        a.getPrijevoz(), a.getBrojDorucaka(), a.getBrojRuckova(), a.getBrojVecera(), a.jeOtkazan(),
-        prijave, aktivne, rez);
+        a.getPrijevoz(), a.getBrojDorucaka(), a.getBrojRuckova(), a.getBrojVecera(), otkazan, rez,
+        pp);
   }
 
   public Aranzman restore() {
-    AranzmanBuilder b = new AranzmanBuilder().postaviOznaku(oznaka).postaviNaziv(naziv)
+    String prijevozTekst = prijevoz.isEmpty() ? null : String.join(";", prijevoz);
+
+    Aranzman a = new AranzmanBuilder().postaviOznaku(oznaka).postaviNaziv(naziv)
         .postaviProgram(program).postaviPocetniDatum(pocetniDatum).postaviZavrsniDatum(zavrsniDatum)
+        .postaviVrijemeKretanja(vrijemeKretanja).postaviVrijemePovratka(vrijemePovratka)
         .postaviCijenu(cijena).postaviMinPutnika(minPutnika).postaviMaxPutnika(maxPutnika)
         .postaviBrojNocenja(brojNocenja).postaviDoplatuJednokrevetna(doplataJednokrevetna)
-        .postaviBrojDorucaka(brojDorucaka).postaviBrojRuckova(brojRuckova)
-        .postaviBrojVecera(brojVecera);
+        .postaviPrijevoz(prijevozTekst).postaviBrojDorucaka(brojDorucaka).postaviBrojRuckova(brojRuckova)
+        .postaviBrojVecera(brojVecera).izgradi();
 
-    if (vrijemeKretanja != null)
-      b.postaviVrijemeKretanja(vrijemeKretanja);
-    if (vrijemePovratka != null)
-      b.postaviVrijemePovratka(vrijemePovratka);
-
-    if (prijevoz != null && !prijevoz.isEmpty()) {
-      b.postaviPrijevoz(String.join(";", prijevoz));
-    }
-
-    Aranzman a = b.izgradi();
-
-    // dodaje rezervacije, aranžman još nije otkazan da ne baci iznimku kod dodavanja
     for (RezervacijaMemento rm : rezervacije) {
-      if (rm == null)
-        continue;
       a.dodajRezervaciju(rm.restore());
     }
 
-    // vrati stanje aranžmana
     if (otkazan) {
       a.postaviOtkazan();
     } else {
-      a.azurirajStanje(brojAktivnih, brojPrijavaUKvoti);
+      int brojPrijava = izracunajPrijave(a);
+      int brojAktivnih = izracunajAktivne(a);
+      a.azurirajStanje(brojAktivnih, brojPrijava);
+    }
+
+    for (PretplataPodaci p : pretplate) {
+      a.dodajPretplatnika(new OsobaPretplatnik(p.ime(), p.prezime()));
     }
 
     return a;
+  }
+
+  private int izracunajPrijave(Aranzman a) {
+    int br = 0;
+    for (Rezervacija r : a.getRezervacije()) {
+      if (r != null && r.brojiSeUKvotu()) {
+        br++;
+      }
+    }
+    return br;
+  }
+
+  private int izracunajAktivne(Aranzman a) {
+    int br = 0;
+    for (Rezervacija r : a.getRezervacije()) {
+      if (r != null && r.jeAktivna()) {
+        br++;
+      }
+    }
+    return br;
   }
 }
