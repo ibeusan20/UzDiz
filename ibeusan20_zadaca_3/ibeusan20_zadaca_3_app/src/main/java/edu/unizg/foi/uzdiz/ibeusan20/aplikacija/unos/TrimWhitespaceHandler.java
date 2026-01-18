@@ -8,7 +8,7 @@ final class TrimIWhitespaceHandler extends ApstraktniHandlerUnosa {
       return;
     }
     String s = ctx.linija.trim();
-    s = s.replaceAll("\\s+", " "); // tabovi/više razmaka -> jedan razmak
+    s = s.replaceAll("\\s+", " "); // tabovi i/ili više razmaka -> jedan razmak
     ctx.linija = s;
   }
 }

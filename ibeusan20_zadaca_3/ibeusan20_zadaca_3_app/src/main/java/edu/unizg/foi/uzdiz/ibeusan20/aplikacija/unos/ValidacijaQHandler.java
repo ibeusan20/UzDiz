@@ -5,7 +5,7 @@ final class ValidacijaQHandler extends ApstraktniHandlerUnosa {
   protected void obradiInterno(UnosKontekst ctx) {
     if (ctx.naredba == null) return;
 
-    // Ako netko upiše "Q nešto", NE želimo da factory to tretira kao izlaz.
+    // Ako netko upiše "Q nešto" ne smatra se isto kao "Q"
     if ("Q".equals(ctx.naredba) && !ctx.argumenti.isEmpty()) {
       ctx.stopGreska("Neispravna komanda. Sintaksa: Q");
     }

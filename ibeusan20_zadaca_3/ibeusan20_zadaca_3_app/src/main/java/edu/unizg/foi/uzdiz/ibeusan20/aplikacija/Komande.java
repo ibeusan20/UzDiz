@@ -42,7 +42,7 @@ public class Komande {
 
     while (true) {
       System.out.print("> ");
-      String unos = sc.nextLine(); // ne trimaj ovdje - lanac radi normalizaciju
+      String unos = sc.nextLine(); // ne trima ovdje - lanac radi normalizaciju tj. trimanje itd.
 
       ObradeniUnos u = obradaUnosa.obradi(unos);
 
@@ -57,7 +57,7 @@ public class Komande {
         break;
       }
 
-      // rekonstruiraj normalizirani unos (komanda + argumenti)
+      // rekonstruira normalizirani unos (komanda + argumenti)
       StringBuilder sb = new StringBuilder();
       sb.append(u.getNaredba());
       for (String a : u.getArgumenti()) {
