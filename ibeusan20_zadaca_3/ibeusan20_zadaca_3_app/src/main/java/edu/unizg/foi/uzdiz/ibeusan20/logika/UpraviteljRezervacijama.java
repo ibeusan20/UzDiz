@@ -9,11 +9,11 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.IdentityHashMap;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.KontekstIspisa;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.ogranicenja.StrategijaBezOgranicenja;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.ogranicenja.StrategijaOgranicenjaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
+import edu.unizg.foi.uzdiz.ibeusan20.model.FormatDatuma;
 import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeAktivnaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeNaCekanjuRezervacija;
@@ -139,18 +139,13 @@ public class UpraviteljRezervacijama {
     int brojAktivnih = 0;
 
     if (brojPrijava == 0) {
-      a.azurirajStanje(0, 0);
-      return;
-    }
-
-    // nije dostignut minimum -> sve su PRIMLJENE
-    if (brojPrijava < minPutnika) {
+      // nema rezervacija koje se broje u kvotu
+      brojAktivnih = 0;
+    } else if (brojPrijava < minPutnika) {
       for (Rezervacija r : kandidati) {
         r.postaviStanje(StanjePrimljenaRezervacija.instanca());
       }
       brojAktivnih = 0;
-
-      // minimum dostignut -> prvih max su AKTIVNE, ostale NA ČEKANJU
     } else {
       int kvotaAktivnih = Math.min(brojPrijava, maxPutnika);
       for (int i = 0; i < kandidati.size(); i++) {
@@ -164,21 +159,21 @@ public class UpraviteljRezervacijama {
       }
     }
 
-    // ažuriraj stanje aranžmana
+    // jednom ažurira stanje aranžmana
     a.azurirajStanje(brojAktivnih, brojPrijava);
 
+    // obavijest!
     if (a.imaPretplata()) {
       String stanjePoslije = a.nazivStanja();
-      int promjeneRez = prebrojiPromjene(a, stanjaRezPrije);
-      String opis = opisPromjeneStanja(stanjePrije, stanjePoslije, promjeneRez);
+
+      List<String> detaljiRez = dohvatiDetaljePromjenaRezervacija(a, stanjaRezPrije);
+      String opis = opisPromjeneStanjaDetaljno(stanjePrije, stanjePoslije, detaljiRez);
 
       if (opis != null && !opis.isBlank()) {
         a.obavijestiPretplatnike(opis);
       }
     }
-
   }
-
 
   /**
    * Provjerava ima li osoba već AKTIVNU rezervaciju za zadani aranžman.
@@ -420,30 +415,53 @@ public class UpraviteljRezervacijama {
     LocalDateTime sada = LocalDateTime.now();
 
     if (aktivna != null && odgodena != null) {
+      String prijeAkt = aktivna.nazivStanja();
       aktivna.otkazi(sada);
+      obavijestiPretplatnikeAkoTreba(a,
+          "Rezervacija osobe " + imePrezime(aktivna) + ": " + prijeAkt + " -> otkazana");
+
+      // odgođena prelazi u aktivnu
+      String prijeOdg = odgodena.nazivStanja();
       odgodena.postaviStanje(StanjeAktivnaRezervacija.instanca());
+      obavijestiPretplatnikeAkoTreba(a, "Rezervacija osobe " + imePrezime(odgodena) + ": "
+          + prijeOdg + " -> " + odgodena.nazivStanja());
+
       rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
       return true;
     }
+
 
     if (aktivna != null) {
+      String prije = aktivna.nazivStanja();
       aktivna.otkazi(sada);
+      obavijestiPretplatnikeAkoTreba(a,
+          "Rezervacija osobe " + imePrezime(aktivna) + ": " + prije + " -> otkazana");
+
       rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
       return true;
     }
+
 
     if (primljena != null) {
+      String prije = primljena.nazivStanja();
       primljena.otkazi(sada);
+      obavijestiPretplatnikeAkoTreba(a,
+          "Rezervacija osobe " + imePrezime(primljena) + ": " + prije + " -> otkazana");
+
       rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
       return true;
     }
+
 
     if (cekanje != null) {
+      String prije = cekanje.nazivStanja();
       cekanje.otkazi(sada);
+      obavijestiPretplatnikeAkoTreba(a,
+          "Rezervacija osobe " + imePrezime(cekanje) + ": " + prije + " -> otkazana");
+
       rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
       return true;
     }
-
     return false;
   }
 
@@ -711,36 +729,76 @@ public class UpraviteljRezervacijama {
     return m;
   }
 
-  private int prebrojiPromjene(Aranzman a, IdentityHashMap<Rezervacija, String> prije) {
-    int br = 0;
+  private List<String> dohvatiDetaljePromjenaRezervacija(Aranzman a,
+      IdentityHashMap<Rezervacija, String> prije) {
+
+    List<String> detalji = new ArrayList<>();
+    if (a == null || prije == null) {
+      return detalji;
+    }
+
     for (Rezervacija r : a.getRezervacije()) {
-      if (r == null) {
+      if (r == null)
         continue;
-      }
+
       String staro = prije.get(r);
       String novo = r.nazivStanja();
-      if (staro != null && novo != null && !staro.equals(novo)) {
-        br++;
-      }
+
+      if (staro == null || novo == null)
+        continue;
+      if (staro.equals(novo))
+        continue;
+
+      String osoba = ((r.getIme() == null) ? "" : r.getIme()) + " "
+          + ((r.getPrezime() == null) ? "" : r.getPrezime());
+      osoba = osoba.trim();
+
+      String dv = FormatDatuma.formatiraj(r.getDatumVrijeme());
+
+      String dio = "Rezervacija osobe " + osoba + (dv.isEmpty() ? "" : " (" + dv + ")") + ": "
+          + staro + " -> " + novo;
+
+      detalji.add(dio);
     }
-    return br;
+
+    return detalji;
   }
 
-  private String opisPromjeneStanja(String prije, String poslije, int promjeneRez) {
+  private String opisPromjeneStanjaDetaljno(String prije, String poslije, List<String> detaljiRez) {
     StringBuilder sb = new StringBuilder();
 
     if (prije != null && poslije != null && !prije.equals(poslije)) {
       sb.append("Stanje aranžmana: '").append(prije).append("' -> '").append(poslije).append("'");
     }
 
-    if (promjeneRez > 0) {
-      if (sb.length() > 0) {
+    if (detaljiRez != null && !detaljiRez.isEmpty()) {
+      if (sb.length() > 0)
         sb.append("; ");
-      }
-      sb.append("Promjene statusa rezervacija: ").append(promjeneRez);
+      sb.append("Promjene statusa rezervacija: ").append(detaljiRez.size());
+      sb.append(" [").append(String.join("; ", detaljiRez)).append("]");
     }
 
     return sb.toString();
+  }
+
+
+  private void obavijestiPretplatnikeAkoTreba(Aranzman a, String opisPromjene) {
+    if (a == null)
+      return;
+    if (opisPromjene == null || opisPromjene.isBlank())
+      return;
+
+    if (a.imaPretplata()) {
+      a.obavijestiPretplatnike(opisPromjene);
+    }
+  }
+
+  private String imePrezime(Rezervacija r) {
+    if (r == null)
+      return "";
+    String i = (r.getIme() == null) ? "" : r.getIme().trim();
+    String p = (r.getPrezime() == null) ? "" : r.getPrezime().trim();
+    return (i + " " + p).trim();
   }
 
 }
