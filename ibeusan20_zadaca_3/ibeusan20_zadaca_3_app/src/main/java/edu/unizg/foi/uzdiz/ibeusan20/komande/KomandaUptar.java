@@ -37,6 +37,7 @@ public class KomandaUptar implements Komanda {
 
   private boolean ukloniSve(String oznaka) {
     Aranzman a = ua.pronadiPoOznaci(oznaka);
+    ispis.ispisi("PTAR " + oznaka);
     if (a == null) {
       ispis.ispisi("Aranžman '" + oznaka + "' ne postoji.");
       return true;
@@ -49,6 +50,7 @@ public class KomandaUptar implements Komanda {
 
   private boolean ukloniJednu(String ime, String prezime, String oznaka) {
     Aranzman a = ua.pronadiPoOznaci(oznaka);
+    ispis.ispisi("PTAR " + ime + " " + prezime + " " + oznaka);
     if (a == null) {
       ispis.ispisi("Aranžman '" + oznaka + "' ne postoji.");
       return true;

@@ -26,6 +26,8 @@ public class KomandaVstar implements Komanda {
     }
 
     String oznaka = argumenti[0];
+    
+    ispis.ispisi("VSTAR " + oznaka);
 
     //  ne tražimo u listi, nego vraćamo iz spremišta
     AranzmanMemento m = SpremisteAranzmana.instanca().zadnji(oznaka);

@@ -27,6 +27,8 @@ public class KomandaPtar implements Komanda {
     String ime = argumenti[0];
     String prezime = argumenti[1];
     String oznaka = argumenti[2];
+    
+    ispis.ispisi("PTAR " + ime + " " + prezime + " " + oznaka);
 
     Aranzman a = ua.pronadiPoOznaci(oznaka);
     if (a == null) {
