@@ -14,6 +14,34 @@ public class OsobaPretplatnik implements Pretplatnik {
     this.prezime = prezime == null ? "" : prezime.trim();
   }
 
+  public static String skratiImenaOdDrugogRetka(String text) {
+    String[] lines = text.split("\\R", -1); // hvata new line
+    if (lines.length <= 1)
+      return text;
+
+    for (int i = 1; i < lines.length; i++) {
+      String line = lines[i].trim();
+      if (line.isEmpty())
+        continue;
+
+      // prva i druga riječ + ostatak retka
+      String[] parts = line.split("\\s+", 3);
+      if (parts.length < 2)
+        continue;
+
+      String initials = Character.toUpperCase(parts[0].charAt(0)) + ". "
+          + Character.toUpperCase(parts[1].charAt(0)) + ".";
+      String rest = (parts.length == 3) ? " " + parts[2] : "";
+
+      // sačuva eventualni leading whitespace iz originalnog retka
+      int leadingSpaces = lines[i].length() - lines[i].stripLeading().length();
+      String indent = " ".repeat(Math.max(0, leadingSpaces));
+
+      lines[i] = indent + initials + rest;
+    }
+    return String.join(System.lineSeparator(), lines);
+  }
+
   @Override
   public String getIme() {
     return ime;
@@ -36,7 +64,7 @@ public class OsobaPretplatnik implements Pretplatnik {
     ispis.ispisi("---------------------------------------------------------");
     ispis.ispisi(osoba);
     ispis.ispisi(aranzman);
-    ispis.ispisi(promjena);
+    ispis.ispisi(skratiImenaOdDrugogRetka(promjena));
     ispis.ispisi("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
   }
 }

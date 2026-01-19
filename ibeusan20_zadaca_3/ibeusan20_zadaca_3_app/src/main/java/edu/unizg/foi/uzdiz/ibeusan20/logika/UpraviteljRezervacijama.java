@@ -40,7 +40,7 @@ public class UpraviteljRezervacijama {
   /** Zadnje poznato stanje aranžmana (da se uhvate i promjene prije rekalkulacije, npr. postaviOtkazan). */
   private final Map<String, String> zadnjeStanjeAranzmana = new HashMap<>();
 
-  /** Promjene rezervacija po aranžmanu koje čekaju, tako da OTA/ORTA ne šalju hrpu obavijesti. */
+  /** Promjene rezervacija po aranžmanu koje čekaju, tako da neke komande ne šalju hrpu obavijesti. */
   private final Map<String, List<String>> pendingPromjeneRez = new HashMap<>();
 
   public UpraviteljRezervacijama(UpraviteljAranzmanima upraviteljAranzmanima) {
@@ -86,7 +86,7 @@ public class UpraviteljRezervacijama {
         rekalkulirajZaAranzmanCore(a, a.getMinPutnika(), a.getMaxPutnika());
       }
 
-      // pravilo preklapanja po osobi (ODGOĐENE) / kvota po osobi itd.
+      // pravilo preklapanja po osobi / kvota po osobi itd.
       strategija.primijeni(upraviteljAranzmanima);
 
       Map<Rezervacija, String> poslije = snapshotStanjaZaStabilnost();
@@ -120,7 +120,7 @@ public class UpraviteljRezervacijama {
   private void rekalkulirajZaAranzmanCore(Aranzman a, int minPutnika, int maxPutnika) {
     if (a == null) return;
 
-    // sortiraj kronološki
+    // sortira kronološki
     List<Rezervacija> sve = new ArrayList<>(a.getRezervacije());
     sve.sort(Comparator.comparing(Rezervacija::getDatumVrijeme,
         Comparator.nullsLast(Comparator.naturalOrder())));
@@ -156,7 +156,7 @@ public class UpraviteljRezervacijama {
       }
     }
 
-    // ažuriraj stanje aranžmana (ako nije otkazan)
+    // ažurira stanje aranžmana ako nije otkazan
     a.azurirajStanje(brojAktivnih, brojPrijava);
   }
 
@@ -179,7 +179,7 @@ public class UpraviteljRezervacijama {
     // update “zadnje poznato”
     zadnjeStanjeAranzmana.put(oznaka, stanjePoslije);
 
-    // stvarno slanje (samo ako ima pretplata i ako ima što za slati)
+    // stvarno slanje ako ima pretplata i ako ima što za slati
     posaljiObavijest(a, opis);
   }
 
@@ -376,7 +376,7 @@ public class UpraviteljRezervacijama {
 
   /**
    * Otkazuje rezervaciju osobe za zadani aranžman
-   * VAŽNO: ovdje se samo zabilježi promjena u pending buffer (bez slanja obavijesti),
+   * Ovdje se samo zabilježi promjena u pending buffer (bez slanja obavijesti),
    * a obavijest se šalje kod rekalkulacije 
    */
   public boolean otkaziRezervaciju(String ime, String prezime, String oznakaAranzmana) {
@@ -516,7 +516,7 @@ public class UpraviteljRezervacijama {
     return rezultat;
   }
 
-  /** Broj svih rezervacija (preko svih aranžmana). */
+  /** Broj svih rezervacija preko svih aranžmana. */
   public int brojRezervacija() {
     int br = 0;
     for (Aranzman a : upraviteljAranzmanima.svi()) {
