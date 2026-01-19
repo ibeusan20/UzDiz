@@ -1,12 +1,7 @@
 package edu.unizg.foi.uzdiz.ibeusan20.pretplate;
 
-import java.util.ArrayList;
-import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
-import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisAranzmanaAdapter;
-import edu.unizg.foi.uzdiz.ibeusan20.ispisi.IspisniRed;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
-import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
 
 public class OsobaPretplatnik implements Pretplatnik {
 

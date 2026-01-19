@@ -1,12 +1,9 @@
 package edu.unizg.foi.uzdiz.ibeusan20.komande;
 
-import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.FormatIspisaBridge;
 import edu.unizg.foi.uzdiz.ibeusan20.ispisi.TablicniFormat;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljAranzmanima;
 import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
-import edu.unizg.foi.uzdiz.ibeusan20.model.Aranzman;
-import edu.unizg.foi.uzdiz.ibeusan20.model.Rezervacija;
 
 /**
  * BP – brisanje podataka.
@@ -78,47 +75,5 @@ public class KomandaBp implements Komanda {
 
     int obrisano = uprRez.obrisiSveRezervacijeFizicki();
     ispis.ispisi("Fizički obrisane sve rezervacije: " + obrisano);
-  }
-
-  private void obrisiSveAranzmaneLogicki() {
-    List<Aranzman> svi = uprAranz.svi();
-    if (svi.isEmpty()) {
-      ispis.ispisi("Nema aranžmana za brisanje.");
-      return;
-    }
-
-    for (Aranzman a : svi) {
-      // otkaži sve rezervacije tog aranžmana
-      List<Rezervacija> rez = uprRez.dohvatiZaAranzmanIVrste(a.getOznaka(), "PAČOD");
-      for (Rezervacija r : rez) {
-        uprRez.otkaziRezervaciju(r.getIme(), r.getPrezime(), a.getOznaka());
-      }
-      a.postaviOtkazan();
-      uprRez.rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
-    }
-
-    ispis.ispisi("Logički obrisani (otkazani) svi aranžmani i sve njihove rezervacije.");
-  }
-
-  private void obrisiSveRezervacijeLogicki() {
-    List<Aranzman> svi = uprAranz.svi();
-    boolean bilo = false;
-
-    for (Aranzman a : svi) {
-      List<Rezervacija> rez = uprRez.dohvatiZaAranzmanIVrste(a.getOznaka(), "PAČOD");
-      for (Rezervacija r : rez) {
-        boolean ok = uprRez.otkaziRezervaciju(r.getIme(), r.getPrezime(), a.getOznaka());
-        if (ok) {
-          bilo = true;
-        }
-      }
-      uprRez.rekalkulirajZaAranzman(a.getOznaka(), a.getMinPutnika(), a.getMaxPutnika());
-    }
-
-    if (bilo) {
-      ispis.ispisi("Logički obrisane (otkazane) sve rezervacije.");
-    } else {
-      ispis.ispisi("Nema rezervacija za brisanje.");
-    }
   }
 }

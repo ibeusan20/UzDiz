@@ -31,8 +31,6 @@ public class UpraviteljAranzmanima {
    */
   public List<Aranzman> svi() {
     List<Aranzman> kopija = new ArrayList<>(aranzmani);
-    // ovdje bi po potrebi mogao sortirati po datumu početka,
-    // ali ako već imaš željeni redoslijed, ne diramo
     if (KontekstIspisa.jeObrnuto()) {
       Collections.reverse(kopija);
     }
@@ -143,7 +141,7 @@ public class UpraviteljAranzmanima {
     return -1;
   }
 
-  /** Uklanja aranžman po oznaci (ako postoji). */
+  /** Uklanja aranžman po oznaci, ako postoji. */
   public boolean ukloniPoOznaci(String oznaka) {
     int idx = indexOfOznaka(oznaka);
     if (idx < 0) return false;
@@ -151,7 +149,7 @@ public class UpraviteljAranzmanima {
     return true;
   }
 
-  /** Dodaje novi aranžman ili zamjenjuje postojeći s istom oznakom (na istoj poziciji). */
+  /** Dodaje novi aranžman ili zamjenjuje postojeći s istom oznakom. */
   public void dodajIliZamijeni(Aranzman novi) {
     if (novi == null) return;
     int idx = indexOfOznaka(novi.getOznaka());
