@@ -39,6 +39,9 @@ public class OsobaPretplatnik implements Pretplatnik {
 
       lines[i] = indent + initials + rest;
     }
+    for (int i = 0; i < lines.length; i++) {
+      lines[i] = "| " + lines[i];
+    }
     return String.join(System.lineSeparator(), lines);
   }
 
@@ -59,12 +62,12 @@ public class OsobaPretplatnik implements Pretplatnik {
     String promjena = ("Promjena: " + (opisPromjene == null ? "" : opisPromjene));
     String nazivTablice = "OBAVIJEST";
 
-    ispis.ispisi("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-    ispis.ispisi(nazivTablice);
-    ispis.ispisi("---------------------------------------------------------");
-    ispis.ispisi(osoba);
-    ispis.ispisi(aranzman);
+    ispis.ispisi("\n|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|");
+    ispis.ispisi("|                       " + nazivTablice + "                       |");
+    ispis.ispisi("|-------------------------------------------------------|");
+    ispis.ispisi("| " + osoba);
+    ispis.ispisi("| " + aranzman);
     ispis.ispisi(skratiImenaOdDrugogRetka(promjena));
-    ispis.ispisi("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+    ispis.ispisi("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|\n");
   }
 }
