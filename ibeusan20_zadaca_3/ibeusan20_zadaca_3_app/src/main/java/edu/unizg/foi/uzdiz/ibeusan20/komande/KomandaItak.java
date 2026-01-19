@@ -46,7 +46,7 @@ public class KomandaItak implements Komanda {
         datumOd = PomocnikDatum.procitajDatum(argumenti[0]);
         datumDo = PomocnikDatum.procitajDatum(argumenti[1]);
         if (datumOd == null || datumDo == null) {
-          System.out.println("Neispravan format datuma. Koristi dd.MM.yyyy.");
+          ispis.ispisi("Neispravan format datuma. Koristi dd.MM.yyyy.");
           return true;
         }
       }

@@ -17,6 +17,7 @@ public class KomandaPptar implements Komanda {
   private final UpraviteljAranzmanima uprAranz;
   private final String tip; // A ili R
   private final String rijec;
+  TablicniFormat tf = new TablicniFormat();
 
   public KomandaPptar(UpraviteljAranzmanima uprAranz, String tip, String rijec) {
     this.uprAranz = uprAranz;
@@ -30,15 +31,13 @@ public class KomandaPptar implements Komanda {
       return true;
     }
     if (!tip.equals("A") && !tip.equals("R")) {
-      System.out.println("Neispravna komanda. Sintaksa: PPTAR [A|R] riječ");
+      tf.ispisi("Neispravna komanda. Sintaksa: PPTAR [A|R] riječ");
       return true;
     }
     if (rijec.isBlank()) {
-      System.out.println("Neispravna komanda. Nedostaje riječ. Sintaksa: PPTAR [A|R] riječ");
+      tf.ispisi("Neispravna komanda. Nedostaje riječ. Sintaksa: PPTAR [A|R] riječ");
       return true;
     }
-
-    TablicniFormat tf = new TablicniFormat();
 
     if (tip.equals("A")) {
       PretragaAranzmanaVisitor v = new PretragaAranzmanaVisitor(rijec);
