@@ -122,7 +122,7 @@ public class UpraviteljAranzmanima {
 
   /** Svi aranžmani, sortirani po početku + IP poredak. */
   public List<Aranzman> sviZaIspis() {
-    return sortirajZaIspis(svi()); // koristi tvoju postojeću metodu
+    return sortirajZaIspis(svi());
   }
 
   /** Filtrirani aranžmani, sortirani po početku + IP poredak. */
