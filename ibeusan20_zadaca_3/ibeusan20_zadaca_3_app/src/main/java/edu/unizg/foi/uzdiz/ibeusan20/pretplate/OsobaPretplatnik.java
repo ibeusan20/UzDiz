@@ -14,7 +14,7 @@ public class OsobaPretplatnik implements Pretplatnik {
     this.prezime = prezime == null ? "" : prezime.trim();
   }
 
-  public static String skratiImenaOdDrugogRetka(String text) {
+  public static String skratiImena(String text) {
     String[] lines = text.split("\\R", -1); // hvata new line
     if (lines.length <= 1)
       return text;
@@ -67,7 +67,7 @@ public class OsobaPretplatnik implements Pretplatnik {
     ispis.ispisi("|-------------------------------------------------------|");
     ispis.ispisi("| " + osoba);
     ispis.ispisi("| " + aranzman);
-    ispis.ispisi(skratiImenaOdDrugogRetka(promjena));
+    ispis.ispisi(skratiImena(promjena));
     ispis.ispisi("|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|\n");
   }
 }
