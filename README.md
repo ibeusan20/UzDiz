@@ -3,7 +3,11 @@ Project for Design patterns class
 
 Zadaca 1-3 - Kolegij Uzorci dizajna 2025./2026.
 
-Pokretanje: mvn clean install u korijenu projekta
+Pokretanje: izvršiti "mvn clean install" u korijenu projekta i "java -jar /home/NWTiS_2/ibeusan20/ibeusan20_zadaca_3/ibeusan20_zadaca_3_app/target/ibeusan20_zadaca_3.jar" odakle se pokreće program (npr. Desktop/)
+
+ili jednostavno pokretanje:
+./run_file.sh u UzDiz_helper/DZX_pokretanje
+
 
 
 Vjezba 1-8 - Kolegij Napredne web tehnologije i servisi 2024./2025.
