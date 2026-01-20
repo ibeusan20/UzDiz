@@ -28,7 +28,7 @@ import edu.unizg.foi.uzdiz.ibeusan20.pretplate.Pretplatnik;
  * ({@link StanjeOtkazanAranzman}), dodavanje rezervacija nije dozvoljeno.
  * </p>
  */
-public class Aranzman implements Posjetljiv {
+public class Aranzman implements Posjetljiv, ElementRezervacijskeStrukture {
 
   private final String oznaka;
   private final String naziv;
@@ -302,6 +302,33 @@ public class Aranzman implements Posjetljiv {
       }
     }
     return false;
+  }
+  
+  @Override
+  public void dodaj(ElementRezervacijskeStrukture element) {
+    if (element == null) return;
+    if (element instanceof Rezervacija r) {
+      dodajRezervaciju(r);
+      return;
+    }
+    // ako se ikad proširi struktura (npr. aranzmani i dodatni datumi polazaka) 
+    // ovdje bi se to obradilo i doradilo.
+    throw new IllegalArgumentException("Aranžman može sadržavati samo Rezervacija elemente.");
+  }
+
+  @Override
+  public void ukloni(ElementRezervacijskeStrukture element) {
+    if (element == null) return;
+    if (element instanceof Rezervacija r) {
+      obrisiRezervacijuFizicki(r);
+      return;
+    }
+  }
+
+  @Override
+  public List<Rezervacija> dohvatiSveRezervacije() {
+    // podstablo = sve rezervacije aranžmana
+    return getRezervacije();
   }
 
 

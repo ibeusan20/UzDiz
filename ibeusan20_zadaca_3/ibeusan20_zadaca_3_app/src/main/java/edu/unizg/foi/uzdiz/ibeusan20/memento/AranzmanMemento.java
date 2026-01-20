@@ -65,7 +65,7 @@ public class AranzmanMemento {
 
   public static AranzmanMemento from(Aranzman a) {
     List<RezervacijaMemento> rez = new ArrayList<>();
-    for (Rezervacija r : a.getRezervacije()) {
+    for (Rezervacija r : a.dohvatiSveRezervacije()) {
       rez.add(RezervacijaMemento.from(r));
     }
 
@@ -95,7 +95,7 @@ public class AranzmanMemento {
         .postaviBrojVecera(brojVecera).izgradi();
 
     for (RezervacijaMemento rm : rezervacije) {
-      a.dodajRezervaciju(rm.restore());
+      a.dodaj(rm.restore());
     }
 
     if (otkazan) {
@@ -115,7 +115,7 @@ public class AranzmanMemento {
 
   private int izracunajPrijave(Aranzman a) {
     int br = 0;
-    for (Rezervacija r : a.getRezervacije()) {
+    for (Rezervacija r : a.dohvatiSveRezervacije()) {
       if (r != null && r.brojiSeUKvotu()) {
         br++;
       }
@@ -125,7 +125,7 @@ public class AranzmanMemento {
 
   private int izracunajAktivne(Aranzman a) {
     int br = 0;
-    for (Rezervacija r : a.getRezervacije()) {
+    for (Rezervacija r : a.dohvatiSveRezervacije()) {
       if (r != null && r.jeAktivna()) {
         br++;
       }

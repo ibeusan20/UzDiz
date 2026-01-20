@@ -33,7 +33,7 @@ public class StrategijaJdr implements StrategijaOgranicenjaRezervacija {
     Map<String, List<Rezervacija>> poOsobi = new HashMap<>();
 
     for (Aranzman a : ua.svi()) {
-      for (Rezervacija r : a.getRezervacije()) {
+      for (Rezervacija r : a.dohvatiSveRezervacije()) {
         String kljuc = kljucOsobe(r);
         poOsobi.computeIfAbsent(kljuc, k -> new ArrayList<>()).add(r);
       }

@@ -31,7 +31,7 @@ public class StrategijaVdr implements StrategijaOgranicenjaRezervacija {
     }
 
     int limit = izracunajLimit(a.getMaxPutnika());
-    Map<String, List<Rezervacija>> poOsobi = grupirajPoOsobi(a.getRezervacije());
+    Map<String, List<Rezervacija>> poOsobi = grupirajPoOsobi(a.dohvatiSveRezervacije());
 
     for (List<Rezervacija> lista : poOsobi.values()) {
       primijeniLimit(lista, limit);

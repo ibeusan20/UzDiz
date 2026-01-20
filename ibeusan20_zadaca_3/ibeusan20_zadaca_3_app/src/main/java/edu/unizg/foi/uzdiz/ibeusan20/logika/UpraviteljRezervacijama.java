@@ -24,7 +24,7 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjePrimljenaRezervacija;
 /**
  * Upravlja rezervacijama u sklopu aranžmana (Composite).
  *
- * - ne čuva vlastitu kolekciju, koristi Aranzman.getRezervacije()
+ * - ne čuva vlastitu kolekciju, koristi Aranzman.getRezervacije() preko Aranzman.dohvatiSveRezervacije()
  * - implementira State logiku i kvote
  * - poštuje IP poredak pri vraćanju listi za ispis
  *
@@ -121,7 +121,7 @@ public class UpraviteljRezervacijama {
     if (a == null) return;
 
     // sortira kronološki
-    List<Rezervacija> sve = new ArrayList<>(a.getRezervacije());
+    List<Rezervacija> sve = new ArrayList<>(a.dohvatiSveRezervacije());
     sve.sort(Comparator.comparing(Rezervacija::getDatumVrijeme,
         Comparator.nullsLast(Comparator.naturalOrder())));
 
@@ -216,7 +216,7 @@ public class UpraviteljRezervacijama {
     List<String> detalji = new ArrayList<>();
     if (a == null) return detalji;
 
-    for (Rezervacija r : a.getRezervacije()) {
+    for (Rezervacija r : a.dohvatiSveRezervacije()) {
       if (r == null) continue;
 
       String staro = (prije == null) ? null : prije.get(r);
@@ -284,7 +284,7 @@ public class UpraviteljRezervacijama {
   private Map<Rezervacija, String> snapshotStanjaRezervacijaZaObavijest() {
     Map<Rezervacija, String> m = new IdentityHashMap<>();
     for (Aranzman a : upraviteljAranzmanima.svi()) {
-      for (Rezervacija r : a.getRezervacije()) {
+      for (Rezervacija r : a.dohvatiSveRezervacije()) {
         if (r != null) m.put(r, r.nazivStanja());
       }
     }
@@ -294,7 +294,7 @@ public class UpraviteljRezervacijama {
   private Map<Rezervacija, String> snapshotStanjaRezervacijaZaJedanAranzman(Aranzman a) {
     Map<Rezervacija, String> m = new IdentityHashMap<>();
     if (a == null) return m;
-    for (Rezervacija r : a.getRezervacije()) {
+    for (Rezervacija r : a.dohvatiSveRezervacije()) {
       if (r != null) m.put(r, r.nazivStanja());
     }
     return m;
@@ -304,7 +304,7 @@ public class UpraviteljRezervacijama {
   private Map<Rezervacija, String> snapshotStanjaZaStabilnost() {
     Map<Rezervacija, String> m = new IdentityHashMap<>();
     for (Aranzman a : upraviteljAranzmanima.svi()) {
-      for (Rezervacija r : a.getRezervacije()) {
+      for (Rezervacija r : a.dohvatiSveRezervacije()) {
         if (r != null) m.put(r, r.nazivStanja());
       }
     }
@@ -327,7 +327,7 @@ public class UpraviteljRezervacijama {
     Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(oznakaAranzmana);
     if (a == null) return false;
 
-    for (Rezervacija r : a.getRezervacije()) {
+    for (Rezervacija r : a.dohvatiSveRezervacije()) {
       if (ime.equalsIgnoreCase(r.getIme()) && prezime.equalsIgnoreCase(r.getPrezime())
           && oznakaAranzmana.equalsIgnoreCase(r.getOznakaAranzmana()) && r.jeAktivna()) {
         return true;
@@ -359,7 +359,7 @@ public class UpraviteljRezervacijama {
 
       if (!preklapaSe(ciljniOd, ciljniDo, od, d0)) continue;
 
-      for (Rezervacija r : a.getRezervacije()) {
+      for (Rezervacija r : a.dohvatiSveRezervacije()) {
         if (ime.equalsIgnoreCase(r.getIme()) && prezime.equalsIgnoreCase(r.getPrezime())
             && r.jeAktivna()) {
           return true;
@@ -428,7 +428,7 @@ public class UpraviteljRezervacijama {
       String oznakaAranzmana) {
 
     List<Rezervacija> kandidati = new ArrayList<>();
-    for (Rezervacija r : a.getRezervacije()) {
+    for (Rezervacija r : a.dohvatiSveRezervacije()) {
       if (r == null) continue;
 
       boolean isti = ime.equalsIgnoreCase(r.getIme())
@@ -467,7 +467,7 @@ public class UpraviteljRezervacijama {
     boolean imaFiltera = !filter.isBlank();
 
     List<Rezervacija> rezultat = new ArrayList<>();
-    for (Rezervacija r : a.getRezervacije()) {
+    for (Rezervacija r : a.dohvatiSveRezervacije()) {
       String ns = r.nazivStanja();
       String u = ns == null ? "" : ns.toUpperCase();
 
@@ -501,7 +501,7 @@ public class UpraviteljRezervacijama {
     if (ime == null || prezime == null) return rezultat;
 
     for (Aranzman a : upraviteljAranzmanima.svi()) {
-      for (Rezervacija r : a.getRezervacije()) {
+      for (Rezervacija r : a.dohvatiSveRezervacije()) {
         if (ime.equalsIgnoreCase(r.getIme()) && prezime.equalsIgnoreCase(r.getPrezime())) {
           rezultat.add(r);
         }
@@ -520,7 +520,7 @@ public class UpraviteljRezervacijama {
   public int brojRezervacija() {
     int br = 0;
     for (Aranzman a : upraviteljAranzmanima.svi()) {
-      br += a.getRezervacije().size();
+      br += a.dohvatiSveRezervacije().size();
     }
     return br;
   }
@@ -552,7 +552,7 @@ public class UpraviteljRezervacijama {
     Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(oznakaAranzmana);
     if (a == null) return false;
 
-    for (Rezervacija r : a.getRezervacije()) {
+    for (Rezervacija r : a.dohvatiSveRezervacije()) {
       if (r == null) continue;
 
       boolean isti = ime.equalsIgnoreCase(r.getIme())

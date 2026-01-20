@@ -1,6 +1,7 @@
 package edu.unizg.foi.uzdiz.ibeusan20.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeOdgodenaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjeOtkazanaRezervacija;
 import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjePrimljenaRezervacija;
@@ -17,7 +18,7 @@ import edu.unizg.foi.uzdiz.ibeusan20.visitor.Posjetljiv;
  * {@link StanjeRezervacije}).
  * </p>
  */
-public class Rezervacija implements Posjetljiv {
+public class Rezervacija implements Posjetljiv, ElementRezervacijskeStrukture {
 
   private final String ime;
   private final String prezime;
@@ -106,4 +107,18 @@ public class Rezervacija implements Posjetljiv {
     p.posjetiRezervaciju(this, kontekst);
   }
 
+  @Override
+  public void dodaj(ElementRezervacijskeStrukture element) {
+    throw new UnsupportedOperationException("Rezervacija je leaf i ne može sadržavati djecu.");
+  }
+
+  @Override
+  public void ukloni(ElementRezervacijskeStrukture element) {
+    throw new UnsupportedOperationException("Rezervacija je leaf i nema djecu.");
+  }
+
+  @Override
+  public List<Rezervacija> dohvatiSveRezervacije() {
+    return List.of(this);
+  }
 }

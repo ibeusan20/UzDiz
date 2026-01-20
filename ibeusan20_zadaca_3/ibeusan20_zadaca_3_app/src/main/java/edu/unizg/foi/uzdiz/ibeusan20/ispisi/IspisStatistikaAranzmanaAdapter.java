@@ -21,7 +21,7 @@ public class IspisStatistikaAranzmanaAdapter implements IspisniRed {
   public String[] vrijednosti() {
     int ukupno = 0, aktivne = 0, cekanje = 0, odgodene = 0, otkazane = 0;
 
-    for (Rezervacija r : a.getRezervacije()) {
+    for (Rezervacija r : a.dohvatiSveRezervacije()) {
       ukupno++;
       String s = (r.nazivStanja() == null) ? "" : r.nazivStanja().toUpperCase();
 
