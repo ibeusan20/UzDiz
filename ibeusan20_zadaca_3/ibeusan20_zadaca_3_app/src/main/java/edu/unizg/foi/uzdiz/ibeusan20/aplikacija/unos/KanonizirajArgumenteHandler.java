@@ -4,12 +4,14 @@ final class KanonizirajArgumenteHandler extends ApstraktniHandlerUnosa {
 
   @Override
   protected void obradiInterno(UnosKontekst ctx) {
-    if (ctx.naredba == null) return;
+    if (ctx.naredba == null)
+      return;
 
     String cmd = ctx.naredba;
 
-    // Argument 0 je argument (A/R) za ove komande:
-    if ((cmd.equals("BP") || cmd.equals("UP") || cmd.equals("PPTAR")) && ctx.argumenti.size() >= 1) {
+    // Argument 0 je argument (A/R) za komande:
+    if ((cmd.equals("BP") || cmd.equals("UP") || cmd.equals("PPTAR"))
+        && ctx.argumenti.size() >= 1) {
       ctx.argumenti.set(0, ctx.argumenti.get(0).trim().toUpperCase());
     }
 

@@ -108,7 +108,7 @@ public class TablicniFormat implements FormatIspisaBridge {
       return;
     }
 
-    // detekcija numeričkih kolona za poravnanje desno
+    // detekcija numeričkih stupaca za poravnanje desno
     boolean[] numericCol = new boolean[cols];
     for (int c = 0; c < cols; c++) {
       boolean any = false;

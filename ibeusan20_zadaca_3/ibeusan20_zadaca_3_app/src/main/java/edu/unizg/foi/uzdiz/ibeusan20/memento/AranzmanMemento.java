@@ -91,8 +91,8 @@ public class AranzmanMemento {
         .postaviVrijemeKretanja(vrijemeKretanja).postaviVrijemePovratka(vrijemePovratka)
         .postaviCijenu(cijena).postaviMinPutnika(minPutnika).postaviMaxPutnika(maxPutnika)
         .postaviBrojNocenja(brojNocenja).postaviDoplatuJednokrevetna(doplataJednokrevetna)
-        .postaviPrijevoz(prijevozTekst).postaviBrojDorucaka(brojDorucaka).postaviBrojRuckova(brojRuckova)
-        .postaviBrojVecera(brojVecera).izgradi();
+        .postaviPrijevoz(prijevozTekst).postaviBrojDorucaka(brojDorucaka)
+        .postaviBrojRuckova(brojRuckova).postaviBrojVecera(brojVecera).izgradi();
 
     for (RezervacijaMemento rm : rezervacije) {
       a.dodaj(rm.restore());

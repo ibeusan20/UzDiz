@@ -27,7 +27,7 @@ public class KomandaPstar implements Komanda {
     }
 
     String oznaka = argumenti[0];
-    
+
     ispis.ispisi("PSTAR " + oznaka);
 
     Aranzman a = ua.pronadiPoOznaci(oznaka);

@@ -63,7 +63,7 @@ public class CitacAranzmana implements UcitavacPodataka<AranzmanCsv> {
           a.vrijemeKretanja = PomocnikDatum.procitajVrijeme(uzmi(stupci, 5));
           a.vrijemePovratka = PomocnikDatum.procitajVrijeme(uzmi(stupci, 6));
 
-          // Cijena, min, max – obično obavezni
+          // Cijena, min, max
           a.cijena = procitajFloatObavezno(uzmi(stupci, 7), "Cijena nije definirana.");
           a.minPutnika =
               procitajIntObavezno(uzmi(stupci, 8), "Minimalni broj putnika nije definiran.");

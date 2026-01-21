@@ -129,9 +129,10 @@ public class UpraviteljAranzmanima {
   public List<Aranzman> filtrirajPoRasponuZaIspis(LocalDate od, LocalDate d0) {
     return sortirajZaIspis(filtrirajPoRasponu(od, d0));
   }
-  
+
   private int indexOfOznaka(String oznaka) {
-    if (oznaka == null) return -1;
+    if (oznaka == null)
+      return -1;
     for (int i = 0; i < aranzmani.size(); i++) {
       Aranzman a = aranzmani.get(i);
       if (a != null && oznaka.equalsIgnoreCase(a.getOznaka())) {
@@ -144,14 +145,16 @@ public class UpraviteljAranzmanima {
   /** Uklanja aranžman po oznaci, ako postoji. */
   public boolean ukloniPoOznaci(String oznaka) {
     int idx = indexOfOznaka(oznaka);
-    if (idx < 0) return false;
+    if (idx < 0)
+      return false;
     aranzmani.remove(idx);
     return true;
   }
 
   /** Dodaje novi aranžman ili zamjenjuje postojeći s istom oznakom. */
   public void dodajIliZamijeni(Aranzman novi) {
-    if (novi == null) return;
+    if (novi == null)
+      return;
     int idx = indexOfOznaka(novi.getOznaka());
     if (idx >= 0) {
       aranzmani.set(idx, novi);
@@ -159,5 +162,4 @@ public class UpraviteljAranzmanima {
       aranzmani.add(novi);
     }
   }
-
 }

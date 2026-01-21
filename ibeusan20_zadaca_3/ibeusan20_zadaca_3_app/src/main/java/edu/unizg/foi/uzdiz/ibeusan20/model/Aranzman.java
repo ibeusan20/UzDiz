@@ -218,7 +218,7 @@ public class Aranzman implements Posjetljiv, ElementRezervacijskeStrukture {
       }
     }
   }
-  
+
   public boolean imaPretplata() {
     return !pretplatnici.isEmpty();
   }
@@ -303,22 +303,24 @@ public class Aranzman implements Posjetljiv, ElementRezervacijskeStrukture {
     }
     return false;
   }
-  
+
   @Override
   public void dodaj(ElementRezervacijskeStrukture element) {
-    if (element == null) return;
+    if (element == null)
+      return;
     if (element instanceof Rezervacija r) {
       dodajRezervaciju(r);
       return;
     }
-    // ako se ikad proširi struktura (npr. aranzmani i dodatni datumi polazaka) 
-    // ovdje bi se to obradilo i doradilo.
+    // ako se ikad proširi struktura (npr. aranzmani i dodatni datumi polazaka)
+    // ovdje se to može doraditi (NOTE) bilješka za sebe.
     throw new IllegalArgumentException("Aranžman može sadržavati samo Rezervacija elemente.");
   }
 
   @Override
   public void ukloni(ElementRezervacijskeStrukture element) {
-    if (element == null) return;
+    if (element == null)
+      return;
     if (element instanceof Rezervacija r) {
       obrisiRezervacijuFizicki(r);
       return;
@@ -330,6 +332,4 @@ public class Aranzman implements Posjetljiv, ElementRezervacijskeStrukture {
     // podstablo = sve rezervacije aranžmana
     return getRezervacije();
   }
-
-
 }

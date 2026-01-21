@@ -24,23 +24,27 @@ import edu.unizg.foi.uzdiz.ibeusan20.model.stanja.StanjePrimljenaRezervacija;
 /**
  * Upravlja rezervacijama u sklopu aranžmana (Composite).
  *
- * - ne čuva vlastitu kolekciju, koristi Aranzman.getRezervacije() preko Aranzman.dohvatiSveRezervacije()
- * - implementira State logiku i kvote
- * - poštuje IP poredak pri vraćanju listi za ispis
+ * - ne čuva vlastitu kolekciju, koristi Aranzman.getRezervacije() preko
+ * Aranzman.dohvatiSveRezervacije() - implementira State logiku i kvote - poštuje IP poredak pri
+ * vraćanju listi za ispis
  *
- * Obavijesti (PTAR/Observer):
- * - promjene se spremaju tijekom akcija (npr. ORTA/OTA) u pending buffer
- * - stvarno slanje obavijesti događa se isključivo pri rekalkulaciji (jedno mjesto)
+ * Obavijesti (PTAR/Observer): - promjene se spremaju tijekom akcija (npr. ORTA/OTA) u pending
+ * buffer - stvarno slanje obavijesti događa se isključivo pri rekalkulaciji (jedno mjesto)
  */
 public class UpraviteljRezervacijama {
 
   private final UpraviteljAranzmanima upraviteljAranzmanima;
   private final StrategijaOgranicenjaRezervacija strategija;
 
-  /** Zadnje poznato stanje aranžmana (da se uhvate i promjene prije rekalkulacije, npr. postaviOtkazan). */
+  /**
+   * Zadnje poznato stanje aranžmana (da se uhvate i promjene prije rekalkulacije, npr.
+   * postaviOtkazan).
+   */
   private final Map<String, String> zadnjeStanjeAranzmana = new HashMap<>();
 
-  /** Promjene rezervacija po aranžmanu koje čekaju, tako da neke komande ne šalju hrpu obavijesti. */
+  /**
+   * Promjene rezervacija po aranžmanu koje čekaju, tako da neke komande ne šalju hrpu obavijesti.
+   */
   private final Map<String, List<String>> pendingPromjeneRez = new HashMap<>();
 
   public UpraviteljRezervacijama(UpraviteljAranzmanima upraviteljAranzmanima) {
@@ -55,23 +59,27 @@ public class UpraviteljRezervacijama {
 
   /** Dodaje početne rezervacije u pripadajuće aranžmane */
   public void dodajPocetne(List<Rezervacija> pocetne) {
-    if (pocetne == null) return;
+    if (pocetne == null)
+      return;
     for (Rezervacija r : pocetne) {
       Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(r.getOznakaAranzmana());
-      if (a != null) a.dodajRezervaciju(r);
+      if (a != null)
+        a.dodajRezervaciju(r);
     }
   }
 
   /** Dodaje novu rezervaciju u odgovarajući aranžman */
   public void dodaj(Rezervacija r) {
-    if (r == null) return;
+    if (r == null)
+      return;
     Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(r.getOznakaAranzmana());
-    if (a != null) a.dodajRezervaciju(r);
+    if (a != null)
+      a.dodajRezervaciju(r);
   }
 
   /**
-   * Rekalkulacija svih aranžmana do stabilnog stanja.
-   * Obavijesti se šalju jednom na kraju da nema dupliranja.
+   * Rekalkulacija svih aranžmana do stabilnog stanja. Obavijesti se šalju jednom na kraju da nema
+   * dupliranja.
    */
   public void rekalkulirajSve() {
     // obavijest: zadnje poznato stanje aranžmana + trenutna stanja rezervacija
@@ -90,7 +98,8 @@ public class UpraviteljRezervacijama {
       strategija.primijeni(upraviteljAranzmanima);
 
       Map<Rezervacija, String> poslije = snapshotStanjaZaStabilnost();
-      if (jednako(prije, poslije)) break;
+      if (jednako(prije, poslije))
+        break;
     }
 
     // jedna obavijest po aranžmanu (ako ima pretplata i ako ima promjena)
@@ -100,12 +109,13 @@ public class UpraviteljRezervacijama {
   }
 
   /**
-   * Rekalkulacija pojedinog aranžmana OTA npr to zove.
-   * Ovdje se također šalje obavijest i ovdje se “pokupi” pending buffer.
+   * Rekalkulacija pojedinog aranžmana OTA npr to zove. Ovdje se također šalje obavijest i ovdje se
+   * “pokupi” pending buffer.
    */
   public void rekalkulirajZaAranzman(String oznaka, int minPutnika, int maxPutnika) {
     Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(oznaka);
-    if (a == null) return;
+    if (a == null)
+      return;
 
     String stanjePrijeZaObavijest = zadnjeStanjeAranzmana.getOrDefault(oznaka, a.nazivStanja());
     Map<Rezervacija, String> stanjaRezPrije = snapshotStanjaRezervacijaZaJedanAranzman(a);
@@ -116,9 +126,10 @@ public class UpraviteljRezervacijama {
     posaljiObavijestZaAranzman(a, stanjePrijeZaObavijest, stanjaRezPrije);
   }
 
-  //  rekalkulacije bez obavijesti
+  // rekalkulacije bez obavijesti
   private void rekalkulirajZaAranzmanCore(Aranzman a, int minPutnika, int maxPutnika) {
-    if (a == null) return;
+    if (a == null)
+      return;
 
     // sortira kronološki
     List<Rezervacija> sve = new ArrayList<>(a.dohvatiSveRezervacije());
@@ -128,8 +139,10 @@ public class UpraviteljRezervacijama {
     // kandidati za kvotu = oni koji se broje u kvotu (primljena/aktivna/čekanje)
     List<Rezervacija> kandidati = new ArrayList<>();
     for (Rezervacija r : sve) {
-      if (r == null) continue;
-      if (!r.brojiSeUKvotu()) continue; // automatski izbaci otkazane/odgođene/nova
+      if (r == null)
+        continue;
+      if (!r.brojiSeUKvotu())
+        continue; // automatski izbaci otkazane/odgođene/nova
       kandidati.add(r);
     }
 
@@ -160,11 +173,12 @@ public class UpraviteljRezervacijama {
     a.azurirajStanje(brojAktivnih, brojPrijava);
   }
 
-  // Obavijesti 
+  // Obavijesti
   private void posaljiObavijestZaAranzman(Aranzman a, String stanjePrijeZaObavijest,
       Map<Rezervacija, String> stanjaRezPrije) {
 
-    if (a == null) return;
+    if (a == null)
+      return;
 
     String oznaka = a.getOznaka();
     String stanjePoslije = a.nazivStanja();
@@ -184,9 +198,12 @@ public class UpraviteljRezervacijama {
   }
 
   private void posaljiObavijest(Aranzman a, String opisPromjene) {
-    if (a == null) return;
-    if (opisPromjene == null || opisPromjene.isBlank()) return;
-    if (!a.imaPretplata()) return;
+    if (a == null)
+      return;
+    if (opisPromjene == null || opisPromjene.isBlank())
+      return;
+    if (!a.imaPretplata())
+      return;
     a.obavijestiPretplatnike(opisPromjene);
   }
 
@@ -201,8 +218,10 @@ public class UpraviteljRezervacijama {
     }
 
     List<String> sveRezPromjene = new ArrayList<>();
-    if (pending != null && !pending.isEmpty()) sveRezPromjene.addAll(pending);
-    if (promjeneRez != null && !promjeneRez.isEmpty()) sveRezPromjene.addAll(promjeneRez);
+    if (pending != null && !pending.isEmpty())
+      sveRezPromjene.addAll(pending);
+    if (promjeneRez != null && !promjeneRez.isEmpty())
+      sveRezPromjene.addAll(promjeneRez);
 
     if (!sveRezPromjene.isEmpty()) {
       linije.add("Promjene statusa rezervacija: " + sveRezPromjene.size() + ".");
@@ -214,17 +233,22 @@ public class UpraviteljRezervacijama {
 
   private List<String> dohvatiPromjeneRezervacija(Aranzman a, Map<Rezervacija, String> prije) {
     List<String> detalji = new ArrayList<>();
-    if (a == null) return detalji;
+    if (a == null)
+      return detalji;
 
     for (Rezervacija r : a.dohvatiSveRezervacije()) {
-      if (r == null) continue;
+      if (r == null)
+        continue;
 
       String staro = (prije == null) ? null : prije.get(r);
       String novo = r.nazivStanja();
 
-      if (novo == null) continue;
-      if (staro == null) staro = "nova";
-      if (Objects.equals(staro, novo)) continue;
+      if (novo == null)
+        continue;
+      if (staro == null)
+        staro = "nova";
+      if (Objects.equals(staro, novo))
+        continue;
 
       detalji.add(formatPromjenuRezervacije(r, staro, novo));
     }
@@ -236,37 +260,51 @@ public class UpraviteljRezervacijama {
     String osoba = imePrezime(r);
     String dv = FormatDatuma.formatiraj(r.getDatumVrijeme());
     String suf = (dv == null || dv.isBlank()) ? "" : " (" + dv + ")";
-    return osoba + suf + ": " + formatStanjeRezervacije(staro) + " -> " + formatStanjeRezervacije(novo);
+    return osoba + suf + ": " + formatStanjeRezervacije(staro) + " -> "
+        + formatStanjeRezervacije(novo);
   }
 
   private String formatStanjeRezervacije(String naziv) {
-    if (naziv == null) return "";
+    if (naziv == null)
+      return "";
     String u = naziv.trim().toUpperCase();
 
-    if (u.contains("OTKAZ")) return "OTKAZANA";
-    if (u.contains("ODGOĐ") || u.contains("ODGOD")) return "ODGOĐENA";
-    if (u.contains("ČEKANJ") || u.contains("CEKANJ")) return "ČEKANJE";
-    if (u.contains("AKTIV")) return "AKTIVNA";
-    if (u.contains("PRIMLJEN")) return "PRIMLJENA";
-    if (u.contains("NOVA")) return "NOVA";
+    if (u.contains("OTKAZ"))
+      return "OTKAZANA";
+    if (u.contains("ODGOĐ") || u.contains("ODGOD"))
+      return "ODGOĐENA";
+    if (u.contains("ČEKANJ") || u.contains("CEKANJ"))
+      return "ČEKANJE";
+    if (u.contains("AKTIV"))
+      return "AKTIVNA";
+    if (u.contains("PRIMLJEN"))
+      return "PRIMLJENA";
+    if (u.contains("NOVA"))
+      return "NOVA";
 
     return u;
   }
 
   private String formatStanjeAranzmana(String naziv) {
-    if (naziv == null) return "";
+    if (naziv == null)
+      return "";
     String u = naziv.trim().toUpperCase();
 
-    if (u.contains("OTKAZ")) return "OTKAZAN";
-    if (u.contains("POPUNJ")) return "POPUNJEN";
-    if (u.contains("AKTIV")) return "AKTIVAN";
-    if (u.contains("PRIPREM")) return "U PRIPREMI";
+    if (u.contains("OTKAZ"))
+      return "OTKAZAN";
+    if (u.contains("POPUNJ"))
+      return "POPUNJEN";
+    if (u.contains("AKTIV"))
+      return "AKTIVAN";
+    if (u.contains("PRIPREM"))
+      return "U PRIPREMI";
 
     return u;
   }
 
   private void dodajPendingPromjenu(String oznakaAranzmana, String linija) {
-    if (oznakaAranzmana == null || linija == null || linija.isBlank()) return;
+    if (oznakaAranzmana == null || linija == null || linija.isBlank())
+      return;
     pendingPromjeneRez.computeIfAbsent(oznakaAranzmana, k -> new ArrayList<>()).add(linija);
   }
 
@@ -285,7 +323,8 @@ public class UpraviteljRezervacijama {
     Map<Rezervacija, String> m = new IdentityHashMap<>();
     for (Aranzman a : upraviteljAranzmanima.svi()) {
       for (Rezervacija r : a.dohvatiSveRezervacije()) {
-        if (r != null) m.put(r, r.nazivStanja());
+        if (r != null)
+          m.put(r, r.nazivStanja());
       }
     }
     return m;
@@ -293,9 +332,11 @@ public class UpraviteljRezervacijama {
 
   private Map<Rezervacija, String> snapshotStanjaRezervacijaZaJedanAranzman(Aranzman a) {
     Map<Rezervacija, String> m = new IdentityHashMap<>();
-    if (a == null) return m;
+    if (a == null)
+      return m;
     for (Rezervacija r : a.dohvatiSveRezervacije()) {
-      if (r != null) m.put(r, r.nazivStanja());
+      if (r != null)
+        m.put(r, r.nazivStanja());
     }
     return m;
   }
@@ -305,16 +346,19 @@ public class UpraviteljRezervacijama {
     Map<Rezervacija, String> m = new IdentityHashMap<>();
     for (Aranzman a : upraviteljAranzmanima.svi()) {
       for (Rezervacija r : a.dohvatiSveRezervacije()) {
-        if (r != null) m.put(r, r.nazivStanja());
+        if (r != null)
+          m.put(r, r.nazivStanja());
       }
     }
     return m;
   }
 
   private boolean jednako(Map<Rezervacija, String> a, Map<Rezervacija, String> b) {
-    if (a.size() != b.size()) return false;
+    if (a.size() != b.size())
+      return false;
     for (Map.Entry<Rezervacija, String> e : a.entrySet()) {
-      if (!Objects.equals(e.getValue(), b.get(e.getKey()))) return false;
+      if (!Objects.equals(e.getValue(), b.get(e.getKey())))
+        return false;
     }
     return true;
   }
@@ -322,10 +366,12 @@ public class UpraviteljRezervacijama {
 
   /** Provjerava ima li osoba već AKTIVNU rezervaciju za zadani aranžman. */
   public boolean imaAktivnuZa(String ime, String prezime, String oznakaAranzmana) {
-    if (ime == null || prezime == null || oznakaAranzmana == null) return false;
+    if (ime == null || prezime == null || oznakaAranzmana == null)
+      return false;
 
     Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(oznakaAranzmana);
-    if (a == null) return false;
+    if (a == null)
+      return false;
 
     for (Rezervacija r : a.dohvatiSveRezervacije()) {
       if (ime.equalsIgnoreCase(r.getIme()) && prezime.equalsIgnoreCase(r.getPrezime())
@@ -343,21 +389,26 @@ public class UpraviteljRezervacijama {
   public boolean imaAktivnuUPeriodu(String ime, String prezime, String oznakaAranzmana,
       UpraviteljAranzmanima ignoriraj) {
 
-    if (ime == null || prezime == null || oznakaAranzmana == null) return false;
+    if (ime == null || prezime == null || oznakaAranzmana == null)
+      return false;
 
     Aranzman ciljni = upraviteljAranzmanima.pronadiPoOznaci(oznakaAranzmana);
-    if (ciljni == null) return false;
+    if (ciljni == null)
+      return false;
 
     LocalDate ciljniOd = ciljni.getPocetniDatum();
     LocalDate ciljniDo = ciljni.getZavrsniDatum();
-    if (ciljniOd == null || ciljniDo == null) return false;
+    if (ciljniOd == null || ciljniDo == null)
+      return false;
 
     for (Aranzman a : upraviteljAranzmanima.svi()) {
       LocalDate od = a.getPocetniDatum();
       LocalDate d0 = a.getZavrsniDatum();
-      if (od == null || d0 == null) continue;
+      if (od == null || d0 == null)
+        continue;
 
-      if (!preklapaSe(ciljniOd, ciljniDo, od, d0)) continue;
+      if (!preklapaSe(ciljniOd, ciljniDo, od, d0))
+        continue;
 
       for (Rezervacija r : a.dohvatiSveRezervacije()) {
         if (ime.equalsIgnoreCase(r.getIme()) && prezime.equalsIgnoreCase(r.getPrezime())
@@ -370,23 +421,26 @@ public class UpraviteljRezervacijama {
   }
 
   private boolean preklapaSe(LocalDate od1, LocalDate do1, LocalDate od2, LocalDate do2) {
-    if (do1.isBefore(od2) || do2.isBefore(od1)) return false;
+    if (do1.isBefore(od2) || do2.isBefore(od1))
+      return false;
     return true;
   }
 
   /**
-   * Otkazuje rezervaciju osobe za zadani aranžman
-   * Ovdje se samo zabilježi promjena u pending buffer (bez slanja obavijesti),
-   * a obavijest se šalje kod rekalkulacije 
+   * Otkazuje rezervaciju osobe za zadani aranžman Ovdje se samo zabilježi promjena u pending buffer
+   * (bez slanja obavijesti), a obavijest se šalje kod rekalkulacije
    */
   public boolean otkaziRezervaciju(String ime, String prezime, String oznakaAranzmana) {
-    if (ime == null || prezime == null || oznakaAranzmana == null) return false;
+    if (ime == null || prezime == null || oznakaAranzmana == null)
+      return false;
 
     Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(oznakaAranzmana);
-    if (a == null) return false;
+    if (a == null)
+      return false;
 
     List<Rezervacija> kandidati = dohvatiKandidateZaOtkazivanje(a, ime, prezime, oznakaAranzmana);
-    if (kandidati.isEmpty()) return false;
+    if (kandidati.isEmpty())
+      return false;
 
     kandidati.sort(Comparator.comparing(Rezervacija::getDatumVrijeme,
         Comparator.nullsLast(Comparator.naturalOrder())));
@@ -398,21 +452,23 @@ public class UpraviteljRezervacijama {
 
     for (Rezervacija r : kandidati) {
       if (r.getStanje() instanceof StanjeAktivnaRezervacija) {
-        if (aktivna == null) aktivna = r;
+        if (aktivna == null)
+          aktivna = r;
       } else if (r.getStanje() instanceof StanjePrimljenaRezervacija) {
-        if (primljena == null) primljena = r;
+        if (primljena == null)
+          primljena = r;
       } else if (r.getStanje() instanceof StanjeNaCekanjuRezervacija) {
-        if (cekanje == null) cekanje = r;
+        if (cekanje == null)
+          cekanje = r;
       } else if (jeOdgodena(r)) {
-        if (odgodena == null) odgodena = r;
+        if (odgodena == null)
+          odgodena = r;
       }
     }
 
     Rezervacija zaOtkazati = (aktivna != null) ? aktivna
         : (primljena != null) ? primljena
-        : (cekanje != null) ? cekanje
-        : (odgodena != null) ? odgodena
-        : kandidati.get(0);
+            : (cekanje != null) ? cekanje : (odgodena != null) ? odgodena : kandidati.get(0);
 
     String prije = zaOtkazati.nazivStanja();
     zaOtkazati.otkazi(LocalDateTime.now());
@@ -429,14 +485,16 @@ public class UpraviteljRezervacijama {
 
     List<Rezervacija> kandidati = new ArrayList<>();
     for (Rezervacija r : a.dohvatiSveRezervacije()) {
-      if (r == null) continue;
+      if (r == null)
+        continue;
 
-      boolean isti = ime.equalsIgnoreCase(r.getIme())
-          && prezime.equalsIgnoreCase(r.getPrezime())
+      boolean isti = ime.equalsIgnoreCase(r.getIme()) && prezime.equalsIgnoreCase(r.getPrezime())
           && oznakaAranzmana.equalsIgnoreCase(r.getOznakaAranzmana());
 
-      if (!isti) continue;
-      if (r.getStanje() instanceof StanjeOtkazanaRezervacija) continue;
+      if (!isti)
+        continue;
+      if (r.getStanje() instanceof StanjeOtkazanaRezervacija)
+        continue;
 
       kandidati.add(r);
     }
@@ -444,9 +502,11 @@ public class UpraviteljRezervacijama {
   }
 
   private boolean jeOdgodena(Rezervacija r) {
-    if (r == null) return false;
+    if (r == null)
+      return false;
     String ns = r.nazivStanja();
-    if (ns == null) return false;
+    if (ns == null)
+      return false;
     String u = ns.toUpperCase();
     return u.contains("ODGOĐ") || u.contains("ODGOD");
   }
@@ -454,7 +514,8 @@ public class UpraviteljRezervacijama {
   /** Vraća rezervacije za aranžman uz filtriranje po vrstama */
   public List<Rezervacija> dohvatiZaAranzmanIVrste(String oznaka, String vrste) {
     Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(oznaka);
-    if (a == null) return List.of();
+    if (a == null)
+      return List.of();
 
     String filter = (vrste == null) ? "" : vrste.toUpperCase();
 
@@ -478,19 +539,26 @@ public class UpraviteljRezervacijama {
 
       boolean pripada = false;
 
-      if (fP && u.contains("PRIMLJEN")) pripada = true;
-      if (fA && u.contains("AKTIV")) pripada = true;
-      if (fC && (u.contains("ČEKANJ") || u.contains("CEKANJ"))) pripada = true;
-      if (fO && u.contains("OTKAZ")) pripada = true;
-      if (fD && (u.contains("ODGOĐ") || u.contains("ODGOD"))) pripada = true;
+      if (fP && u.contains("PRIMLJEN"))
+        pripada = true;
+      if (fA && u.contains("AKTIV"))
+        pripada = true;
+      if (fC && (u.contains("ČEKANJ") || u.contains("CEKANJ")))
+        pripada = true;
+      if (fO && u.contains("OTKAZ"))
+        pripada = true;
+      if (fD && (u.contains("ODGOĐ") || u.contains("ODGOD")))
+        pripada = true;
 
-      if (pripada) rezultat.add(r);
+      if (pripada)
+        rezultat.add(r);
     }
 
     rezultat.sort(Comparator.comparing(Rezervacija::getDatumVrijeme,
         Comparator.nullsLast(Comparator.naturalOrder())));
 
-    if (KontekstIspisa.jeObrnuto()) Collections.reverse(rezultat);
+    if (KontekstIspisa.jeObrnuto())
+      Collections.reverse(rezultat);
 
     return rezultat;
   }
@@ -498,7 +566,8 @@ public class UpraviteljRezervacijama {
   /** Vraća sve rezervacije za zadanu osobu, preko svih aranžmana. */
   public List<Rezervacija> dohvatiZaOsobu(String ime, String prezime) {
     List<Rezervacija> rezultat = new ArrayList<>();
-    if (ime == null || prezime == null) return rezultat;
+    if (ime == null || prezime == null)
+      return rezultat;
 
     for (Aranzman a : upraviteljAranzmanima.svi()) {
       for (Rezervacija r : a.dohvatiSveRezervacije()) {
@@ -511,7 +580,8 @@ public class UpraviteljRezervacijama {
     rezultat.sort(Comparator.comparing(Rezervacija::getDatumVrijeme,
         Comparator.nullsLast(Comparator.naturalOrder())));
 
-    if (KontekstIspisa.jeObrnuto()) Collections.reverse(rezultat);
+    if (KontekstIspisa.jeObrnuto())
+      Collections.reverse(rezultat);
 
     return rezultat;
   }
@@ -550,23 +620,26 @@ public class UpraviteljRezervacijama {
     }
 
     Aranzman a = upraviteljAranzmanima.pronadiPoOznaci(oznakaAranzmana);
-    if (a == null) return false;
+    if (a == null)
+      return false;
 
     for (Rezervacija r : a.dohvatiSveRezervacije()) {
-      if (r == null) continue;
+      if (r == null)
+        continue;
 
-      boolean isti = ime.equalsIgnoreCase(r.getIme())
-          && prezime.equalsIgnoreCase(r.getPrezime())
+      boolean isti = ime.equalsIgnoreCase(r.getIme()) && prezime.equalsIgnoreCase(r.getPrezime())
           && oznakaAranzmana.equalsIgnoreCase(r.getOznakaAranzmana())
           && datumVrijeme.equals(r.getDatumVrijeme());
 
-      if (isti) return true;
+      if (isti)
+        return true;
     }
     return false;
   }
 
   public boolean dodajAkoNePostoji(Rezervacija r) {
-    if (r == null) return false;
+    if (r == null)
+      return false;
 
     if (postojiIdenticna(r.getIme(), r.getPrezime(), r.getOznakaAranzmana(), r.getDatumVrijeme())) {
       return false;
@@ -577,7 +650,8 @@ public class UpraviteljRezervacijama {
   }
 
   private String imePrezime(Rezervacija r) {
-    if (r == null) return "";
+    if (r == null)
+      return "";
     String i = (r.getIme() == null) ? "" : r.getIme().trim();
     String p = (r.getPrezime() == null) ? "" : r.getPrezime().trim();
     return (i + " " + p).trim();

@@ -5,4 +5,3 @@ interface HandlerUnosa {
 
   void obradi(UnosKontekst ctx);
 }
-

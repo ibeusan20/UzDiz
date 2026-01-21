@@ -24,4 +24,3 @@ final class TokenizacijaHandler extends ApstraktniHandlerUnosa {
     }
   }
 }
-

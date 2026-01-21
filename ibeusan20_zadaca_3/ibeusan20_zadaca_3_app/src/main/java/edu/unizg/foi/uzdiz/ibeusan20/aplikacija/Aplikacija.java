@@ -34,6 +34,7 @@ public class Aplikacija {
    * <ul>
    * <li><code>--ta &lt;datoteka_aranzmana&gt;</code></li>
    * <li><code>--rta &lt;datoteka_rezervacija&gt;</code></li>
+   * <li><code>potencijalno --jdr ili --vdr</code></li>
    * </ul>
    *
    * @param args argumenti komandne linije
@@ -115,7 +116,6 @@ public class Aplikacija {
       }
 
       // upravitelji
-      
       UpraviteljAranzmanima uprAranz = new UpraviteljAranzmanima(aranzmani);
 
       TvornicaStrategijeOgranicenja tvornica = new TvornicaStrategijeOgranicenja();
@@ -124,7 +124,7 @@ public class Aplikacija {
 
       UpraviteljRezervacijama uprRez = new UpraviteljRezervacijama(uprAranz, strategija);
 
-      
+
       // popunjavanje Composite strukture (aranžman -> rezervacije)
       uprRez.dodajPocetne(rezervacije);
       uprRez.rekalkulirajSve();

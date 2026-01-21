@@ -26,10 +26,10 @@ public class KomandaVstar implements Komanda {
     }
 
     String oznaka = argumenti[0];
-    
+
     ispis.ispisi("VSTAR " + oznaka);
 
-    //  ne tražimo u listi, nego vraćamo iz spremišta
+    // ne traži u listi, nego vraća iz spremišta
     AranzmanMemento m = SpremisteAranzmana.instanca().zadnji(oznaka);
     if (m == null) {
       ispis.ispisi("Nema spremljenog stanja za aranžman '" + oznaka + "'.");

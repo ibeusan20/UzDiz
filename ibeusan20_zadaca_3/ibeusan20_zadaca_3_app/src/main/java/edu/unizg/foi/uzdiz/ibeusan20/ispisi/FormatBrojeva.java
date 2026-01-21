@@ -110,7 +110,7 @@ public final class FormatBrojeva {
 
     try {
       // Podržava ulaz koji možda dođe kao "4100,00" ili "4.100,00"
-      // ali izlaz uvijek s točkama.
+      // izlaz uvijek s točkama.
       if (t.contains(".") && t.contains(",")) {
         // "4.100,00" -> "4100.00"
         t = t.replace(".", "").replace(",", ".");

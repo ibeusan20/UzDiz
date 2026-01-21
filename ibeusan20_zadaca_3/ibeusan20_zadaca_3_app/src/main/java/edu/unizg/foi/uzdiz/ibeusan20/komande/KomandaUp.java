@@ -143,5 +143,4 @@ public class KomandaUp implements Komanda {
       ispis.ispisi("Preskočeno (nepoznat aranžman): " + preskocenoNepoznatiAranzman);
     }
   }
-
 }

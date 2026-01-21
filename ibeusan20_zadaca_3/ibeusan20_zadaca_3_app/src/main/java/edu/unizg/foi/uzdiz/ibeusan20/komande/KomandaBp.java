@@ -14,10 +14,6 @@ import edu.unizg.foi.uzdiz.ibeusan20.logika.UpraviteljRezervacijama;
  * <li>{@code BP A} – fizičko brisanje svih aranžmana</li>
  * <li>{@code BP R} – fizičko brisanje svih rezervacija</li>
  * </ul>
- * <p>
- * U klasi postoje i pomoćne metode za “logičko brisanje” (otkazivanje) koje su prije korištene za
- * testiranje, ali u trenutnoj izvedbi {@link #izvrsi()} koristi fizičko brisanje.
- * </p>
  */
 public class KomandaBp implements Komanda {
 

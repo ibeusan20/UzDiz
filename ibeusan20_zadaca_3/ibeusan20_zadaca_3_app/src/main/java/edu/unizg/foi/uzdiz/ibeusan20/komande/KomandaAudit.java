@@ -83,7 +83,7 @@ public class KomandaAudit implements Komanda {
       redovi.add(new IspisAuditAdapter(s));
     tab.ispisiTablicu(komandaTekst, nazivTablice, redovi);
 
-    // sažetak po komandi (ukupno u dnevniku, ne samo prikazani)
+    // sažetak po komandi, ukupno u dnevniku a ne samo prikazan
     List<AuditStavka> sve = AuditDnevnik.instanca().sve();
     ispisiZbroj(tab, "AUDIT - Sažetak po komandi (ukupno)", sve);
   }
@@ -124,5 +124,4 @@ public class KomandaAudit implements Komanda {
     String[] dijelovi = t.split("\\s+");
     return (dijelovi.length == 0) ? "?" : dijelovi[0].toUpperCase();
   }
-
 }
