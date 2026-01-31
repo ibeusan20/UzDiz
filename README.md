@@ -10,6 +10,4 @@ ili jednostavno pokretanje:
 
 
 
-Vjezba 1-8 - Kolegij Napredne web tehnologije i servisi 2024./2025.
-
 TODO: dodati detaljniji opis
