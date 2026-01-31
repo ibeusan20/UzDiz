@@ -8,6 +8,6 @@ Pokretanje: izvršiti "mvn clean install" u korijenu projekta i "java -jar /home
 ili jednostavno pokretanje:
 ./run_file.sh u UzDiz_helper/DZX_pokretanje
 
-
+Više informacija na wiki.
 
 TODO: dodati detaljniji opis
