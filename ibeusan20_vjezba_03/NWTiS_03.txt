@@ -1,3 +1,0 @@
-maksDubina=10
-pauzaDretve=3000
-maksDretvi=20

@@ -1,2 +1,0 @@
-mreznaVrataRegistracija=8000
-partner=1
