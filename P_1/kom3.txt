@@ -1,0 +1,99 @@
+-------------------------------------------------spemanje3
+PSTAR 3
+-------------------------------------------------aspect5
+ITAK
+-------------------------------------------------aspect6
+ITAK 01.01.2026. 31.01.2026.
+-------------------------------------------------aspect7
+ITAP
+ITAP 99
+ITAP
+ITAP 3
+-------------------------------------------------aspect8
+IRTA 2 PA
+IRTA 2 ODO
+IRTA ODPAČO
+IRTA 2 PAŽO
+IRTA 3 PAČODO
+-------------------------------------------------aspect9
+IRO Ema Grgić
+IRO Ema Maja Grgić
+IRO
+-------------------------------------------------aspect10
+ORTA Karlo Novak 1
+ORTA Karlo Novak 2
+ORTA Karlo Novak
+ORTA
+-------------------------------------------------aspect11
+DRTA Damir Zurub 1 22.01.2026 09:00:00
+DRTA Damir Zurub 1
+DRTA Damir Zurub
+DRTA
+-------------------------------------------------aspect12
+OTA 3
+OTA 99
+OTA
+--------------------------------------------------vracanje3
+VSTAR 3
+-------------------------------------------------aspect13
+ITAK
+IP N
+ITAK
+IP
+-------------------------------------------------aspect14
+ITAK
+IP S
+ITAK
+IP
+-------------------------------------------------aspect15
+ITAS
+-------------------------------------------------aspect16
+ITAS 1.10.2025. 2.10.2025.
+ITAS 01.10.2025. 02.10.2025.
+-------------------------------------------------aspect17
+PPTAR A skijanje
+PPTAR A Davos
+PPTAR A
+-------------------------------------------------aspect18
+PPTAR R Kovač
+PPTAR R Donald
+PPTAR R
+-------------------------------------------------aspect19
+PTAR Dalibor Andres 3
+PTAR Anton Prekalj
+ORTA Luka Buljan 3
+DRTA Damir Zurub 3 22.01.2026 09:10:00
+-------------------------------------------------aspect20
+PSTAR 3
+OTA 3
+IRTA 3 PAČO
+-------------------------------------------------aspect21
+IRTA 3 PAČO
+VSTAR 3
+IRTA 3 PAČO
+-------------------------------------------------aspect22
+UPTAR Dalibor Andres 3
+UPTAR Dalibor Andres 4
+UPTAR Anton Prekalj
+-------------------------------------------------aspect23
+ITAK
+UP A DZ_3_aranzmani_3.csv
+ITAK
+UP A DZ_3_aranzmani_3_1.csv
+-------------------------------------------------aspect24
+IRTA 8 PAČO
+UP R DZ_3_rezervacije_3.1.csv
+IRTA 8 PAČO
+-------------------------------------------------aspect25
+IRTA 8 PAČO
+BP R
+IRTA 8 PAČO
+-------------------------------------------------aspect26
+ITAK
+BP A
+ITAK
+IRTA 1 PAČO
+-------------------------------------------------DEKORATOR-VLASTITO
+AUDIT 10
+AUDIT
+Q

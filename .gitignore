@@ -4,4 +4,10 @@
 *.tar.gz
 *.jar
 /.metadata/
+
+# sve vježbe i njihove upute
 /ibeusan20_vjezba*/
+/komandeNWTiS.txt
+
+# ne prati ovaj folder (ima razmake u nazivu)
+/libraries/EclipseLink 4.0.2/eclipselink/
