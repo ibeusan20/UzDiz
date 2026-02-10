@@ -12,3 +12,5 @@ Jednostavno pokretanje:
 (run_file.sh nije nužno točan naziv)
 
 P_1 direktorij se koristi za pokretanje zadaće (run_file.sh)
+
+<img width="2781" height="2022" alt="dz3 drawio" src="https://github.com/ibeusan20/UzDiz/blob/master/dz3.drawio.png" />
